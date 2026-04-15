@@ -1,0 +1,21 @@
+{
+  "title": "System Health Dashboard",
+  "panels": [
+    {
+      "name": "Request Volume",
+      "metric": "requests_total"
+    },
+    {
+      "name": "Latency P95",
+      "metric": "prediction_latency_ms_p95"
+    },
+    {
+      "name": "Error Rate",
+      "metric": "error_rate"
+    },
+    {
+      "name": "Healthy Predictions",
+      "metric": "healthy_predictions"
+    }
+  ]
+}

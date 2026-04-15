@@ -1,0 +1,14 @@
+{
+  "fintech": [
+    "Audit logging",
+    "Data encryption in transit",
+    "Role-based access control",
+    "Incident response workflow"
+  ],
+  "healthcare": [
+    "PHI handling controls",
+    "Access logging",
+    "Least-privilege service access",
+    "Availability monitoring"
+  ]
+}

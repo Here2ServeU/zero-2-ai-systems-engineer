@@ -1,0 +1,5 @@
+{
+  "development": "model-v1",
+  "staging": "model-v1",
+  "production": "model-v0"
+}
