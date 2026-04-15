@@ -88,19 +88,19 @@ Chapter `4` was not included in the materials, so this plan skips it and keeps m
 
 ## Course Structure
 
-- `week-01-foundations/`
-- `week-02-regulated-environments/`
-- `week-03-serving-models-via-apis/`
-- `week-04-containerization-with-docker/`
-- `week-05-infrastructure-as-code-terraform/`
-- `week-06-cloud-deployment/`
-- `week-07-ci-cd-for-mlops/`
-- `week-08-kubernetes-and-orchestration/`
-- `week-09-observability-and-monitoring/`
-- `week-10-aiops/`
-- `week-11-advanced-ci-cd-and-retraining-pipelines/`
-- `week-12-advanced-deployment-and-model-promotion/`
-- `week-13-observability-deep-dive-and-dashboards/`
+- `course/week-01-foundations/`
+- `course/week-02-regulated-environments/`
+- `course/week-03-serving-models-via-apis/`
+- `course/week-04-containerization-with-docker/`
+- `course/week-05-infrastructure-as-code-terraform/`
+- `course/week-06-cloud-deployment/`
+- `course/week-07-ci-cd-for-mlops/`
+- `course/week-08-kubernetes-and-orchestration/`
+- `course/week-09-observability-and-monitoring/`
+- `course/week-10-aiops/`
+- `course/week-11-advanced-ci-cd-and-retraining-pipelines/`
+- `course/week-12-advanced-deployment-and-model-promotion/`
+- `course/week-13-observability-deep-dive-and-dashboards/`
 
 Each week follows the same pattern:
 
@@ -112,6 +112,6 @@ Each week follows the same pattern:
 
 ## Mapped Assets
 
-- Week 5 contains Terraform assets in `week-05-infrastructure-as-code-terraform/terraform/`
-- Week 8 contains Kubernetes and Helm assets in `week-08-kubernetes-and-orchestration/kubernetes/`
-- Week 13 contains dashboards in `week-13-observability-deep-dive-and-dashboards/dashboards/`
+- Week 5 contains Terraform assets in `course/week-05-infrastructure-as-code-terraform/terraform/`
+- Week 8 contains Kubernetes and Helm assets in `course/week-08-kubernetes-and-orchestration/kubernetes/`
+- Week 13 contains dashboards in `course/week-13-observability-deep-dive-and-dashboards/dashboards/`

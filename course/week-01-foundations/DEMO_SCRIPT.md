@@ -8,8 +8,8 @@
 
 Open VS Code and show:
 
-- `week-01-foundations/data/system_metrics.csv`
-- `week-01-foundations/src/train_model.py`
+- `course/week-01-foundations/data/system_metrics.csv`
+- `course/week-01-foundations/src/train_model.py`
 
 Explain:
 
@@ -23,7 +23,7 @@ Run:
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-python3 week-01-foundations/src/train_model.py
+python3 course/week-01-foundations/src/train_model.py
 ```
 
 Explain the output and highlight the prediction result.

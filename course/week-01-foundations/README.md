@@ -30,7 +30,7 @@ A working ML model that predicts system health conditions.
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-python3 week-01-foundations/src/train_model.py
+python3 course/week-01-foundations/src/train_model.py
 ```
 
 ## Deployment Path
