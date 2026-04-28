@@ -1,108 +1,117 @@
 # Project Weeks Roadmap
 
-This roadmap organizes the provided chapters into a practical weekly build sequence for the NAWEX Production AI Systems Platform.
+This roadmap maps the chapters of *Zero 2 AI Systems Engineer* to the week-by-week build sequence in this repository. Every chapter from 1 to 18 has a corresponding week, plus the capstone.
 
-## Note
+## Week 1 — Foundations of Production AI Systems
 
-The source set provided includes Chapters `1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15`.
-
-Chapter `4` was not included in the materials, so this plan skips it and keeps momentum on the implementation path.
-
-## Week 1 - Foundations of Production AI Systems
-
-- Chapters: `1` and `2`
+- Chapters: `1`, `2`
 - Focus: production AI mindset, system thinking, MLOps + DevOps + AIOps foundations
-- Project outcome: baseline repository, Week 1 dataset, first system health prediction model
+- Outcome: baseline repository, system health prediction model
 
-## Week 2 - AI in Regulated Environments
+## Week 2 — AI in Regulated Environments
 
 - Chapter: `3`
-- Focus: FinTech and Healthcare constraints, compliance-aware system design, reliability expectations
-- Project outcome: document risk, governance, and environment assumptions for both verticals
+- Focus: FinTech and Healthcare constraints, compliance-aware system design
+- Outcome: documented risk, governance, and environment assumptions for both verticals
 
-## Week 3 - Serving Models via APIs
+## Week 3 — Classical ML and Experiment Tracking with MLflow
+
+- Chapter: `4`
+- Focus: train fraud detection and anomaly detection models; track every run in MLflow
+- Outcome: reproducible model artifacts plus MLflow run history
+
+## Week 4 — Serving Models via APIs
 
 - Chapter: `5`
-- Focus: expose the Week 1 model through a Flask or FastAPI service
-- Project outcome: prediction API with `/predict` and `/health` endpoints
+- Focus: expose the Week 3 models through a Flask service
+- Outcome: prediction API with `/predict` and `/health` endpoints
 
-## Week 4 - Containerization with Docker
+## Week 5 — Containerization with Docker
 
 - Chapter: `6`
 - Focus: package the API as a container
-- Project outcome: `Dockerfile`, container run instructions, local image build workflow
+- Outcome: `Dockerfile`, container run instructions, local image build workflow
 
-## Week 5 - Infrastructure as Code with Terraform
+## Week 6 — Infrastructure as Code with Terraform
 
 - Chapter: `7`
 - Focus: define cloud infrastructure as code
-- Project outcome: initial Terraform modules for networking, compute, and deployment support
+- Outcome: Terraform modules for networking, compute, and deployment support
 
-## Week 6 - Cloud Deployment
+## Week 7 — Cloud Deployment
 
 - Chapter: `8`
 - Focus: deploy the application stack to AWS
-- Project outcome: cloud deployment plan for the API and supporting infrastructure
+- Outcome: cloud deployment plan for the API and supporting infrastructure
 
-## Week 7 - CI/CD for MLOps
+## Week 8 — CI/CD for MLOps
 
 - Chapter: `9`
 - Focus: automate testing, packaging, and deployment workflows
-- Project outcome: CI pipeline for linting, dependency install, model script validation, and image build
+- Outcome: CI pipeline for linting, dependency install, model validation, image build
 
-## Week 8 - Kubernetes and Orchestration
+## Week 9 — Kubernetes and Orchestration
 
 - Chapter: `10`
-- Focus: orchestration, scaling, resilience, and service exposure
-- Project outcome: Kubernetes manifests and Helm-based deployment path
+- Focus: orchestration, scaling, resilience, service exposure
+- Outcome: Kubernetes manifests and Helm-based deployment path
 
-## Week 9 - Observability and Monitoring
+## Week 10 — Observability and Monitoring
 
 - Chapter: `11`
-- Focus: metrics, health checks, logging, and monitoring design
-- Project outcome: observability baseline with Prometheus and Grafana integration points
+- Focus: metrics, health checks, logging, monitoring design
+- Outcome: observability baseline with Prometheus and Grafana integration
 
-## Week 10 - AIOps
+## Week 11 — AIOps
 
 - Chapter: `12`
-- Focus: intelligent operations, anomaly detection, alerting signals, and operational automation
-- Project outcome: initial AIOps use case for system health anomaly detection
+- Focus: intelligent operations, anomaly detection, alerting signals
+- Outcome: initial AIOps use case for system health anomaly detection
 
-## Week 11 - Advanced CI/CD and Retraining Pipelines
+## Week 12 — Advanced CI/CD and Retraining Pipelines
 
 - Chapter: `13`
-- Focus: retraining workflows, scheduled jobs, and model lifecycle automation
-- Project outcome: retraining pipeline design for continuous improvement
+- Focus: retraining workflows, scheduled jobs, model lifecycle automation
+- Outcome: retraining pipeline triggered by drift signals
 
-## Week 12 - Advanced Deployment and Model Promotion
+## Week 13 — Advanced Deployment and Model Promotion
 
 - Chapter: `14`
-- Focus: model versioning, promotion strategy, rollback planning, and release controls
-- Project outcome: staged deployment strategy for development, staging, and production
+- Focus: model versioning, canary and blue-green deployment, rollback planning
+- Outcome: staged deployment strategy for development, staging, and production
 
-## Week 13 - Observability Deep Dive and Dashboards
+## Week 14 — Observability Deep Dive and Dashboards
 
 - Chapter: `15`
-- Focus: dashboards, deep metrics visibility, and decision-ready reporting
-- Project outcome: platform dashboard plan for API, model, infrastructure, and operations views
+- Focus: dashboards, deep metrics visibility, decision-ready reporting
+- Outcome: platform dashboards covering API, model, infrastructure, operations
+
+## Week 15 — LLM-Powered Customer Service with Claude
+
+- Chapter: `16`
+- Focus: integrate Anthropic Claude behind production-grade controls
+- Outcome: chat endpoint with structured logging, prompt versioning, recorded-response tests
+
+## Week 16 — RAG Pipeline with ChromaDB
+
+- Chapter: `17`
+- Focus: ground the LLM in a private knowledge base via retrieval-augmented generation
+- Outcome: ingestion script, persistent ChromaDB collection, RAG-augmented chat endpoint
+
+## Week 17 — Production LLM Systems
+
+- Chapter: `18`
+- Focus: prompt caching, evaluation harness, output validation, cost guardrails, fallbacks, PII handling
+- Outcome: hardened LLM platform fit for production operation
+
+## Capstone — Nawex AI Reliability Platform
+
+- See [capstone-nawex-ai-reliability-platform/README.md](capstone-nawex-ai-reliability-platform/README.md)
+- Wires all 8 layers and 15 milestones into one runnable platform
 
 ## Course Structure
 
-- `course/week-01-foundations/`
-- `course/week-02-regulated-environments/`
-- `course/week-03-serving-models-via-apis/`
-- `course/week-04-containerization-with-docker/`
-- `course/week-05-infrastructure-as-code-terraform/`
-- `course/week-06-cloud-deployment/`
-- `course/week-07-ci-cd-for-mlops/`
-- `course/week-08-kubernetes-and-orchestration/`
-- `course/week-09-observability-and-monitoring/`
-- `course/week-10-aiops/`
-- `course/week-11-advanced-ci-cd-and-retraining-pipelines/`
-- `course/week-12-advanced-deployment-and-model-promotion/`
-- `course/week-13-observability-deep-dive-and-dashboards/`
-
-Each week follows the same pattern:
+Every week folder follows the same pattern:
 
 - `lab/` hands-on implementation
 - `data/` datasets or sample inputs
@@ -112,6 +121,7 @@ Each week follows the same pattern:
 
 ## Mapped Assets
 
-- Week 5 contains Terraform assets in `course/week-05-infrastructure-as-code-terraform/terraform/`
-- Week 8 contains Kubernetes and Helm assets in `course/week-08-kubernetes-and-orchestration/kubernetes/`
-- Week 13 contains dashboards in `course/week-13-observability-deep-dive-and-dashboards/dashboards/`
+- Week 6 contains Terraform assets in `course/week-06-infrastructure-as-code-terraform/terraform/`
+- Week 9 contains Kubernetes and Helm assets in `course/week-09-kubernetes-and-orchestration/kubernetes/`
+- Week 14 contains dashboards in `course/week-14-observability-deep-dive-and-dashboards/dashboards/`
+- Week 16 persists vector embeddings in `course/week-16-rag-pipeline/chroma/`

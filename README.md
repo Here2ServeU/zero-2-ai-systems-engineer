@@ -1,66 +1,71 @@
-# NAWEX Production AI Systems Platform
+# Zero 2 AI Systems Engineer
 
-This repository documents my journey building production-grade AI systems across FinTech and Healthcare.
+The companion repository to *Zero 2 AI Systems Engineer: The Complete Beginner's Playbook* by Rev. Emmanuel Naweji (T2S Mentorship Program, 2026).
+
+This repo contains the working codebase for the book's capstone project — the **Nawex AI Reliability Platform** — built up week by week across all 8 layers.
+
+## The 8 Layers
+
+1. **Foundation & Mindset** — Weeks 1, 2 (Chapters 1, 2, 3)
+2. **Data & Models** — Week 3 (Chapter 4)
+3. **APIs & Containers** — Weeks 4, 5 (Chapters 5, 6)
+4. **Cloud Infrastructure** — Weeks 6, 7 (Chapters 7, 8)
+5. **Automation & Orchestration** — Weeks 8, 9 (Chapters 9, 10)
+6. **Observability & Operations** — Weeks 10, 11 (Chapters 11, 12)
+7. **Continuous Delivery & Safe Deployment** — Weeks 12, 13, 14 (Chapters 13, 14, 15)
+8. **Modern AI · LLMs & RAG** — Weeks 15, 16, 17 (Chapters 16, 17, 18)
+9. **Capstone** — Nawex AI Reliability Platform (15 milestones)
 
 ## What I Am Building
 
-- Fraud detection system (FinTech)
-- Healthcare anomaly detection system
-- ML APIs (Flask/FastAPI)
+- Fraud detection model (FinTech) with MLflow experiment tracking
+- Healthcare anomaly detection model
+- Flask APIs for model serving
 - Dockerized services
-- Terraform infrastructure
-- Kubernetes deployment (EKS)
-- Helm charts for Kubernetes packaging
-- Monitoring and AIOps (Prometheus, Grafana)
+- Terraform infrastructure on AWS
+- Kubernetes deployment with Helm
+- Prometheus + Grafana monitoring
+- AIOps for predictive operations
+- Automated retraining on drift
+- Canary and blue-green safe deployment
+- LLM customer-service feature with Anthropic Claude
+- RAG pipeline grounded in a private knowledge base via ChromaDB
 
-## Architecture
+## Repository Layout
 
-Data -> Model -> API -> Infrastructure -> Monitoring -> Automation
+```
+course/                      # Week-by-week implementation
+  week-01-foundations/
+  week-02-regulated-environments/
+  week-03-classical-ml-and-mlflow/
+  week-04-serving-models-via-apis/
+  week-05-containerization-with-docker/
+  week-06-infrastructure-as-code-terraform/
+  week-07-cloud-deployment/
+  week-08-ci-cd-for-mlops/
+  week-09-kubernetes-and-orchestration/
+  week-10-observability-and-monitoring/
+  week-11-aiops/
+  week-12-advanced-ci-cd-and-retraining-pipelines/
+  week-13-advanced-deployment-and-model-promotion/
+  week-14-observability-deep-dive-and-dashboards/
+  week-15-llm-customer-service/
+  week-16-rag-pipeline/
+  week-17-production-llm-systems/
+capstone-nawex-ai-reliability-platform/   # All 8 layers wired together
+fintech/                     # FinTech vertical notes
+healthcare/                  # Healthcare vertical notes
+```
 
-## Weekly Progress
-
-- `course/week-01-foundations`
-- `course/week-02-regulated-environments`
-- `course/week-03-serving-models-via-apis`
-- `course/week-04-containerization-with-docker`
-- `course/week-05-infrastructure-as-code-terraform`
-- `course/week-06-cloud-deployment`
-- `course/week-07-ci-cd-for-mlops`
-- `course/week-08-kubernetes-and-orchestration`
-- `course/week-09-observability-and-monitoring`
-- `course/week-10-aiops`
-- `course/week-11-advanced-ci-cd-and-retraining-pipelines`
-- `course/week-12-advanced-deployment-and-model-promotion`
-- `course/week-13-observability-deep-dive-and-dashboards`
-
-## Goal
-
-To become a top-tier AI Systems Engineer capable of designing, deploying, and operating production AI platforms.
-
-## Deployment Assets
-
-- Terraform infrastructure under `course/week-05-infrastructure-as-code-terraform/terraform/`
-- Kubernetes and Helm deployment assets under `course/week-08-kubernetes-and-orchestration/kubernetes/`
-- Dashboards under `course/week-13-observability-deep-dive-and-dashboards/dashboards/`
-- Full chapter-to-week roadmap in `PROJECT_WEEKS.md`
-- Full course index in `COURSE_INDEX.md`
-
-## Course Layout
-
-Each week is organized as its own module with:
-
-- `lab/`
-- `data/`
-- `notebooks/`
-- `src/`
-- `README.md`
+Each week follows the same pattern: `README.md`, `src/`, `data/` (where applicable), and supporting infrastructure assets.
 
 ## Start Here
 
-- Course folder: [course/README.md](/Users/emmanuelnaweji/nawex-mlops-aiops-plaftorm/course/README.md)
-- Course index: [COURSE_INDEX.md](/Users/emmanuelnaweji/nawex-mlops-aiops-plaftorm/COURSE_INDEX.md)
-- Weekly roadmap: [PROJECT_WEEKS.md](/Users/emmanuelnaweji/nawex-mlops-aiops-plaftorm/PROJECT_WEEKS.md)
-- Current implemented lab: [week-01-foundations](/Users/emmanuelnaweji/nawex-mlops-aiops-plaftorm/course/week-01-foundations/README.md)
+- [course/README.md](course/README.md) — week-by-week overview
+- [COURSE_INDEX.md](COURSE_INDEX.md) — full course index
+- [PROJECT_WEEKS.md](PROJECT_WEEKS.md) — chapter-to-week roadmap
+- [course/week-01-foundations/README.md](course/week-01-foundations/README.md) — first lab
+- [capstone-nawex-ai-reliability-platform/README.md](capstone-nawex-ai-reliability-platform/README.md) — capstone milestones
 
 ## Local Setup
 
@@ -70,3 +75,13 @@ source .venv/bin/activate
 pip install -r requirements.txt
 python3 course/week-01-foundations/src/train_model.py
 ```
+
+For the LLM and RAG weeks (15-17), you also need an Anthropic API key:
+
+```bash
+export ANTHROPIC_API_KEY=...
+```
+
+## Goal
+
+To become a top-tier AI Systems Engineer capable of designing, deploying, and operating production AI platforms across classical ML, MLOps, AIOps, large language models, and retrieval-augmented generation.

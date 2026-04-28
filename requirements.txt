@@ -1,4 +1,9 @@
 pandas
 scikit-learn
+flask
 fastapi
 uvicorn
+mlflow
+anthropic
+chromadb
+requests
