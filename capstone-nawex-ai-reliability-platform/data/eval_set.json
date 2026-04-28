@@ -1,0 +1,22 @@
+[
+  {
+    "question": "What is the Nawex AI Reliability Platform?",
+    "must_contain": ["platform", "AI"]
+  },
+  {
+    "question": "How does the platform detect fraud?",
+    "must_contain": ["fraud"]
+  },
+  {
+    "question": "What model does the platform use for healthcare anomaly detection?",
+    "must_contain": ["anomaly"]
+  },
+  {
+    "question": "How are model drifts handled?",
+    "must_contain": ["drift", "retrain"]
+  },
+  {
+    "question": "Which deployment strategies does the platform support?",
+    "must_contain": ["canary"]
+  }
+]
