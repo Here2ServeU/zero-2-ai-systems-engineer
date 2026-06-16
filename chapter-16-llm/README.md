@@ -9,25 +9,55 @@
 - `llm_api.py` — a Flask `/chat` endpoint wrapping Claude behind a system prompt, with
   input validation, request IDs, structured logging, and token accounting.
 
+**Three provider options.** The book uses **Anthropic Claude**, but the exact same lab
+works with **OpenAI** or **Google Gemini** — pick whichever account you have. Each provider
+has its own pair of scripts that behave identically (same `/chat` door, same JSON answer):
+
+| Provider | Verify script | API script | Install | API key env var |
+|---|---|---|---|---|
+| Anthropic (Claude) | `verify_api.py` | `llm_api.py` | `pip install anthropic flask` | `ANTHROPIC_API_KEY` |
+| OpenAI (GPT) | `verify_api_openai.py` | `llm_api_openai.py` | `pip install openai flask` | `OPENAI_API_KEY` |
+| Google (Gemini) | `verify_api_gemini.py` | `llm_api_gemini.py` | `pip install google-genai flask` | `GEMINI_API_KEY` |
+
 ## Setup & run
 
 ```bash
 python3 -m venv venv && source venv/bin/activate
+
+# ---- Option A: Anthropic (Claude) — the book's default ----
 pip install anthropic flask python-dotenv
-
 export ANTHROPIC_API_KEY='your-key-here'   # PowerShell: $env:ANTHROPIC_API_KEY='...'
-
 python verify_api.py
-python llm_api.py            # Terminal 1
-# Terminal 2:
+python llm_api.py                           # Terminal 1
+
+# ---- Option B: OpenAI (GPT) ----
+pip install openai flask
+export OPENAI_API_KEY='your-key-here'
+python verify_api_openai.py
+python llm_api_openai.py                     # Terminal 1
+
+# ---- Option C: Google (Gemini) ----
+pip install google-genai flask
+export GEMINI_API_KEY='your-key-here'
+python verify_api_gemini.py
+python llm_api_gemini.py                      # Terminal 1
+
+# Any of the three answers the SAME request (Terminal 2):
 curl -X POST http://localhost:5000/chat \
   -H 'Content-Type: application/json' \
   -d '{"question":"How do I reset my pin?"}'
 ```
 
-> **Model id:** the book uses `model='claude-opus-4-7'`. Set this to a currently
-> available Claude model (e.g. `claude-opus-4-8` or `claude-sonnet-4-6`) for your account.
+> **Model ids:** the book uses `model='claude-opus-4-7'`. Set this to a currently
+> available model for whichever provider you chose:
+> - **Anthropic:** `claude-opus-4-8` (smartest) or `claude-sonnet-4-6` (fast, cheaper)
+> - **OpenAI:** `gpt-4o` (default) or `gpt-4o-mini` (fast, cheaper)
+> - **Gemini:** `gemini-2.5-pro` (smartest) or `gemini-2.5-flash` (fast, cheaper)
+>
 > Never hardcode the API key — use an env var locally, a secrets manager in production.
+> Get a key from [console.anthropic.com](https://console.anthropic.com),
+> [platform.openai.com](https://platform.openai.com), or
+> [aistudio.google.com](https://aistudio.google.com).
 
 ## What each file does (explained for absolute beginners)
 
@@ -88,5 +118,42 @@ banking question and get the robot's answer back.
    how many word-pieces were used.
 
 **What you get:** A working "ask the bank robot a question" web door that logs every call.
+
+### The OpenAI and Gemini twins — the same robot, a different company
+
+There isn't just one well-read robot for hire. Three big companies each rent you one,
+and they all do the same job: you send words, they send words back. This chapter ships a
+matching pair of scripts for each company so you can use whichever one you have a key for.
+
+- **Anthropic's robot is named Claude** → `verify_api.py` + `llm_api.py`
+- **OpenAI's robot is named GPT** → `verify_api_openai.py` + `llm_api_openai.py`
+- **Google's robot is named Gemini** → `verify_api_gemini.py` + `llm_api_gemini.py`
+
+**In one sentence:** The OpenAI and Gemini scripts are exact copies of the Claude scripts —
+same test, same `/chat` door, same answer shape — just phoning a different company's robot.
+
+**What's the same in all three:**
+
+1. You still need a secret password (an **API key**), read from your computer's settings so
+   it never sits in the file. Each company gives you its own key, stored under its own name:
+   `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, or `GEMINI_API_KEY`.
+2. You still send a **prompt** (your question) and the same **system prompt** (the standing
+   "you are a Nawex Bank helper" instruction).
+3. You still get back the answer plus how many word-pieces (**tokens**) went in and out.
+4. The `/chat` web door still listens on port 5000 and replies with the same fields, so the
+   one `curl` command works no matter which robot you started.
+
+**What's a little different (just the robot's name tag):**
+
+1. The shopping list changes: `pip install openai flask` for GPT, or
+   `pip install google-genai flask` for Gemini.
+2. The model name changes: `gpt-4o` for OpenAI, `gemini-2.5-flash` for Gemini (swap in
+   `gpt-4o-mini` or `gemini-2.5-pro` to go cheaper or smarter) — just like you'd swap
+   `claude-opus-4-7` for a real Claude name.
+3. Each company words the phone call slightly differently inside the code, but you don't
+   have to care — the scripts hide that for you and hand back the same tidy answer.
+
+**What you get:** Three interchangeable ways to power the very same bank-helper door, so you
+can start with whichever account you already have — or compare the robots side by side.
 
 ➡ Next: [chapter-17-rag](../chapter-17-rag) — ground the LLM in a private knowledge base.
