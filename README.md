@@ -1,87 +1,86 @@
-# Zero 2 AI Systems Engineer
+# Zero to AI Systems Engineer
 
-The companion repository to *Zero 2 AI Systems Engineer: The Complete Beginner's Playbook* by Rev. Emmanuel Naweji (T2S Mentorship Program, 2026).
+Companion code for **_Zero to AI Systems Engineer: Build, Deploy, and Scale Real ML
+Systems_** by Rev. Dr. Emmanuel Naweji (T2S — Transformed 2 Succeed, Professional Edition,
+2026).
 
-This repo contains the working codebase for the book's capstone project — the **Nawex AI Reliability Platform** — built up week by week across all 8 layers.
+This repository **is** the book's `ai-ml-engineer` workspace. Each chapter maps to one
+`chapter-XX-*` folder containing that chapter's exact lab scripts, plus the book's two
+industry capstones, **NexaGuard** (FinTech) and **ClarityAI** (Healthcare). The folder
+names, scripts, and run commands match the book verbatim, so you can `cd chapter-XX-...` and
+follow along.
 
-## The 8 Layers
+## The flagship project: Zero2AI fraud detection
 
-1. **Foundation & Mindset** — Weeks 1, 2 (Chapters 1, 2, 3)
-2. **Data & Models** — Week 3 (Chapter 4)
-3. **APIs & Containers** — Weeks 4, 5 (Chapters 5, 6)
-4. **Cloud Infrastructure** — Weeks 6, 7 (Chapters 7, 8)
-5. **Automation & Orchestration** — Weeks 8, 9 (Chapters 9, 10)
-6. **Observability & Operations** — Weeks 10, 11 (Chapters 11, 12)
-7. **Continuous Delivery & Safe Deployment** — Weeks 12, 13, 14 (Chapters 13, 14, 15)
-8. **Modern AI · LLMs & RAG** — Weeks 15, 16, 17 (Chapters 16, 17, 18)
-9. **Capstone** — Nawex AI Reliability Platform (15 milestones)
+Layer by layer, the chapter labs build one production AI system — a fraud detection
+platform that generates data, trains a model, serves it behind a Flask API, runs in
+Docker and Kubernetes, deploys to AWS with Terraform, monitors itself with Prometheus +
+Grafana, predicts its own failures with AIOps, retrains on drift, deploys safely with
+canary/blue-green, and answers questions with an LLM grounded by RAG.
 
-## What I Am Building
+## Chapter map
 
-- Fraud detection model (FinTech) with MLflow experiment tracking
-- Healthcare anomaly detection model
-- Flask APIs for model serving
-- Dockerized services
-- Terraform infrastructure on AWS
-- Kubernetes deployment with Helm
-- Prometheus + Grafana monitoring
-- AIOps for predictive operations
-- Automated retraining on drift
-- Canary and blue-green safe deployment
-- LLM customer-service feature with Anthropic Claude
-- RAG pipeline grounded in a private knowledge base via ChromaDB
+| Folder | Book chapter(s) | Topic | Key scripts |
+|---|---|---|---|
+| [chapter-01-setup](chapter-01-setup) | 0, 1 | Toolkit + dev environment | `hello.py` |
+| [chapter-02-data](chapter-02-data) | 2 | First ML experiment (manual logging) | `generate_data.py`, `train_model.py` |
+| [chapter-03-models](chapter-03-models) | 3 | Fraud + healthcare anomaly models | `create_fintech_data.py`, `fraud_detection.py`, `anomaly_detection.py` |
+| [chapter-04-mlflow](chapter-04-mlflow) | 4 | Experiment tracking with MLflow | `train_with_tracking.py`, `register_best_model.py` |
+| [chapter-05-api](chapter-05-api) | 5 | Serving models via APIs | `app/model.py`, `app/api.py` |
+| [chapter-06-docker](chapter-06-docker) | 6 | Containerization with Docker | `Dockerfile`, `docker-compose.yml` |
+| [chapter-07-terraform](chapter-07-terraform) | 7 | Infrastructure as Code | `main.tf` |
+| [chapter-08-cloud](chapter-08-cloud) | 8 | Cloud deployment, modules, SSH | `modules/ec2/`, `environments/dev/` |
+| [chapter-09-cicd](chapter-09-cicd) | 9 | CI/CD with GitHub Actions | [`.github/workflows/ci.yml`](.github/workflows/ci.yml) |
+| [chapter-10-kubernetes](chapter-10-kubernetes) | 10 | Kubernetes & orchestration | `deployment.yaml`, `service.yaml` |
+| [chapter-11-monitoring](chapter-11-monitoring) | 11 | Observability with Prometheus | `app_with_metrics.py`, `anomaly_detection.py` |
+| [chapter-12-aiops](chapter-12-aiops) | 12 | AIOps engine | `aiops_engine.py`, `automated_response.py` |
+| [chapter-13-retraining](chapter-13-retraining) | 13 | Drift detection + retraining | `drift_detector.py`, `retrain_pipeline.py`, [`retrain.yml`](.github/workflows/retrain.yml) |
+| [chapter-14-deployment](chapter-14-deployment) | 14 | Canary, feature flags, blue/green | `src/router.py`, `src/feature_flag.py`, `src/switch.py` |
+| [chapter-15-dashboards](chapter-15-dashboards) | 15 | Prometheus + Grafana stack | `monitored_api.py`, `docker-compose.yml` |
+| [chapter-16-llm](chapter-16-llm) | 16 | LLM foundations (Claude) | `verify_api.py`, `llm_api.py` |
+| [chapter-17-rag](chapter-17-rag) | 17 | RAG pipeline (ChromaDB) | `index_corpus.py`, `retrieval.py`, `rag_query.py` |
+| [chapter-18-prodllm](chapter-18-prodllm) | 18 | Production LLM systems | `production_llm.py` |
+| [nexaguard](nexaguard) | Capstone 1 | FinTech fraud platform | scaffold + 10 milestones |
+| [clarityai](clarityai) | Capstone 2 | Healthcare clinical platform | scaffold + 10 milestones |
 
-## Repository Layout
+## The eight-layer stack
 
-```
-course/                      # Week-by-week implementation
-  week-01-foundations/
-  week-02-regulated-environments/
-  week-03-classical-ml-and-mlflow/
-  week-04-serving-models-via-apis/
-  week-05-containerization-with-docker/
-  week-06-infrastructure-as-code-terraform/
-  week-07-cloud-deployment/
-  week-08-ci-cd-for-mlops/
-  week-09-kubernetes-and-orchestration/
-  week-10-observability-and-monitoring/
-  week-11-aiops/
-  week-12-advanced-ci-cd-and-retraining-pipelines/
-  week-13-advanced-deployment-and-model-promotion/
-  week-14-observability-deep-dive-and-dashboards/
-  week-15-llm-customer-service/
-  week-16-rag-pipeline/
-  week-17-production-llm-systems/
-capstone-nawex-ai-reliability-platform/   # All 8 layers wired together
-fintech/                     # FinTech vertical notes
-healthcare/                  # Healthcare vertical notes
-```
+1. **Foundation & Mindset** — Chapters 1–3
+2. **Data & Models** — Chapters 4–5
+3. **APIs & Containers** — Chapters 5–6
+4. **Cloud Infrastructure** — Chapters 7–8
+5. **Automation & Orchestration** — Chapters 9–10
+6. **Observability & Operations** — Chapters 11–12
+7. **Continuous Delivery & Safe Deployment** — Chapters 13–15
+8. **Modern AI · LLMs & RAG** — Chapters 16–18
 
-Each week follows the same pattern: `README.md`, `src/`, `data/` (where applicable), and supporting infrastructure assets.
-
-## Start Here
-
-- [course/README.md](course/README.md) — week-by-week overview
-- [COURSE_INDEX.md](COURSE_INDEX.md) — full course index
-- [PROJECT_WEEKS.md](PROJECT_WEEKS.md) — chapter-to-week roadmap
-- [course/week-01-foundations/README.md](course/week-01-foundations/README.md) — first lab
-- [capstone-nawex-ai-reliability-platform/README.md](capstone-nawex-ai-reliability-platform/README.md) — capstone milestones
-
-## Local Setup
+## Getting started
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
+# Per the book, each chapter's lab uses its own virtual environment and installs
+# only the packages it needs. To set up one environment for the whole workspace:
+python3 -m venv venv && source venv/bin/activate   # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-python3 course/week-01-foundations/src/train_model.py
+
+# Run the first program:
+python3 chapter-01-setup/hello.py
 ```
 
-For the LLM and RAG weeks (15-17), you also need an Anthropic API key:
+For the LLM/RAG chapters (16–18) you also need an Anthropic API key:
 
 ```bash
-export ANTHROPIC_API_KEY=...
+export ANTHROPIC_API_KEY='your-key-here'
 ```
 
-## Goal
+> **Model id note:** the book's LLM labs use `model='claude-opus-4-7'`. Set this to a
+> currently available Claude model for your account (e.g. `claude-opus-4-8` or
+> `claude-sonnet-4-6`).
 
-To become a top-tier AI Systems Engineer capable of designing, deploying, and operating production AI platforms across classical ML, MLOps, AIOps, large language models, and retrieval-augmented generation.
+## The professional workflow (Appendix A)
+
+Every lab follows the same loop: create folder → create venv → activate → write code →
+`git add` → `git commit` → push → `deactivate`. See
+[APPENDIX_A_github_workflow.md](APPENDIX_A_github_workflow.md) for the full GitHub setup
+and push workflow.
+
+— *Soli Deo gloria.*

@@ -1,9 +1,15 @@
+# Aggregate of every package the book installs across the chapters.
+# Each chapter's lab installs only the subset it needs (see the per-chapter READMEs);
+# this file is a convenience for setting up one environment for the whole workspace.
 pandas
+numpy
 scikit-learn
+scipy
 flask
-fastapi
-uvicorn
 mlflow
+prometheus-client
+tenacity
 anthropic
 chromadb
-requests
+sentence-transformers
+python-dotenv

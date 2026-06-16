@@ -1,0 +1,30 @@
+# .github/workflows/retrain.yml
+name: Model Retraining Pipeline
+
+on:
+  schedule:
+    - cron: '0 2 * * 1'   # Every Monday at 2 AM
+  workflow_dispatch:        # Manual trigger button
+
+jobs:
+  retrain:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install scikit-learn pandas
+          pip install numpy scipy mlflow
+      - name: Check for drift
+        run: |
+          source venv/bin/activate
+          python chapter-13-retraining/drift_detector.py
+      - name: Retrain if needed
+        run: |
+          source venv/bin/activate
+          python chapter-13-retraining/retrain_pipeline.py

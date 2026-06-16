@@ -1,0 +1,23 @@
+# Per Appendix A — never commit virtual environments or build/runtime artifacts.
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.log
+
+# Data / model / experiment artifacts
+mlruns/
+mlartifacts/
+vector_db/
+*.joblib
+
+# Terraform state and secrets
+.terraform/
+*.tfstate
+*.tfstate.*
+aws-key
+aws-key.pub
+.env
+
+# OS
+.DS_Store
