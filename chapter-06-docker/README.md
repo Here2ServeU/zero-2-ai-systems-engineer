@@ -1,139 +1,210 @@
-# Chapter 06 — Containerization with Docker
+# Chapter 06 — Pack your program into a box (Docker)
 
-**Book:** Chapter 6 (Containerization with Docker) · Lab 6.3
-**Layer:** 3 · APIs & Containers · **You build:** A portable image of the fraud API
+> Matches **Chapter 06** in the book. The runnable scripts for this chapter are in this folder.
 
-## What you build
+**Labels:** 💻 Runs free on your laptop · 🧑‍🤝‍🧑 Easier with a helper the first time
 
-The Chapter 5 API packaged into an immutable Docker image with layer caching, a
-non-root user, and a small base image — plus a `docker-compose.yml` for one-command
-startup. (`app/` here is copied from Chapter 5, exactly as the book's lab does.)
+---
 
-## Build & run
+## The big idea (in plain words)
+
+In Chapter 05 you built a front desk (an API) and ran it on *your* laptop. But here's a worry
+every builder has: "It works on my computer... will it work on someone else's?" Maybe their
+computer has a different Python, or a missing helper, and it breaks.
+
+The fix is to pack your program into a **lunchbox** — your code *and* every helper it needs,
+all sealed together — so it runs the exact same way on any computer. The tool that makes these
+lunchboxes is called **Docker**. A sealed lunchbox is called a **container**, and the recipe
+for making one is a **Dockerfile**.
+
+> **Good news:** the program *inside* the box is the **same** fraud front desk you already
+> built in Chapter 05. We're not writing new app code — we're just learning to pack it up.
+
+## New words (look up anything unfamiliar in the [GLOSSARY](../GLOSSARY.md))
+
+- **Docker** — the tool that packs your program into a lunchbox so it runs the same everywhere.
+- **Image** — the recipe/snapshot Docker builds (the *packed* lunchbox, before it's opened).
+- **Container** — a *running* copy of an image (the lunchbox, opened and in use).
+- **Dockerfile** — the recipe that tells Docker how to build the image.
+
+## What you will build
+
+A self-contained lunchbox (a Docker **image**) holding your fraud API, then you'll run it as a
+**container** and knock on its door — just like Chapter 05, but now fully packed up. Expected
+result: `curl http://localhost:5000/health` answers `healthy` from inside the box.
+
+---
+
+## Let's do it, one small step at a time
+
+### Step 1 — Install Docker Desktop (this is the fiddly part)
+
+Before anything else, you need Docker itself.
+
+1. Go to **docker.com/products/docker-desktop** and download **Docker Desktop** for your
+   system (Windows or Mac).
+2. Install it like a normal app, then **open it**. Wait until its little whale icon shows it's
+   "running" (it can take a minute the first time).
+3. **Check it worked** — open your terminal and type:
+
+   ```bash
+   docker --version
+   ```
+
+   **What you should see:** something like `Docker version 24.0.6`.
+
+> 🧑‍🤝‍🧑 This install is the trickiest part of the whole book — it touches deep computer
+> settings and sometimes asks for a restart. If a more experienced person is around, this is a
+> great moment to have them sit with you. Once Docker is installed, the rest is easy.
+
+### Step 2 — Go to the chapter's code folder
 
 ```bash
-docker build -t nawex-fraud-api:v1.0 .
-docker run -d -p 5000:5000 --name fraud-api nawex-fraud-api:v1.0
-docker ps
-curl http://localhost:5000/health
-docker logs fraud-api
-docker stop fraud-api && docker rm fraud-api
-
-# Or the whole thing with compose:
-docker compose up -d
-docker compose down
+cd chapter-06-docker
 ```
 
-## What each file does (explained for absolute beginners)
+Inside you'll find the same `app/` from Chapter 05, plus two new files:
 
-Think of the computer as a friend who only does *exactly* what you tell it. A script
-is just a list of instructions you hand to that friend, one line at a time. In this
-chapter we put our little fraud-checking program into a **lunchbox** so it works the
-same on every computer. The fancy word for that lunchbox is a **container**, and the
-tool that makes it is called **Docker**.
+- **`Dockerfile`** — the recipe for the lunchbox.
+- **`docker-compose.yml`** — a one-button way to start the whole thing.
 
-### `Dockerfile` — the recipe for the lunchbox
+**What the `Dockerfile` recipe says, in plain words (you don't edit it — just understand it):**
 
-**In one sentence:** This file is the recipe that tells Docker how to build the lunchbox
-(the **image**) that holds our program.
+- Start from a small box that already has Python inside.
+- Copy in the shopping list (`requirements.txt`) and install all the helpers.
+- Copy in our actual program files (`app/`).
+- Switch to a plain, non-boss user for safety.
+- Open window (**port**) `5000` and, when the box turns on, start the program with
+  `python api.py`.
 
-**What it does, step by step:**
+### Step 3 — Build the lunchbox (the image)
 
-1. `FROM python:3.11-slim` — Start with a small, ready-made box that already has Python
-   inside. "slim" means it is a tiny box with only the parts we need, so it stays light.
-2. `LABEL ...` — Stick name tags on the box (who made it, the program name, the version).
-   These are just sticky notes; they do not change how it runs.
-3. `ENV ...` — Set a few rules for inside the box: do not leave messy leftover files,
-   print messages right away, and run in "production" mode (the grown-up, careful mode).
-4. `WORKDIR /app` — Pick a room inside the box called `/app` and do all our work there.
-5. `COPY requirements.txt .` — Copy in our shopping list of helpers first (see the
-   `requirements.txt` part below). We copy it first on purpose so Docker can remember
-   ("cache") the helpers and not re-download them every time we change our code.
-6. `RUN pip install --no-cache-dir -r requirements.txt` — Go shopping: install all the
-   helpers on the list. `--no-cache-dir` means do not keep the receipts, to save space.
-7. `COPY app/ .` — Now copy our actual program files into the box.
-8. `RUN useradd -m appuser` and `USER appuser` — Make a regular, non-boss user named
-   `appuser` and switch to it. Running as the boss ("root") is risky, so we use a plain
-   user to stay safe.
-9. `EXPOSE 5000` — Tell the box to open a little window numbered 5000 so people outside
-   can talk to our program.
-10. `CMD ["python", "api.py"]` — When the box turns on, start the program by running
-    `api.py`.
+```bash
+docker build -t zero2ai-fraud-api:v1.0 .
+```
 
-**What you get:** A complete recipe that bakes our fraud program into one neat, safe,
-portable lunchbox that runs the same anywhere.
+- `docker build` — "follow the recipe and bake an **image**."
+- `-t zero2ai-fraud-api:v1.0` — give the image a name (`zero2ai-fraud-api`) and a version tag
+  (`v1.0`), like a label on the lunchbox.
+- the `.` at the end — "the recipe is in *this* folder."
 
-### `docker-compose.yml` — a way to start the lunchbox with one button
+**What you should see:** lots of steps scrolling by (downloading Python, installing helpers),
+ending with something like `naming to ... zero2ai-fraud-api:v1.0` and no errors. The first build
+is slow; later builds are much faster because Docker remembers the parts that didn't change.
 
-**In one sentence:** This file lets you start (and later stop) the lunchbox with a single
-short command instead of typing many long ones.
+### Step 4 — Run the lunchbox (start a container)
 
-**What it does, step by step:**
+```bash
+docker run -d -p 5000:5000 --name fraud-api zero2ai-fraud-api:v1.0
+```
 
-1. `version: '3.8'` — Tells Docker which rulebook version we are using.
-2. `services:` — Lists the programs we want to run. We have one, called `fraud-api`.
-3. `build: .` — Build the lunchbox using the recipe (the `Dockerfile`) in this folder.
-4. `image: nawex-fraud-api:v1.0` — Give the finished lunchbox a name and a version number.
-5. `ports: ['5000:5000']` — Connect window 5000 on your computer to window 5000 inside
-   the box, so you can visit it in a browser.
-6. `environment: - FLASK_ENV=production` — Run in the careful grown-up mode.
-7. `restart: unless-stopped` — If the program falls down, stand it back up automatically,
-   unless you told it to stop on purpose.
-8. `healthcheck:` — Every 30 seconds, poke the program at `/health` to make sure it is
-   still feeling okay. Try 3 times before deciding it is sick.
+- `docker run` — "open the lunchbox and start it" (this running copy is a **container**).
+- `-d` — run it quietly in the background (so your terminal stays free).
+- `-p 5000:5000` — connect window 5000 on *your* computer to window 5000 *inside* the box, so
+  you can reach it.
+- `--name fraud-api` — give this running container a friendly name.
 
-**What you get:** One simple command (`docker compose up -d`) turns the whole thing on,
-keeps it healthy, and restarts it if it trips.
+**What you should see:** a long string of letters and numbers (the container's ID). That means
+it started.
 
-### `app/model.py` — the brain that guesses fraud
+### Step 5 — Check it's running
 
-**In one sentence:** This file builds and uses a tiny "brain" (a machine-learning model)
-that looks at a payment and guesses whether it is fraud or okay.
+```bash
+docker ps
+```
 
-**What it does, step by step:**
+- `docker ps` lists the lunchboxes that are currently open and running.
 
-1. It lists the clues it looks at (`FEATURES`), like the dollar amount, the hour of day,
-   and whether it was a weekend.
-2. `load_model()` — Makes 2,000 pretend payments to practice on, then trains a
-   "decision tree" (a yes/no question game) to spot fraud. It prints how good it got.
-3. `predict_one(...)` — Takes one real payment, asks the trained brain, and gives back an
-   answer: `FRAUD` or `LEGIT`, plus how sure it is and which version of the brain answered.
+**What you should see:** one line showing `fraud-api`, the image name, and `0.0.0.0:5000->5000`.
 
-**What you get:** A small, trained brain that can take payment clues and say "this looks
-like fraud" or "this looks fine."
+### Step 6 — Knock on its door
 
-### `app/api.py` — the front desk that people talk to
+```bash
+curl http://localhost:5000/health
+```
 
-**In one sentence:** This file is the front desk (a web service) that takes requests from
-the internet, checks them, asks the brain, and sends back an answer.
+**What you should see:** the same friendly answer as Chapter 05:
 
-**What it does, step by step:**
+```
+{"status":"healthy","ts":"2026-06-16T12:00:00"}
+```
 
-1. It starts a tiny web server using Flask (a helper for making web services) and loads
-   the brain from `model.py`.
-2. `validate(...)` — Checks that the visitor sent all the needed clues and that they are
-   the right kind (numbers where numbers belong, hour between 0 and 23).
-3. `/health` — A door you can knock on to ask "are you alive?" It answers "healthy."
-4. `/info` — A door that tells you the program's name, version, and author.
-5. `/predict` — The main door. Send it a payment, it checks it, asks the brain, and
-   returns `FRAUD` or `LEGIT` with a unique ticket number for that request.
-6. The last lines start the server listening on window 5000 for everyone.
+🎉 Your fraud front desk is now answering from *inside the lunchbox*. The very same program
+would now run identically on any computer that has Docker.
 
-**What you get:** A working web front desk that people and other programs can send
-payments to and get a fraud answer back.
+You can also peek at the logbook inside the box:
 
-### `requirements.txt` — the shopping list
+```bash
+docker logs fraud-api
+```
 
-**In one sentence:** This is a shopping list of the helper tools our program needs.
+### Step 7 — Stop and clean up
 
-**What it does, step by step:**
+When you're done:
 
-1. `flask` — the helper that builds the web front desk.
-2. `scikit-learn` — the helper that builds the fraud-guessing brain.
-3. `pandas` — the helper that holds our pretend payments in a neat table.
-4. `numpy` — the helper that does fast number-crunching.
+```bash
+docker stop fraud-api && docker rm fraud-api
+```
 
-**What you get:** A simple list so Docker can buy (install) every helper our program needs
-in one go.
+- `docker stop` closes the running container.
+- `docker rm` removes it (the *image* recipe stays, so you can run it again anytime).
 
-➡ Next: [chapter-07-terraform](../chapter-07-terraform) — provision a real cloud server as code.
+### Step 8 — The one-button way (Docker Compose)
+
+Typing all those flags gets old. There's a file, `docker-compose.yml`, that remembers them for
+you. From the `chapter-06-docker` folder:
+
+```bash
+docker compose up -d      # build + start everything in the background
+docker compose down       # stop and clean up
+```
+
+**What you should see:** `compose up` builds and starts the container in one go; `curl
+http://localhost:5000/health` works exactly the same. `compose down` tidies it all away.
+
+---
+
+## Try it yourself (mini challenges)
+
+- 🔧 **Change the version tag.** Build again with `docker build -t zero2ai-fraud-api:v1.1 .`,
+  then run `docker ps` (after starting it) and notice the new `v1.1` label.
+- 🔧 **Talk to the boxed model.** With the container running, send a `/predict` request exactly
+  like Chapter 05's Step 6. The boxed front desk answers FRAUD or LEGIT just the same.
+- 🔧 **List your lunchboxes.** Run `docker images` to see every image you've built, with names
+  and tags.
+- 🔧 **Watch it self-heal.** Start it with `docker compose up -d`, then `docker stop fraud-api`.
+  Wait a moment and run `docker ps` — Compose is set to restart it automatically.
+
+## If something breaks
+
+- **`docker: command not found` or "Cannot connect to the Docker daemon"** → Docker isn't
+  installed, or **Docker Desktop isn't open and running**. Open Docker Desktop and wait for the
+  whale icon to say it's running, then try again (Step 1).
+- **"port is already allocated" / "address already in use"** → Window 5000 is busy. Stop any
+  old container (`docker stop fraud-api`) or the Chapter 05 server (Ctrl+C in its terminal),
+  then run Step 4 again.
+- **`permission denied` while building or running** (common on Linux) → Make sure Docker
+  Desktop is running. On Linux you may need to run the command with `sudo`, or ask a helper to
+  add your user to the `docker` group.
+- **"name fraud-api is already in use"** → A container with that name already exists. Remove it
+  with `docker rm -f fraud-api`, then run Step 4 again.
+- **The build is very slow the first time** → That's normal. It's downloading Python and the
+  helpers once. Later builds reuse them and are quick.
+
+## What you just learned
+
+- **Docker** packs your program *and its helpers* into a sealed **container** so it runs the
+  same on any computer.
+- A **Dockerfile** is the recipe; building it creates an **image**; running the image creates a
+  **container**.
+- Key commands: `docker build`, `docker run`, `docker ps`, `docker logs`, `docker stop`,
+  `docker rm`.
+- **Docker Compose** (`docker compose up -d` / `down`) starts and stops everything with one
+  short command.
+- The program inside the box is the **same** fraud API you built in Chapter 05 — only now it's
+  portable.
+
+## Where to next
+
+➡ [Chapter 07 — Rent a computer with a wish-list (Terraform)](../chapter-07-terraform). You'll
+learn how to ask the cloud for a real computer to run your lunchbox on.

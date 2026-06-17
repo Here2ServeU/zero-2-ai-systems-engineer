@@ -2,4 +2,4 @@
 variable "ami" {}
 variable "instance_type" {}
 variable "key_name" {}
-variable "name" { default = "nawex-server" }
+variable "name" { default = "zero2ai-server" }

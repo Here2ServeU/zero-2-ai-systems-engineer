@@ -2,20 +2,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nawex-fraud-api
+  name: zero2ai-fraud-api
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: nawex-fraud-api
+      app: zero2ai-fraud-api
   template:
     metadata:
       labels:
-        app: nawex-fraud-api
+        app: zero2ai-fraud-api
     spec:
       containers:
       - name: fraud-api
-        image: nawex-fraud-api:v1.0
+        image: zero2ai-fraud-api:v1.0
         ports:
         - containerPort: 5000
         livenessProbe:

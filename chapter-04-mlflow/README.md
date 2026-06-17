@@ -1,86 +1,205 @@
-# Chapter 04 — Experiment Tracking with MLflow
+# Chapter 04 — Keep a tidy notebook of your experiments
 
-**Book:** Chapter 4 (Experiment Tracking and Reproducibility) · Lab 4.4
-**Layer:** 2 · Data & Models · **You build:** Tracked runs + Model Registry
+> Matches **Chapter 04** in the book. The same training as before, but the notebook keeps itself.
+> The runnable scripts for this chapter are in this folder.
 
-## What you build
+**Labels:** 💻 Runs free on your laptop
 
-Replace Chapter 2's text-file logging with MLflow. Train three hyperparameter variants,
-compare them in the MLflow UI, and register the best run in the Model Registry.
+---
 
-> Reads `../chapter-02-data/data/transactions.csv` — run Chapter 2's `generate_data.py` first.
+## The big idea (in plain words)
 
-## Setup & run
+Back in Chapter 02 you wrote your scores into a text file by hand, one line per run. That works,
+but it's easy to forget a line, lose track of *which settings* gave *which score*, or fumble
+when you've run twenty experiments.
+
+Imagine instead a smart lab notebook that writes itself. Every time you run an experiment, it
+quietly records what dials you turned, what scores you got, and even saves the trained model —
+all on its own. Later you open a clean web page, line up all your tries side by side, and pick
+the winner. That self-writing notebook is **MLflow**, and at the end you put your best try on a
+"trophy shelf" (a **model registry**) so it's easy to find and use later.
+
+## New words (look up anything unfamiliar in the [GLOSSARY](../GLOSSARY.md))
+
+- **MLflow** — a tool that automatically keeps a tidy notebook of every experiment you run.
+- **Experiment tracking** — a fancy way of saying "keeping score" of your training runs.
+- **Hyperparameter** — a dial you set *before* training (like how many questions the tree may ask).
+- **Model registry** — a "trophy shelf" where you store your best model under a name and version.
+- **MLflow UI** — a web page that shows all your tracked runs so you can compare them.
+
+## What you will build
+
+You'll train the same fraud model three times with different dial settings, let MLflow record
+every run, compare them in a web page, then crown the best one. Each run prints a single line:
+
+```
+Recall: 0.800
+```
+
+And after crowning the winner:
+
+```
+Registered version: 1
+```
+
+(Your exact numbers may differ a little — that's normal.)
+
+---
+
+## Let's do it, one small step at a time
+
+### Step 1 — Make sure Chapter 02's data exists
+
+This chapter reuses the table you made in Chapter 02. If you haven't run that yet, make it now:
 
 ```bash
-python3 -m venv venv && source venv/bin/activate
-pip install mlflow scikit-learn pandas numpy
+cd chapter-02-data/src
+python generate_data.py
+cd ../..
+```
 
+**What you should see:** `Generated 1000 rows, 18 fraud`. Now the file
+`chapter-02-data/data/transactions.csv` exists, which this chapter will read.
+
+> If you already did Chapter 02 and the file is there, you can skip this step.
+
+### Step 2 — Go to this chapter's project folder
+
+```bash
+cd chapter-04-mlflow
+```
+
+**What you should see:** your prompt shows you're inside `chapter-04-mlflow`. Type `ls` and you
+should see `train_with_tracking.py` and `register_best_model.py`.
+
+### Step 3 — Make a clean toolbox just for this project
+
+```bash
+python3 -m venv venv && source venv/bin/activate   # Windows: venv\Scripts\activate
+```
+
+**What you should see:** your prompt now starts with `(venv)`.
+
+### Step 4 — Install the helpers (now including MLflow)
+
+```bash
+pip install mlflow scikit-learn pandas numpy
+```
+
+**What you should see:** lots of lines, ending in `Successfully installed mlflow... scikit-learn... pandas... numpy...`.
+The new one this time is **MLflow** — our self-writing notebook.
+
+### Step 5 — Run three experiments with different dials
+
+Each command trains the model once with different **hyperparameters** (the dials). MLflow
+records each run automatically. Run them one at a time:
+
+```bash
 python train_with_tracking.py --max_depth 3 --min_samples 2
 python train_with_tracking.py --max_depth 8 --min_samples 5
 python train_with_tracking.py --max_depth 6 --criterion entropy
+```
 
-mlflow ui    # open http://127.0.0.1:5000 -> select runs -> Compare
+**What you should see:** each command prints one line like `Recall: 0.800`. You won't see the
+scores written to a file — MLflow tucked them away for you behind the scenes.
+
+**What `train_with_tracking.py` does, in plain words** (open it in VS Code to follow along):
+
+1. It opens a list of dials you can set before training: `--max_depth`, `--min_samples`, and
+   `--criterion`. These are the **hyperparameters**. If you don't set one, it uses a safe default.
+2. It reads the big table of purchases (`transactions.csv`) from the Chapter 02 folder.
+3. It picks two clues — the `amount` and the `time` — and the answer to learn, `is_fraud`.
+4. It does the **train/test split**: a big pile to study from, a small pile to quiz with.
+5. `mlflow.start_run()` — It tells MLflow, "Start a new try and keep score," then writes down
+   which dial settings it used so they're never forgotten.
+6. It builds a **decision tree** with your dial settings and lets it study the big pile.
+7. It quizzes the model and records three scores — accuracy, recall, and f1 — into MLflow.
+8. `mlflow.sklearn.log_model(...)` — It even saves the trained model itself into MLflow, then
+   prints the recall score on the screen.
+
+> **The key difference from Chapter 02:** there you wrote one line to `experiments.txt` by hand.
+> Here MLflow saves the settings, the three scores, *and* the trained model — automatically,
+> every run. No more hand-written log.
+
+### Step 6 — Open the notebook web page and compare
+
+Start MLflow's web page:
+
+```bash
+mlflow ui
+```
+
+**What you should see:** a line like `Listening at: http://127.0.0.1:5000`. Open that address in
+your web browser. You'll see your three runs listed.
+
+- Tick the boxes next to all three runs, then click **Compare**.
+- Look at the `recall` column to see which dial settings caught the most fraud.
+
+When you're done looking, go back to the terminal and press **Ctrl+C** to stop the web page.
+
+> The web page is just a friendly view of the notebook MLflow has been keeping. Nothing here is
+> online or costs money — it's all running on your own computer at the `127.0.0.1` address.
+
+### Step 7 — Put the winner on the trophy shelf
+
+With the web page stopped, crown the best run:
+
+```bash
 python register_best_model.py
 ```
 
-## What each file does (explained for absolute beginners)
+**What you should see:**
 
-Think of the computer as a friend who only does *exactly* what you tell it. A script
-is just a list of instructions you hand to that friend, one line at a time. In this
-chapter we use **MLflow** — a notebook that automatically writes down how well each try
-did. This is called **experiment tracking**, which is a fancy way of saying *keeping
-score*. At the end we put our best try on a **model registry** — a trophy shelf where
-you keep the best model.
+```
+Registered version: 1
+```
 
-### `train_with_tracking.py` — try a guess, and let MLflow keep score
+**What `register_best_model.py` does, in plain words** (open it to follow along):
 
-**In one sentence:** This file trains a fraud-spotting model one time and writes down the
-settings it used and how good it turned out.
+1. It opens a helper that can read all your saved tries from MLflow.
+2. It finds the group of tries named `fraud-detection-v1` (the experiments from Step 5).
+3. It asks MLflow for every try, sorted best-to-worst by **recall**. The first one is the winner.
+4. It grabs the winner's special address (its "run id").
+5. It places that winning model on the **model registry** — the trophy shelf — under the name
+   `FraudDetectionModel`.
+6. It prints the version number the winner got (version 1, then 2, and so on each new time).
 
-**What it does, step by step:**
+---
 
-1. It opens a list of dials you can turn before training. These dials are called
-   `--max_depth`, `--min_samples`, and `--criterion`. You set them when you start the
-   script. If you do not set them, the script uses safe default numbers.
-2. It opens a big table of past money transactions (the file `transactions.csv`) and
-   reads it in.
-3. It picks two clues to look at — the `amount` of money and the `time` — and the answer
-   it wants to learn — was it fraud or not (`is_fraud`).
-4. It splits the table into two piles: a big pile to learn from and a small pile to test
-   itself on later. This is like studying with most of your flashcards and saving a few
-   to quiz yourself.
-5. It tells MLflow, "Start a new try now and keep score." Then it writes down which dial
-   settings it used so we never forget them.
-6. It builds a little decision-tree model (a model that asks yes/no questions to make a
-   guess) using your dial settings, and lets it study the big pile.
-7. It quizzes the model on the small pile and counts how often it was right. It writes
-   down three scores: accuracy, recall, and f1 (different ways of measuring "how good").
-8. It saves the trained model itself into MLflow and prints the recall score on the
-   screen so you can see it.
+## Try it yourself (mini challenges)
 
-**What you get:** One scored "try" saved in MLflow. Run it a few times with different
-dials, and MLflow remembers every try so you can compare them.
+- 🔧 **Add a fourth try.** Run `python train_with_tracking.py --max_depth 10 --min_samples 10`,
+  then refresh the MLflow web page. A new run should appear.
+- 🔧 **Change the deepest dial.** Try `--max_depth 1`. In the web page, does its recall drop
+  compared with the deeper trees?
+- 🔧 **Crown a new winner.** After adding more tries, run `python register_best_model.py` again.
+  Watch the version number climb to `2`, `3`, and so on.
+- 🔧 **Spot the columns.** In the Compare view, find the `max_depth`, `min_samples`, and
+  `recall` columns side by side. This is exactly the picture your hand-written log could never show clearly.
 
-### `register_best_model.py` — put the winner on the trophy shelf
+## If something breaks
 
-**In one sentence:** This file looks at all your tries, finds the one with the best score,
-and moves it to the trophy shelf so it is easy to find and use later.
+- **`No such file or directory: '../chapter-02-data/data/transactions.csv'`** → The Chapter 02
+  data is missing. Do Step 1 to create it.
+- **`No module named mlflow`** → Your toolbox isn't on, or MLflow isn't installed. Confirm your
+  prompt shows `(venv)`, then redo Step 3 and Step 4.
+- **`mlflow: command not found`** → Same fix: make sure `(venv)` is on and you ran the
+  `pip install` from Step 4.
+- **The web page won't open / "address already in use"** → Another MLflow page may still be
+  running. Find the old terminal and press **Ctrl+C**, or just close that terminal, then try again.
+- **`register_best_model.py` errors about no runs** → You haven't trained anything yet. Run the
+  experiments in Step 5 first.
 
-**What it does, step by step:**
+## What you just learned
 
-1. It opens a helper that can talk to MLflow and read all your saved tries.
-2. It finds the group of tries named `fraud-detection-v1` (the experiment you ran).
-3. It asks MLflow for every try in that group, sorted from best to worst by the
-   **recall** score. The very first one in the line is the winner.
-4. It grabs the winner's special address (its "run id") so it knows exactly which model
-   to pick up.
-5. It places that winning model on the trophy shelf, the **model registry**, under the
-   name `FraudDetectionModel`.
-6. It prints which version number the winner got (version 1, then 2, and so on each time
-   you register a new winner).
+- **MLflow** is a self-writing lab notebook — it does the **experiment tracking** for you.
+- **Hyperparameters** are the dials you set before training; MLflow records which ones you used.
+- The **MLflow UI** lets you compare many runs side by side in your browser.
+- A **model registry** is a trophy shelf for your best model, with a clear name and version.
+- This replaces the hand-written log file from Chapter 02 — same idea, far less effort and far
+  fewer mistakes.
 
-**What you get:** Your best model, picked by recall score, sitting safely on the trophy
-shelf with a clear name and version number — ready for the next chapter to use.
+## Where to next
 
-➡ Next: [chapter-05-api](../chapter-05-api) — serve the model behind a Flask API.
+➡ [Chapter 05 — Let other programs talk to your model](../chapter-05-api). You'll wrap your fraud
+model in a "front desk" so other programs can send it a purchase and get back an answer.

@@ -1,89 +1,251 @@
-# Chapter 10 — Kubernetes and Orchestration
+# Chapter 10 — Run many copies safely (Kubernetes)
 
-**Book:** Chapter 10 (Kubernetes and Orchestration) · Lab 10.3
-**Layer:** 5 · Automation & Orchestration · **You build:** Self-healing, scalable deployment
+> Matches **Chapter 10** in the book. The runnable scripts for this chapter are in this folder.
 
-## What you build
+**Labels:** 🧑‍🤝‍🧑 Easier with a helper the first time
 
-A Kubernetes Deployment (2 replicas, liveness probe) and a NodePort Service for the
-fraud API image from Chapter 6. Same manifests work on Docker Desktop K8s, Minikube, EKS,
-AKS, or GKE.
+---
 
-## Run
+## The big idea (in plain words)
+
+Back in Chapter 06 you packed your app into a **container** (a sealed lunchbox that runs the same
+anywhere). One lunchbox is fine for a test. But what if it crashes at 3 a.m.? What if a thousand
+people show up and one copy can't keep up?
+
+Enter the **traffic controller** — its real name is **Kubernetes** (people shorten it to *k8s*).
+Think of it as a playground manager. You tell it: *"Always keep this many copies of my app
+running."* It does exactly that — and if a copy falls over, the manager quietly throws it out and
+starts a fresh one. No one has to wake up at 3 a.m.
+
+You tell Kubernetes what you want with two small files:
+
+- **`deployment.yaml`** — *how many copies* to run, and how to check each one is still alive.
+- **`service.yaml`** — *how visitors reach* a healthy copy (the front desk).
+
+> 🧑‍🤝‍🧑 **Easier with a helper the first time.** Getting Kubernetes running on your own
+> laptop is the fiddly part. Once it's set up, the commands are short and friendly. A helper
+> nearby for the setup step saves a lot of frustration.
+
+## New words (look up anything unfamiliar in the [GLOSSARY](../GLOSSARY.md))
+
+- **Container** — A sealed, packed-up running copy of your app (the "lunchbox").
+- **Image** — The recipe/snapshot a container is started from.
+- **Kubernetes (k8s)** — A traffic controller that runs many copies of your app and restarts any
+  that fall over.
+- **Deployment** — The rule that says "always keep this many copies running."
+- **Pod** — One running copy (Kubernetes' name for one running container-group).
+- **Replica** — One of the many copies. "2 replicas" means "keep 2 copies."
+- **Service** — The front desk that sends each visitor to a healthy copy.
+- **minikube** — A free tool that runs a tiny Kubernetes on your own laptop, with no cloud bill.
+
+## What you will build
+
+A running pair of files on **your own laptop, for free**:
+
+- A **Deployment** that keeps **2 copies** of the fraud app alive and pokes each one to check
+  it's healthy.
+- A **Service** (front desk) that gives one steady address forwarding visitors to a healthy copy.
+
+Then you'll do the magic trick: delete a copy on purpose and watch Kubernetes bring it back.
+
+---
+
+## The free way to try this on your laptop (no cloud bill)
+
+You don't need to rent anything. You can run a tiny Kubernetes right on your computer. Pick
+**one** of these (a helper can confirm which is easiest for you):
+
+- **Option A — Docker Desktop's built-in Kubernetes.** If you installed Docker Desktop in Chapter
+  06, open its **Settings → Kubernetes** and tick **Enable Kubernetes**. Wait for it to turn
+  green. Done.
+- **Option B — minikube.** Install **minikube** (search "minikube install" for your system),
+  then start it:
+
+  ```bash
+  minikube start
+  ```
+
+Either way, check the manager is awake:
 
 ```bash
-# Enable Kubernetes (Docker Desktop) or: minikube start
 kubectl get nodes
-
-kubectl apply -f deployment.yaml
-kubectl apply -f service.yaml
-kubectl get pods            # expect 2 Running
-curl http://localhost:30080/health
-
-# Self-healing + scaling
-kubectl delete pod <pod-name>      # watch it get replaced
-kubectl scale deployment nawex-fraud-api --replicas=5
 ```
 
-> The image `nawex-fraud-api:v1.0` must be available to the cluster (built in Chapter 6;
-> on Docker Desktop set `imagePullPolicy: IfNotPresent` or push to a registry).
+**What you should see:** at least one line with status `Ready`. `kubectl` (say "cube control")
+is how you talk to Kubernetes.
 
-## What each file does (explained for absolute beginners)
+> ⚠️ This setup step is the fiddly one. If `kubectl get nodes` doesn't show `Ready`, that's
+> normal first-time friction — this is the moment a helper helps most. Don't push past it; get
+> the node `Ready` before going on.
 
-Think of the computer as a friend who only does *exactly* what you tell it. A script
-is just a list of instructions you hand to that friend, one line at a time. These two
-files are the rules you hand to a playground manager named Kubernetes.
+> 📦 **About the image.** These files run an app image called `zero2ai-fraud-api:v1.0`, built back
+> in Chapter/Chapter 06. On a local cluster, make sure that image is available to it (on Docker
+> Desktop, having built it locally is usually enough). If you haven't built it, you can still
+> read along and learn what each file does.
 
-Kubernetes (people call it k8s for short) is like a playground manager. It runs many
-copies of your app and quickly restarts any copy that falls down, so your app almost
-never goes dark.
+## Reading the two files (in plain words)
 
-### `deployment.yaml` — the rule that says "always keep copies running"
+### `deployment.yaml` — "always keep copies running"
 
-**In one sentence:** This file tells the playground manager to always keep two copies of
-your fraud app running, and to poke each one to make sure it is still alive.
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zero2ai-fraud-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: zero2ai-fraud-api
+  template:
+    metadata:
+      labels:
+        app: zero2ai-fraud-api
+    spec:
+      containers:
+      - name: fraud-api
+        image: zero2ai-fraud-api:v1.0
+        ports:
+        - containerPort: 5000
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 30
+```
 
-**What it does, step by step:**
+Step by step:
 
-1. **Says what kind of rule this is.** `kind: Deployment` means "this is the rule about
-   how many copies to keep running." A deployment is just that promise: always keep this
-   many copies up.
-2. **Gives it a name.** It calls the app `nawex-fraud-api` so the manager can find it.
-3. **Asks for two copies.** `replicas: 2` means "always keep 2 copies running." Each
-   running copy is called a pod. So you get 2 pods.
-4. **Tags the copies.** It labels each copy `app: nawex-fraud-api` so the manager knows
-   which pods belong together.
-5. **Says what to run inside each copy.** Each pod runs a container (a sealed lunchbox with
-   your app inside) built from the picture `nawex-fraud-api:v1.0`.
-6. **Opens a door on the app.** The app listens on port `5000` inside the pod.
-7. **Sets up a health check.** The liveness probe is the manager poking your app to ask
-   "are you still alive?" It knocks on the `/health` path on port `5000`. It waits 10
-   seconds before the first knock (`initialDelaySeconds: 10`) and then knocks every 30
-   seconds (`periodSeconds: 30`). If a copy stops answering, the manager throws it out and
-   starts a fresh one.
+1. `kind: Deployment` — "this is the rule about *how many copies* to keep running."
+2. `name: zero2ai-fraud-api` — the app's name, so the manager can find it.
+3. `replicas: 2` — **always keep 2 copies running.** Each running copy is a **pod**, so you get
+   2 pods.
+4. The `labels` (`app: zero2ai-fraud-api`) — name tags so the manager knows which copies belong
+   together.
+5. `image: zero2ai-fraud-api:v1.0` — each copy runs your app from this lunchbox recipe.
+6. `containerPort: 5000` — the app listens on door (port) `5000` inside each copy.
+7. `livenessProbe` — the **health check**. The manager keeps poking `/health` on port `5000` to
+   ask "are you still alive?" It waits 10 seconds before the first knock
+   (`initialDelaySeconds: 10`), then knocks every 30 seconds (`periodSeconds: 30`). If a copy
+   stops answering, the manager throws it out and starts a fresh one.
 
-**What you get:** Two copies of your app that stay running on their own — if one falls
-down, the playground manager replaces it without you lifting a finger.
+**What you get:** two self-healing copies of your app. If one falls, it's replaced
+automatically.
 
-### `service.yaml` — the front desk that sends visitors to a healthy copy
+### `service.yaml` — the front desk
 
-**In one sentence:** This file sets up a front desk that takes every visitor and sends them
-to one of the healthy copies of your app.
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: zero2ai-fraud-svc
+spec:
+  type: NodePort
+  selector:
+    app: zero2ai-fraud-api
+  ports:
+  - port: 80
+    targetPort: 5000
+    nodePort: 30080
+```
 
-**What it does, step by step:**
+Step by step:
 
-1. **Says what kind of thing this is.** `kind: Service` means "this is the front desk."
-   A service is the front desk that sends visitors to a healthy copy.
-2. **Gives it a name.** It calls the front desk `nawex-fraud-svc`.
-3. **Picks the door type.** `type: NodePort` means visitors knock on a real door number on
-   the machine. NodePort is just that door number.
-4. **Points to the right copies.** It uses the label `app: nawex-fraud-api` so the front
-   desk only sends people to your app's pods.
-5. **Sets the doors and routing.** Inside the cluster the front desk listens on port `80`
-   and passes visitors to port `5000` (`targetPort`) where the app is listening. From the
-   outside world, visitors knock on door number `30080` (`nodePort`).
+1. `kind: Service` — "this is the **front desk**."
+2. `name: zero2ai-fraud-svc` — the front desk's name.
+3. `type: NodePort` — visitors knock on a real door number on the machine. NodePort *is* that
+   door number.
+4. `selector: app: zero2ai-fraud-api` — only send visitors to *your* app's copies.
+5. The ports — inside, the front desk listens on `80` and passes visitors to `5000`
+   (`targetPort`) where the app waits. From the outside, visitors knock on door `30080`
+   (`nodePort`).
 
-**What you get:** One steady front-desk address (door `30080`) that always forwards
-visitors to a healthy copy of your app, even as copies come and go.
+**What you get:** one steady address that always forwards visitors to a healthy copy, even as
+copies come and go.
 
-➡ Next: [chapter-11-monitoring](../chapter-11-monitoring) — instrument with Prometheus.
+## Let's run it
+
+With your node showing `Ready`, run these one at a time:
+
+```bash
+kubectl apply -f deployment.yaml   # ask for 2 copies
+kubectl apply -f service.yaml      # set up the front desk
+kubectl get pods                   # expect 2 copies, status "Running"
+```
+
+`kubectl apply -f <file>` means "read this wish-file and make it real." Then visit the app
+through the front desk:
+
+```bash
+curl http://localhost:30080/health
+```
+
+(`curl` knocks on a door from the terminal — you met it back in the API chapter.)
+
+### See the self-healing trick
+
+```bash
+kubectl get pods                       # copy one pod's name from the list
+kubectl delete pod <pod-name>          # remove one copy on purpose
+kubectl get pods                       # watch a fresh copy appear in its place
+```
+
+You asked for 2 copies. Delete one, and the manager immediately starts another to keep its
+promise. That's self-healing, live, on your laptop.
+
+### Scale up (and back down)
+
+```bash
+kubectl scale deployment zero2ai-fraud-api --replicas=5   # now keep 5 copies
+kubectl get pods                                         # watch 5 appear
+kubectl scale deployment zero2ai-fraud-api --replicas=2   # back to 2
+```
+
+🎉 You just ran many copies of a real app, watched one heal itself, and changed how many run —
+all with a few short commands.
+
+---
+
+## Try it yourself (mini challenges)
+
+- 🔧 **Change the copy count.** In `deployment.yaml`, find the line that sets how many copies run.
+  Change `2` to `3`, then run `kubectl apply -f deployment.yaml` again and watch a third copy
+  appear.
+- 🔧 **Find the health check.** Which lines make the manager poke your app to see if it's alive?
+  Which path and port does it knock on?
+- 🔧 **Find the outside door.** In `service.yaml`, which line sets the door number people outside
+  knock on? What would the new `curl` address be if you changed it to `30090`?
+- 🔧 **Watch healing happen.** Delete a pod (`kubectl delete pod <name>`) and immediately run
+  `kubectl get pods` a couple of times. Catch the new copy being born.
+
+## If something breaks
+
+- **`kubectl: command not found`** → Kubernetes tools aren't ready. Enable Docker Desktop's
+  Kubernetes, or install and `minikube start`. (Helper moment.)
+- **`kubectl get nodes` shows nothing `Ready`** → The local cluster isn't up yet. Wait a minute,
+  or restart it (`minikube start`, or toggle Docker Desktop's Kubernetes off and on).
+- **Pods stuck in `ErrImagePull` / `ImagePullBackOff`** → The cluster can't find the image
+  `zero2ai-fraud-api:v1.0`. Build it locally (Chapter 06) so the local cluster can see it.
+- **`curl: ... Connection refused` on port 30080** → Give the pods a few seconds to reach
+  `Running`, and confirm the Service was applied: `kubectl get service`.
+- **YAML error on `apply`** → Indentation again — two spaces per level, never tabs. Compare to
+  the examples above.
+
+## What you just learned
+
+- **Kubernetes** is a traffic controller / playground manager: it runs many copies and restarts
+  any that fall over.
+- A **Deployment** sets *how many copies* (replicas) to keep alive and how to **health-check**
+  each one.
+- A **Service** is the **front desk** that forwards every visitor to a healthy copy.
+- A **pod** is one running copy; **self-healing** means deleted or crashed copies come back on
+  their own.
+- You can run a real, multi-copy, self-healing app **free on your own laptop** with Docker
+  Desktop's Kubernetes or **minikube** — no cloud bill.
+- `kubectl apply`, `get pods`, `delete pod`, and `scale` are the everyday commands.
+
+## Where to next
+
+➡ [Chapter 11 — Watch your program's health (Monitoring)](../chapter-11-monitoring). Now that many
+copies are running, you'll learn to watch their health on charts you can glance at any time.

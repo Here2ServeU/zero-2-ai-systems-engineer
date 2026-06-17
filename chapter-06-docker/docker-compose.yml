@@ -3,7 +3,7 @@ version: '3.8'
 services:
   fraud-api:
     build: .
-    image: nawex-fraud-api:v1.0
+    image: zero2ai-fraud-api:v1.0
     ports: ['5000:5000']
     environment:
       - FLASK_ENV=production

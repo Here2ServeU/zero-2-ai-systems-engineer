@@ -16,7 +16,7 @@ client = genai.Client(api_key=os.environ['GEMINI_API_KEY'])
 
 SYSTEM_PROMPT = (
     'You are a helpful customer support agent '
-    'for Nawex Bank. Answer in two short '
+    'for Zero2AI Bank. Answer in two short '
     'paragraphs. If the question is outside '
     'banking topics, politely decline.')
 

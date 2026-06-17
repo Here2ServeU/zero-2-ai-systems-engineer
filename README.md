@@ -1,86 +1,85 @@
-# Zero to AI Systems Engineer
+# Start From Zero — The Beginner's Edition
 
-Companion code for **_Zero to AI Systems Engineer: Build, Deploy, and Scale Real ML
-Systems_** by Rev. Dr. Emmanuel Naweji (T2S — Transformed 2 Succeed, Professional Edition,
-2026).
+Welcome. This edition teaches the **exact same skills** as the main book, but rewritten for
+someone who has **never** written code, never used AI or machine learning, and has never
+touched the cloud or DevOps. No experience needed. We start at *truly* zero.
 
-This repository **is** the book's `ai-ml-engineer` workspace. Each chapter maps to one
-`chapter-XX-*` folder containing that chapter's exact lab scripts, plus the book's two
-industry capstones, **NexaGuard** (FinTech) and **ClarityAI** (Healthcare). The folder
-names, scripts, and run commands match the book verbatim, so you can `cd chapter-XX-...` and
-follow along.
+> This is the beginner edition of *Zero to AI Systems Engineer*. Each chapter folder holds a
+> gentle, tiny-step guide **and the runnable scripts** for that chapter, so you can read it,
+> run it, and learn at your own pace — no prior experience needed.
 
-## The flagship project: Zero2AI fraud detection
+## How this edition is different
 
-Layer by layer, the chapter labs build one production AI system — a fraud detection
-platform that generates data, trains a model, serves it behind a Flask API, runs in
-Docker and Kubernetes, deploys to AWS with Terraform, monitors itself with Prometheus +
-Grafana, predicts its own failures with AIOps, retrains on drift, deploys safely with
-canary/blue-green, and answers questions with an LLM grounded by RAG.
+- **Tiny steps.** Every chapter is broken into small steps. You always know the *one* thing
+  to do next.
+- **Plain words first.** We explain the idea with an everyday picture (a lunchbox, a robot
+  builder, a pen pal) *before* showing any code.
+- **Try-it-yourself.** Each chapter ends with little challenges so you *do*, not just read.
+- **"If it breaks" help.** Beginners hit errors. We list the common ones and how to fix them.
+- **No surprises about money.** Some chapters need accounts that can cost money. Those are
+  clearly flagged so you never get a surprise bill.
 
-## Chapter map
+## The labels you'll see at the top of each chapter
 
-| Folder | Book chapter(s) | Topic | Key scripts |
-|---|---|---|---|
-| [chapter-01-setup](chapter-01-setup) | 0, 1 | Toolkit + dev environment | `hello.py` |
-| [chapter-02-data](chapter-02-data) | 2 | First ML experiment (manual logging) | `generate_data.py`, `train_model.py` |
-| [chapter-03-models](chapter-03-models) | 3 | Fraud + healthcare anomaly models | `create_fintech_data.py`, `fraud_detection.py`, `anomaly_detection.py` |
-| [chapter-04-mlflow](chapter-04-mlflow) | 4 | Experiment tracking with MLflow | `train_with_tracking.py`, `register_best_model.py` |
-| [chapter-05-api](chapter-05-api) | 5 | Serving models via APIs | `app/model.py`, `app/api.py` |
-| [chapter-06-docker](chapter-06-docker) | 6 | Containerization with Docker | `Dockerfile`, `docker-compose.yml` |
-| [chapter-07-terraform](chapter-07-terraform) | 7 | Infrastructure as Code | `main.tf` |
-| [chapter-08-cloud](chapter-08-cloud) | 8 | Cloud deployment, modules, SSH | `modules/ec2/`, `environments/dev/` |
-| [chapter-09-cicd](chapter-09-cicd) | 9 | CI/CD with GitHub Actions | [`.github/workflows/ci.yml`](.github/workflows/ci.yml) |
-| [chapter-10-kubernetes](chapter-10-kubernetes) | 10 | Kubernetes & orchestration | `deployment.yaml`, `service.yaml` |
-| [chapter-11-monitoring](chapter-11-monitoring) | 11 | Observability with Prometheus | `app_with_metrics.py`, `anomaly_detection.py` |
-| [chapter-12-aiops](chapter-12-aiops) | 12 | AIOps engine | `aiops_engine.py`, `automated_response.py` |
-| [chapter-13-retraining](chapter-13-retraining) | 13 | Drift detection + retraining | `drift_detector.py`, `retrain_pipeline.py`, [`retrain.yml`](.github/workflows/retrain.yml) |
-| [chapter-14-deployment](chapter-14-deployment) | 14 | Canary, feature flags, blue/green | `src/router.py`, `src/feature_flag.py`, `src/switch.py` |
-| [chapter-15-dashboards](chapter-15-dashboards) | 15 | Prometheus + Grafana stack | `monitored_api.py`, `docker-compose.yml` |
-| [chapter-16-llm](chapter-16-llm) | 16 | LLM foundations (Claude) | `verify_api.py`, `llm_api.py` |
-| [chapter-17-rag](chapter-17-rag) | 17 | RAG pipeline (ChromaDB) | `index_corpus.py`, `retrieval.py`, `rag_query.py` |
-| [chapter-18-prodllm](chapter-18-prodllm) | 18 | Production LLM systems | `production_llm.py` |
-| [nexaguard](nexaguard) | Capstone 1 | FinTech fraud platform | scaffold + 10 milestones |
-| [clarityai](clarityai) | Capstone 2 | Healthcare clinical platform | scaffold + 10 milestones |
+| Label | What it means |
+|---|---|
+| 💻 **Runs free on your laptop** | You can fully do this with just your computer. No account, no money. |
+| 🌐 **Needs the internet** | The chapter talks to something online. |
+| 💳 **Needs an account that may cost money** | You must sign up somewhere, sometimes with a credit card. **Get permission first if the account isn't yours.** |
+| 🧑‍🤝‍🧑 **Easier with a helper the first time** | Setup is fiddly; a more experienced person nearby helps a lot. |
+| 👀 **Read-along** | Hard or costly to run yourself. Read it to understand *what* the pros do, then move on. You lose nothing by reading instead of running. |
 
-## The eight-layer stack
+## The journey (18 chapters)
 
-1. **Foundation & Mindset** — Chapters 1–3
-2. **Data & Models** — Chapters 4–5
-3. **APIs & Containers** — Chapters 5–6
-4. **Cloud Infrastructure** — Chapters 7–8
-5. **Automation & Orchestration** — Chapters 9–10
-6. **Observability & Operations** — Chapters 11–12
-7. **Continuous Delivery & Safe Deployment** — Chapters 13–15
-8. **Modern AI · LLMs & RAG** — Chapters 16–18
+You'll build **one real system, one layer at a time**: a program that spots fake/fraudulent
+payments, then learns to run anywhere, watch itself, heal itself, and even answer questions
+in plain English.
 
-## Getting started
+### Part 1 — Get going (do every step yourself)
+1. [Chapter 01 — Set up your computer and say hello](chapter-01-setup) · 💻
+2. [Chapter 02 — Your very first tiny AI experiment](chapter-02-data) · 💻
+3. [Chapter 03 — Teach the computer to spot trouble](chapter-03-models) · 💻
+4. [Chapter 04 — Keep a tidy notebook of your experiments](chapter-04-mlflow) · 💻
+5. [Chapter 05 — Let other programs talk to your model](chapter-05-api) · 💻 🌐
 
-```bash
-# Per the book, each chapter's lab uses its own virtual environment and installs
-# only the packages it needs. To set up one environment for the whole workspace:
-python3 -m venv venv && source venv/bin/activate   # Windows: venv\Scripts\activate
-pip install -r requirements.txt
+### Part 2 — Make it run anywhere
+6. [Chapter 06 — Pack your program into a box (Docker)](chapter-06-docker) · 💻 🧑‍🤝‍🧑
+7. [Chapter 07 — Rent a computer with a wish-list (Terraform)](chapter-07-terraform) · 👀 💳
+8. [Chapter 08 — Build bigger in the cloud](chapter-08-cloud) · 👀 💳
+9. [Chapter 09 — A robot helper that checks your work (CI/CD)](chapter-09-cicd) · 🌐 🧑‍🤝‍🧑
+10. [Chapter 10 — Run many copies safely (Kubernetes)](chapter-10-kubernetes) · 🧑‍🤝‍🧑
 
-# Run the first program:
-python3 chapter-01-setup/hello.py
-```
+### Part 3 — Make it watch and heal itself
+11. [Chapter 11 — Watch your program's health (Monitoring)](chapter-11-monitoring) · 💻
+12. [Chapter 12 — Teach the system to fix itself (AIOps)](chapter-12-aiops) · 💻
+13. [Chapter 13 — Notice when the world changes (Drift & retraining)](chapter-13-retraining) · 💻
+14. [Chapter 14 — Release changes without scary surprises](chapter-14-deployment) · 💻
+15. [Chapter 15 — Dashboards you can watch (Grafana)](chapter-15-dashboards) · 💻 🧑‍🤝‍🧑
 
-For the LLM/RAG chapters (16–18) you also need an Anthropic API key:
+### Part 4 — Modern AI: smart writing robots
+16. [Chapter 16 — Talk to a smart writing robot (LLM)](chapter-16-llm) · 💳 🌐
+17. [Chapter 17 — Give the robot your own notes to read (RAG)](chapter-17-rag) · 💳 🌐
+18. [Chapter 18 — Run the smart robot for real (Production LLM)](chapter-18-prodllm) · 💳 🌐
 
-```bash
-export ANTHROPIC_API_KEY='your-key-here'
-```
+> **The big graduation projects.** After the chapters, the book includes two full systems to
+> build — **NexaGuard** (catching bank fraud) and **ClarityAI** (helping in healthcare). They
+> are advanced. Come back to them once these 18 chapters feel comfortable.
 
-> **Model id note:** the book's LLM labs use `model='claude-opus-4-7'`. Set this to a
-> currently available Claude model for your account (e.g. `claude-opus-4-8` or
-> `claude-sonnet-4-6`).
+## What you need before Chapter 01
 
-## The professional workflow (Appendix A)
+Almost nothing. Just:
+- A computer (Windows, Mac, or Linux).
+- About 30 minutes for the first setup.
+- Curiosity. That's it.
 
-Every lab follows the same loop: create folder → create venv → activate → write code →
-`git add` → `git commit` → push → `deactivate`. See
-[APPENDIX_A_github_workflow.md](APPENDIX_A_github_workflow.md) for the full GitHub setup
-and push workflow.
+Chapter 01 installs everything else, slowly, one piece at a time.
 
-— *Soli Deo gloria.*
+## One golden rule for beginners
+
+> **Read the whole step, then do it. If something looks scary, it's just a new word — every
+> new word is explained in the [GLOSSARY](GLOSSARY.md).**
+
+Open the [GLOSSARY](GLOSSARY.md) in a second tab. Whenever you meet a bold word you don't
+know, look it up there.
+
+➡ Start now: [Chapter 01 — Set up your computer and say hello](chapter-01-setup)

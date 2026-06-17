@@ -1,7 +1,7 @@
 # environments/dev/main.tf
 terraform {
   backend "s3" {
-    bucket = "nawex-terraform-state-12345"
+    bucket = "zero2ai-terraform-state-12345"
     key    = "dev/terraform.tfstate"
     region = "us-east-1"
   }

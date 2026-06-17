@@ -1,117 +1,203 @@
-# Chapter 05 — Serving Models via APIs
+# Chapter 05 — Let other programs talk to your model
 
-**Book:** Chapter 5 (Serving Models Through APIs) · Lab 5.3
-**Layer:** 3 · APIs & Containers · **You build:** Production Flask API
+> Matches **Chapter 05** in the book. The runnable scripts for this chapter are in this folder.
 
-## What you build
+**Labels:** 💻 Runs free on your laptop · 🌐 Needs the internet
 
-A production-grade fraud API applying the four principles: validate every input,
-return structured responses, handle errors gracefully, log everything. Model logic
-(`app/model.py`) is kept separate from API logic (`app/api.py`).
+---
 
-## Setup & run
+## The big idea (in plain words)
+
+So far, your fraud-spotting model only works when *you* run it by hand. But what if another
+program — a website, a phone app, a bank's system — wanted to ask it "is this payment fraud?"
+It needs a **doorway** to knock on.
+
+Think of a hotel **front desk**. People walk up, ask a question, and the clerk answers. We're
+going to build a front desk for your model. Other programs walk up (over the internet), ask a
+question, and get an answer back. The fancy name for this front desk is an **API**, and we'll
+build it with a small, friendly tool called **Flask**.
+
+## New words (look up anything unfamiliar in the [GLOSSARY](../GLOSSARY.md))
+
+- **API** — a doorway that lets one program ask another program for something.
+- **Endpoint** — one specific door of an API, like `/predict` ("is this fraud?") or `/health`
+  ("are you okay?").
+- **Flask** — a small Python helper for building the front desk.
+- **Request** — a message sent *to* the front desk asking it to do something.
+- **Response** — the answer the front desk sends back.
+- **JSON** — a simple, tidy text format for sending data between programs.
+- **curl** — a command-line tool that lets you knock on an API's door from the terminal.
+- **Port** — a numbered "window" on a computer that programs use to talk. We use window `5000`.
+
+## What you will build
+
+A small web service (a "front desk") that other programs can talk to. You'll start it, then
+send it a pretend payment and watch it answer **FRAUD** or **LEGIT** — all from your own
+laptop.
+
+---
+
+## Let's do it, one small step at a time
+
+> **Heads up: this chapter needs TWO terminals.** One terminal *runs* the front desk and stays
+> busy listening. The other terminal *sends* a question to it. If you try to do both in one
+> terminal, the second command will look stuck. This is normal — you simply need two windows.
+
+### Step 1 — Get the code and open it
+
+Go into the chapter folder that has the code for this chapter:
+
+```bash
+cd chapter-05-api
+```
+
+Inside you'll find an `app/` folder with two important files:
+
+- **`model.py`** — the "brain" that learns from pretend payments and guesses fraud or not.
+  (This is the same kind of model you met in earlier chapters.)
+- **`api.py`** — the **front desk** that listens for questions and asks the brain.
+
+### Step 2 — Make a clean toolbox (virtual environment) and install the helpers
 
 ```bash
 python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
-
-cd app && python api.py        # Terminal 1
 ```
 
-Test (Terminal 2):
+- `python3 -m venv venv` makes a clean, private **toolbox** (a *virtual environment*) just for
+  this project, so its tools don't bump into other projects.
+- `source venv/bin/activate` steps *into* that toolbox. (On Windows, type
+  `venv\Scripts\activate` instead.)
+- `pip install -r requirements.txt` reads the **shopping list** of helpers and installs them:
+  `flask` (builds the front desk), `scikit-learn` (builds the brain), plus `pandas` and
+  `numpy` (number helpers).
+
+**What you should see:** a list of packages being downloaded, ending with something like
+`Successfully installed flask-... scikit-learn-...`.
+
+### Step 3 — Start the front desk (TERMINAL 1)
+
+This is your **first** terminal. It will run the server and keep running.
+
+```bash
+cd app && python api.py
+```
+
+**What you should see:** a few startup lines, then something like:
+
+```
+ * Running on http://0.0.0.0:5000
+```
+
+That means the front desk is open and listening at window (**port**) `5000`. **Leave this
+terminal alone** — do not close it and do not type in it. It needs to stay busy listening.
+
+**What `api.py` does, in plain words:**
+
+- It turns on a **logbook** (logging) so every question gets written down with the time.
+- It builds the Flask front desk and wakes up the brain from `model.py`.
+- It sets a **rulebook** that says which clues a payment must include and what kind of number
+  each should be.
+- `/health` is the door for "Are you okay?" — it answers `healthy`.
+- `/info` is the door for "Who are you?" — it gives the API's name and version.
+- `/predict` is the real door. It reads the payment you send, checks the rules, asks the brain,
+  and hands back the answer plus a short ticket number.
+- The last line tells it to stand at the door (`port=5000`) and start listening.
+
+### Step 4 — Open a SECOND terminal
+
+Leave Terminal 1 running. Open a **brand-new** terminal window (in VS Code:
+**Terminal → New Terminal**; the old one keeps running in its own tab). This second terminal is
+where you'll knock on the door.
+
+### Step 5 — Knock on the easy doors first (TERMINAL 2)
+
+In your **second** terminal, ask the simple questions:
 
 ```bash
 curl http://localhost:5000/health
 curl http://localhost:5000/info
+```
+
+- `curl` is a tool that knocks on an API's door from the terminal.
+- `http://localhost:5000` means "the front desk on *this* computer, at window 5000."
+  (`localhost` always means "this computer.")
+
+**What you should see:** tidy **JSON** answers, something like:
+
+```
+{"status":"healthy","ts":"2026-06-16T12:00:00"}
+{"name":"Zero2AI Fraud API","version":"1.0.0",...}
+```
+
+### Step 6 — Send a payment and get a fraud answer (TERMINAL 2)
+
+Now the real thing. Still in your **second** terminal, send a pretend payment to `/predict`:
+
+```bash
 curl -X POST http://localhost:5000/predict \
   -H 'Content-Type: application/json' \
   -d '{"amount":950,"hour":3,"is_weekend":0,"amount_vs_avg":4.7,
        "is_large_txn":1,"is_late_night":1,"merch_txn_ct":2}'
 ```
 
-## What each file does (explained for absolute beginners)
+**What each part means, in plain words:**
 
-Think of the computer as a friend who only does *exactly* what you tell it. A script
-is just a list of instructions you hand to that friend, one line at a time. In this
-chapter we build an **API** — a waiter who takes your order (a request) and brings back
-food (an answer). We build the waiter with **Flask**, a tool that builds waiters. The
-waiter answers a few specific questions called **endpoints** — like `/health` ("Are you
-okay?"), `/info` ("Who are you?"), and `/predict` ("Is this transaction fraud?").
+- `-X POST` — "I'm *sending* you some data," not just asking a question.
+- `-H 'Content-Type: application/json'` — a note that says "the data I'm sending is in JSON."
+- `-d '{...}'` — the actual payment, written as **JSON**. Each clue is a name and a number:
+  a big `amount` of 950, at `hour` 3 (3 a.m.), much bigger than usual (`amount_vs_avg` 4.7),
+  late at night, and so on. These are exactly the seven clues the brain looks at.
 
-### `model.py` — the brain that decides fraud or not fraud
+**What you should see:** a JSON answer with a label, something like:
 
-**In one sentence:** This file builds and trains the smart guesser, then knows how to ask
-it about one transaction at a time.
+```
+{"label":"FRAUD","confidence":0.97,"req_id":"a1b2c3d4",...}
+```
 
-**What it does, step by step:**
+🎉 You just let another program (curl) talk to your model over the internet. That same doorway
+is how a real website or app would use your fraud detector.
 
-1. It gives the model a name tag, `v1.0.0`, so we always know which version we are using.
-2. It writes down the seven clues the model looks at. These are stored in a list called
-   `FEATURES`: `amount`, `hour`, `is_weekend`, `amount_vs_avg`, `is_large_txn`,
-   `is_late_night`, and `merch_txn_ct`.
-3. In `load_model`, it makes up 2,000 pretend transactions to practice on. (It uses a
-   fixed "seed" number so the pretend data is the same every time — like shuffling a deck
-   the exact same way each game.)
-4. It splits those pretend transactions into a big study pile and a small test pile.
-5. It builds a decision tree (a guesser that asks yes/no questions) and lets it study the
-   big pile.
-6. It quizzes itself on the small pile, prints how often it was right, and hands back the
-   trained brain.
-7. In `predict_one`, it takes one transaction, lines up the seven clues in the right
-   order, and asks the brain for a guess.
-8. It packs the answer into a neat box: was it fraud (1) or legit (0), a friendly label
-   (`FRAUD` or `LEGIT`), how sure it is (confidence), and the model's version name.
+---
 
-**What you get:** A ready-to-use brain plus a simple way to ask it about any single
-transaction and get back a tidy answer.
+## Try it yourself (mini challenges)
 
-### `api.py` — the waiter who takes orders and brings back answers
+- 🔧 **Make it say LEGIT.** Send a different payment: a small `amount` like `20`, at `hour`
+  `14` (2 p.m.), `is_late_night` `0`, `is_large_txn` `0`. Watch the label flip to **LEGIT**.
+- 🔧 **Break a rule on purpose.** Send a payment with `hour` set to `99`. The front desk should
+  refuse it and tell you `hour must be 0-23`. (That's the rulebook protecting your model.)
+- 🔧 **Leave out a clue.** Remove `amount` from the JSON and send it. Read how the front desk
+  politely lists what's missing instead of crashing.
+- 🔧 **Visit `/info` again** after a few `/predict` calls, and peek at **Terminal 1**: every
+  request you sent was written in the logbook with its ticket number.
 
-**In one sentence:** This file builds the waiter (the API) that listens for questions,
-checks that your order makes sense, asks the brain, and hands back the answer.
+## If something breaks
 
-**What it does, step by step:**
+- **"Address already in use" / "port 5000 in use"** → Something is already using window 5000.
+  Stop the old server (go to the terminal running it and press **Ctrl+C**), or close any other
+  copy of `api.py` you started, then run Step 3 again.
+- **`curl: (7) Failed to connect ... Connection refused`** → The front desk isn't running.
+  Check that **Terminal 1** still shows `Running on http://0.0.0.0:5000`. If it stopped or you
+  closed it, start it again with Step 3.
+- **Your `curl` command looks stuck / nothing happens** → You probably typed `curl` in the
+  *same* terminal that's running the server. Open a **second** terminal (Step 4) and run `curl`
+  there.
+- **`command not found: curl`** → Most Macs and Linux have curl already. On Windows, use
+  **PowerShell** (it includes curl), or install Git which also brings it along.
+- **`ModuleNotFoundError: No module named 'flask'`** → You skipped the toolbox or the install.
+  Run `source venv/bin/activate` then `pip install -r requirements.txt` again (Step 2).
 
-1. It turns on a logbook (logging) so every action gets written down with the time —
-   handy for finding out what happened later.
-2. It builds the Flask waiter and wakes up the brain from `model.py` so it is ready to
-   answer.
-3. It makes a rulebook called `REQUIRED` that says which clues must be sent and what kind
-   of number each one should be (some can be decimals, the rest must be whole numbers).
-4. The `validate` helper checks every order: it complains if a clue is missing, if a clue
-   is the wrong kind of number, or if `hour` is not between 0 and 23.
-5. The `/health` endpoint is the question "Are you okay?" The waiter answers "healthy"
-   and tells you the time.
-6. The `/info` endpoint is the question "Who are you?" The waiter tells you the API's
-   name, version, author, and program.
-7. The `/predict` endpoint is the real order. The waiter gives the order a short ticket
-   number (`req_id`), writes it in the logbook, and reads the order.
-8. If the order is not proper JSON, it sends back a polite "Body must be JSON" error. If
-   the order breaks a rule, it sends back the list of problems. (JSON is just a tidy way
-   to write down information so computers can read it.)
-9. If the order is good, the waiter asks the brain, adds the ticket number and the time
-   to the answer, writes the result in the logbook, and hands the answer back.
-10. The last lines tell the waiter to stand at the door (port 5000) and start listening
-    for visitors.
+## What you just learned
 
-**What you get:** A running waiter you can talk to over the web. Ask it `/health`,
-`/info`, or send a transaction to `/predict` and it answers safely, even when you make a
-mistake.
+- An **API** is a front desk that lets other programs talk to your model over the internet.
+- **Flask** builds that front desk; each door it answers is an **endpoint** (`/health`,
+  `/info`, `/predict`).
+- Programs send a **request** and get a **response** back, both written in **JSON**.
+- **curl** lets you knock on those doors from the terminal.
+- A running server needs **one terminal to itself**; you talk to it from a **second** terminal.
+- A good front desk **checks every request** and answers politely even when something's wrong.
 
-### `requirements.txt` — the shopping list of helper tools
+## Where to next
 
-**In one sentence:** This file is a shopping list of helper tools the computer must
-install before the waiter can work.
-
-**What it does, step by step:**
-
-1. `flask` — the tool that builds the waiter (the API).
-2. `scikit-learn` — the toolbox that builds and trains the smart guesser (the model).
-3. `pandas` — a tool for holding information in neat tables, like a spreadsheet.
-4. `numpy` — a tool for doing fast math with lots of numbers, used to make the pretend
-   practice data.
-
-**What you get:** With one install command, the computer grabs every helper tool on the
-list so all the other files have what they need to run.
-
-➡ Next: [chapter-06-docker](../chapter-06-docker) — containerize this API.
+➡ [Chapter 06 — Pack your program into a box (Docker)](../chapter-06-docker). You'll wrap this
+exact front desk into a "lunchbox" so it runs the same on any computer.

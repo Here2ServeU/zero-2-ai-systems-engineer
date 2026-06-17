@@ -1,159 +1,347 @@
-# Chapter 16 — Foundations of Large Language Models
+# Chapter 16 — Talk to a smart writing robot (LLM)
 
-**Book:** Chapter 16 (Foundations of Large Language Models) · Lab 16.5
-**Layer:** 8 · Modern AI · **You build:** Your first production LLM endpoint
+> Matches **Chapter 16** in the book. The runnable scripts for this chapter are in this folder.
 
-## What you build
+**Labels:** 💳 Needs an account that may cost money · 🌐 Needs the internet
 
-- `verify_api.py` — the simplest call that proves your Anthropic API key works.
-- `llm_api.py` — a Flask `/chat` endpoint wrapping Claude behind a system prompt, with
-  input validation, request IDs, structured logging, and token accounting.
+---
 
-**Three provider options.** The book uses **Anthropic Claude**, but the exact same lab
-works with **OpenAI** or **Google Gemini** — pick whichever account you have. Each provider
-has its own pair of scripts that behave identically (same `/chat` door, same JSON answer):
+> ### ⚠️ Money & secrets — please read this first
+>
+> This chapter talks to a paid online robot service. To use it you need an **API key** — think
+> of an API key as a **credit card for a robot service**. Each time your program phones the
+> robot, it can cost a small amount of money (usually a fraction of a cent for these tiny
+> tests, but it is not free).
+>
+> - **Get permission first** if the account isn't yours. Ask the person who owns it before you
+>   run anything that spends money.
+> - **Never paste the key directly into your code, and never share it.** Anyone with your key
+>   can spend your money. Keep it in an **environment variable** (your computer's settings),
+>   exactly as this chapter shows.
+> - **You only need ONE robot company.** The book offers three (Anthropic Claude, OpenAI,
+>   Google Gemini). Pick whichever you can sign up for. **Google Gemini has a free tier**, which
+>   is the cheapest, friendliest way to start.
+> - **No key? No problem.** It is completely fine to *read* this whole chapter to understand how
+>   it works, even if you never run it. You lose nothing by reading.
 
-| Provider | Verify script | API script | Install | API key env var |
-|---|---|---|---|---|
-| Anthropic (Claude) | `verify_api.py` | `llm_api.py` | `pip install anthropic flask` | `ANTHROPIC_API_KEY` |
-| OpenAI (GPT) | `verify_api_openai.py` | `llm_api_openai.py` | `pip install openai flask` | `OPENAI_API_KEY` |
-| Google (Gemini) | `verify_api_gemini.py` | `llm_api_gemini.py` | `pip install google-genai flask` | `GEMINI_API_KEY` |
+---
 
-## Setup & run
+## The big idea (in plain words)
+
+Imagine a **pen pal** who has read almost every book and article in the world. You can phone
+this pen pal over the internet, ask any question in plain words, and they write you back a
+helpful answer in plain words. That pen pal is an **LLM** (Large Language Model) — a very
+well-read robot that *reads and writes words*. Famous ones are named **Claude**, **GPT**, and
+**Gemini**.
+
+In this chapter you'll do two things:
+
+1. Make the **simplest possible phone call** to the robot to prove your secret password (your
+   **API key**) works.
+2. Build a tiny **front desk** (a web door called `/chat`) so other programs can send a banking
+   question and get the robot's answer back.
+
+Small on purpose. By the end you'll have phoned a real LLM and built a little service around it.
+
+## New words (look up anything unfamiliar in the [GLOSSARY](../GLOSSARY.md))
+
+- **LLM (Large Language Model)** — a super-smart pen pal: software that reads and writes text
+  and answers questions. Claude, GPT, and Gemini are examples.
+- **Prompt** — the question or instructions you send to the robot.
+- **System prompt** — a standing instruction the robot *always* follows, like "you are a polite
+  bank helper."
+- **Token** — a small piece of a word. The robot measures its work (and its cost) in tokens.
+- **API key** — a secret password that lets your program use the paid robot service. Keep it in
+  your computer's settings, never in your code.
+
+## What you will build
+
+- `verify_api.py` — the "is the phone working?" test: the simplest call that proves your API
+  key works and the robot answers.
+- `llm_api.py` — a small web service with a `/chat` door. Other programs knock, hand over a
+  banking question, and get the robot's answer back (with a ticket number and a count of how
+  many tokens were used).
+
+---
+
+## Let's do it, one small step at a time
+
+> **Heads up: the front desk part needs TWO terminals.** One terminal *runs* the front desk and
+> stays busy listening. The other terminal *sends* it a question. This is normal — you just need
+> two windows.
+
+### Step 1 — Get the code and open it
+
+Go into the chapter folder that holds the code for this chapter:
+
+```bash
+cd chapter-16-llm
+```
+
+Inside you'll find several files. The two we use first are:
+
+- **`verify_api.py`** — the simplest test call.
+- **`llm_api.py`** — the `/chat` front desk.
+
+> The folder also has `..._openai.py` and `..._gemini.py` twins. Those are the *same* scripts
+> for the other two robot companies. **Ignore the ones you don't need** — pick one company and
+> use just its pair of files.
+
+### Step 2 — Make a clean toolbox (virtual environment) and install the helpers
 
 ```bash
 python3 -m venv venv && source venv/bin/activate
+```
 
-# ---- Option A: Anthropic (Claude) — the book's default ----
+- `python3 -m venv venv` makes a clean, private **toolbox** (a *virtual environment*) just for
+  this project, so its tools don't bump into other projects.
+- `source venv/bin/activate` steps *into* that toolbox. (On Windows, type
+  `venv\Scripts\activate` instead.)
+
+Now install the helpers for **the one company you picked**:
+
+```bash
+# Option A — Anthropic (Claude), the book's default:
 pip install anthropic flask python-dotenv
-export ANTHROPIC_API_KEY='your-key-here'   # PowerShell: $env:ANTHROPIC_API_KEY='...'
-python verify_api.py
-python llm_api.py                           # Terminal 1
 
-# ---- Option B: OpenAI (GPT) ----
+# Option B — OpenAI (GPT):
 pip install openai flask
-export OPENAI_API_KEY='your-key-here'
-python verify_api_openai.py
-python llm_api_openai.py                     # Terminal 1
 
-# ---- Option C: Google (Gemini) ----
+# Option C — Google (Gemini), has a free tier — cheapest to start:
 pip install google-genai flask
-export GEMINI_API_KEY='your-key-here'
-python verify_api_gemini.py
-python llm_api_gemini.py                      # Terminal 1
+```
 
-# Any of the three answers the SAME request (Terminal 2):
+**What you should see:** a list of packages downloading, ending with something like
+`Successfully installed anthropic-... flask-...`.
+
+### Step 3 — Get a key and set it as an environment variable
+
+First, sign up and create a key at the page for your chosen company:
+
+- **Anthropic:** [console.anthropic.com](https://console.anthropic.com)
+- **OpenAI:** [platform.openai.com](https://platform.openai.com)
+- **Google Gemini:** [aistudio.google.com](https://aistudio.google.com)
+
+Then tell *this terminal* about your key. Each company uses a differently-named slot:
+
+```bash
+# Mac / Linux (pick the line for your company):
+export ANTHROPIC_API_KEY='your-key-here'
+export OPENAI_API_KEY='your-key-here'
+export GEMINI_API_KEY='your-key-here'
+```
+
+```powershell
+# Windows PowerShell (pick one):
+$env:ANTHROPIC_API_KEY='your-key-here'
+$env:OPENAI_API_KEY='your-key-here'
+$env:GEMINI_API_KEY='your-key-here'
+```
+
+- `export NAME='value'` puts your secret password into a labeled slot in this terminal's
+  settings. The code reads it from there, so the key never sits inside your files.
+- **This only lasts for the current terminal window.** If you open a new terminal, you must set
+  it again. (That's a common stumble — see "If something breaks.")
+
+> **Important — set the model name to one that exists.** The book's example scripts say
+> `model='claude-opus-4-7'`. That id is **just an example**. Open your verify script and the
+> api script and set `model` to a model that exists for *your* account:
+> - **Anthropic:** `claude-opus-4-8` (smartest) or `claude-sonnet-4-6` (fast, cheaper)
+> - **Gemini:** `gemini-2.5-flash` (fast, cheapest)
+> - **OpenAI:** `gpt-4o-mini` (fast, cheaper)
+
+### Step 4 — Run the "is the phone working?" test
+
+```bash
+python verify_api.py          # Anthropic
+# python verify_api_openai.py # OpenAI
+# python verify_api_gemini.py # Gemini
+```
+
+**What you should see:** a one-sentence hello written *by the robot*, then two number lines,
+something like:
+
+```
+Hello! It's a pleasure to meet you.
+Input tokens: 12
+Output tokens: 11
+```
+
+**What `verify_api.py` does, line by line in plain words:**
+
+```python
+import anthropic, os
+
+client = anthropic.Anthropic(
+    api_key=os.environ['ANTHROPIC_API_KEY'])
+```
+
+- `import anthropic, os` — bring in the helper that knows how to phone the robot, plus `os`
+  which lets us read your computer's settings.
+- `os.environ['ANTHROPIC_API_KEY']` — read your secret password from the slot you set in
+  Step 3. (Notice: the password is *never typed into the file*.)
+- `anthropic.Anthropic(api_key=...)` — pick up the phone, using that password to prove it's you.
+
+```python
+msg = client.messages.create(
+    model='claude-opus-4-7',
+    max_tokens=200,
+    messages=[
+        {'role':'user',
+         'content':'Say hello in one sentence.'}
+    ])
+```
+
+- `model='claude-opus-4-7'` — the robot's name tag. **Change this to a real model** (see
+  Step 3), like `claude-opus-4-8`.
+- `max_tokens=200` — a size limit: "don't write back more than about 200 little word-pieces."
+- `messages=[{'role':'user','content':'Say hello in one sentence.'}]` — your **prompt**: the
+  thing you're asking the robot to do.
+
+```python
+print(msg.content[0].text)
+print('Input tokens:', msg.usage.input_tokens)
+print('Output tokens:', msg.usage.output_tokens)
+```
+
+- `msg.content[0].text` — the robot's written answer.
+- `input_tokens` / `output_tokens` — how many word-pieces went *in* and came *out*. This is how
+  you see how much the call "cost."
+
+### Step 5 — Start the front desk (TERMINAL 1)
+
+This terminal will run the `/chat` server and keep running. Leave it alone after you start it.
+
+```bash
+python llm_api.py             # Anthropic
+# python llm_api_openai.py    # OpenAI
+# python llm_api_gemini.py    # Gemini
+```
+
+**What you should see:** a couple of startup lines, then something like:
+
+```
+ * Running on http://0.0.0.0:5000
+```
+
+That means the front desk is open and listening at window (**port**) `5000`. **Don't close or
+type in this terminal** — it needs to stay busy listening.
+
+**What `llm_api.py` does, in plain words:**
+
+- It starts a **Flask** web server (a front desk that listens for visitors knocking).
+- It opens the phone line to the robot using your **API key**, just like the test did.
+- It sets a **system prompt** — a standing rule the robot always follows. Here it says: *"You
+  are a helpful customer support agent for Zero2AI Bank. Answer in two short paragraphs. If the
+  question isn't about banking, politely decline."*
+
+Here is the heart of it, in plain words:
+
+```python
+@app.route('/chat', methods=['POST'])
+def chat():
+    rid = str(uuid.uuid4())[:8]
+    data = request.get_json(silent=True) or {}
+    question = data.get('question','').strip()
+    if not question:
+        return jsonify({'error':'Missing question','request_id':rid}), 422
+```
+
+- `@app.route('/chat', methods=['POST'])` — open a door named `/chat` that accepts data sent
+  *to* it.
+- `rid = str(uuid.uuid4())[:8]` — give this visit a short **ticket number** so it can be tracked
+  in the logbook.
+- `question = data.get('question','').strip()` — read the question the visitor sent.
+- `if not question: ...` — if no question was sent, politely send back an error instead of
+  bothering (and paying) the robot.
+
+```python
+    msg = client.messages.create(
+        model='claude-opus-4-7',
+        max_tokens=512,
+        system=SYSTEM_PROMPT,
+        messages=[{'role':'user','content':question}])
+    answer = msg.content[0].text
+```
+
+- It phones the robot with the **system prompt** plus the visitor's **question**.
+- `model='claude-opus-4-7'` — again, **swap for a real model** (Step 3).
+- `max_tokens=512` — lets the answer be a bit longer than the test.
+- Then it sends the answer back to the visitor along with the ticket number, the time, and the
+  token counts.
+
+### Step 6 — Knock on the door (TERMINAL 2)
+
+Leave Terminal 1 running. Open a **brand-new** terminal (in VS Code: **Terminal → New
+Terminal**). In this second terminal, send a banking question:
+
+```bash
 curl -X POST http://localhost:5000/chat \
   -H 'Content-Type: application/json' \
   -d '{"question":"How do I reset my pin?"}'
 ```
 
-> **Model ids:** the book uses `model='claude-opus-4-7'`. Set this to a currently
-> available model for whichever provider you chose:
-> - **Anthropic:** `claude-opus-4-8` (smartest) or `claude-sonnet-4-6` (fast, cheaper)
-> - **OpenAI:** `gpt-4o` (default) or `gpt-4o-mini` (fast, cheaper)
-> - **Gemini:** `gemini-2.5-pro` (smartest) or `gemini-2.5-flash` (fast, cheaper)
->
-> Never hardcode the API key — use an env var locally, a secrets manager in production.
-> Get a key from [console.anthropic.com](https://console.anthropic.com),
-> [platform.openai.com](https://platform.openai.com), or
-> [aistudio.google.com](https://aistudio.google.com).
+**What each part means, in plain words:**
 
-## What each file does (explained for absolute beginners)
+- `curl` — a tool that knocks on a web door from the terminal.
+- `-X POST` — "I'm *sending* you some data," not just asking.
+- `-H 'Content-Type: application/json'` — a note saying "the data I'm sending is in **JSON**."
+- `-d '{"question":"How do I reset my pin?"}'` — the actual question, written as JSON.
 
-Think of the computer as a friend who only does *exactly* what you tell it. A script
-is just a list of instructions you hand to that friend, one line at a time. In this
-chapter we phone a very well-read robot (called an **LLM** — think of it as a
-super-smart pen pal that can read and write words) and ask it questions over the
-internet. The robot lives at a company called Anthropic, and the model we talk to is
-named **Claude**.
+**What you should see:** a tidy JSON answer written by the robot, something like:
 
-### `verify_api.py` — the "is the phone working?" test
+```
+{"answer":"To reset your PIN, log in to ... ","tokens_in":48,"tokens_out":96,
+ "request_id":"a1b2c3d4","ts":"2026-06-16T12:00:00"}
+```
 
-**In one sentence:** It makes the simplest possible call to the robot to prove your
-secret password works.
+🎉 You just phoned a real smart writing robot and built a little front desk around it — the same
+shape real apps use to put an LLM behind a website door.
 
-**What it does, step by step:**
+---
 
-1. It picks up the phone to the robot. The robot's phone number is the **Claude/Anthropic
-   API** — "API" just means a way for your program to talk to the robot over the internet.
-2. To make the call you need a secret password called an **API key**. The code reads
-   that password from your computer's settings (`os.environ['ANTHROPIC_API_KEY']`) so you
-   never have to type it into the file.
-3. It sends a tiny **prompt** — a prompt is just the question or instructions you send.
-   Here the prompt is: "Say hello in one sentence."
-4. The line `model='claude-opus-4-7'` is the robot's name tag. `claude-opus-4-7` is the
-   name the book uses as an example. In real life you set it to a robot that exists today,
-   like `claude-opus-4-8` (very smart) or `claude-sonnet-4-6` (fast and a little cheaper).
-5. `max_tokens=200` is a size limit. A "token" is a small piece of a word. This says
-   "don't write back more than about 200 little word-pieces."
-6. It prints the robot's answer, plus how many word-pieces went in and came out — that's
-   how you see how much the call "cost."
+## Try it yourself (mini challenges)
 
-**What you get:** Proof that your secret password works and the robot is answering you.
+- 🔧 **Change the system prompt.** In `llm_api.py`, edit `SYSTEM_PROMPT` to make the robot a
+  helper for a *library* instead of a bank ("You are a friendly library assistant..."). Restart
+  Terminal 1 and ask it about borrowing books.
+- 🔧 **Ask a non-banking question and watch it refuse.** With the original bank prompt, send
+  `{"question":"What's a good recipe for soup?"}`. The robot should *politely decline* because
+  the system prompt told it to stay on banking topics. That's the system prompt doing its job.
+- 🔧 **Shrink the answer.** Lower `max_tokens` from `512` to `60` and ask again. Notice the
+  answer gets cut shorter — and the output token count drops.
+- 🔧 **Read the logbook.** After a few questions, peek at **Terminal 1**: each call wrote a line
+  with its ticket number and how many tokens went in and out.
 
-### `llm_api.py` — a little front desk that passes your questions to the robot
+## If something breaks
 
-**In one sentence:** It builds a tiny website door (`/chat`) so other people can send a
-banking question and get the robot's answer back.
+- **`KeyError: 'ANTHROPIC_API_KEY'`** (or `OPENAI_API_KEY` / `GEMINI_API_KEY`) → The key isn't
+  set *in this terminal*. Redo Step 3's `export` line. Remember: it only lasts for the current
+  terminal window, so if you opened a new one, set it again.
+- **An "authentication" / "invalid API key" / 401 error** → The key is wrong, has a typo, or was
+  copied with extra spaces. Create a fresh key from your company's website and `export` it again.
+- **A "model not found" error** → You're using the example name `claude-opus-4-7`. Change `model`
+  to a real one for your account (Step 3), like `claude-opus-4-8`, `gemini-2.5-flash`, or
+  `gpt-4o-mini`.
+- **`Connection error` / a long hang / timeout** → You need the **internet** for this chapter.
+  Check you're online, then try again.
+- **A "rate limit" / 429 error** → You asked too fast, or a free account hit its cap. Wait a
+  minute and try again, or send fewer requests.
+- **`curl` looks stuck / "Connection refused"** → The front desk isn't running, or you typed
+  `curl` in the *same* terminal as the server. Make sure Terminal 1 still shows
+  `Running on http://0.0.0.0:5000`, and run `curl` in a *second* terminal.
 
-**What it does, step by step:**
+## What you just learned
 
-1. It starts a small web server using Flask. Think of Flask as a front desk that listens
-   for visitors knocking at the door.
-2. It opens the phone line to the robot using your secret password (the **API key**),
-   just like `verify_api.py` did.
-3. It writes a **system prompt** — that's a standing instruction the robot always follows.
-   Here it says: "You are a helpful customer support agent for Nawex Bank. Answer in two
-   short paragraphs. If the question isn't about banking, politely say no."
-4. When someone knocks on the `/chat` door and hands over a question, the front desk first
-   gives that visit a short ticket number (a "request ID") so it can be tracked in the logs.
-5. It checks the visitor actually wrote a question. If the question is empty, it politely
-   sends back an error instead of bothering the robot.
-6. It phones the robot with the system prompt plus the visitor's question. Again
-   `model='claude-opus-4-7'` is the example robot name — swap it for a real one like
-   `claude-opus-4-8` or `claude-sonnet-4-6` for your own account. `max_tokens=512` lets the
-   answer be a bit longer than the test script.
-7. It writes the answer back to the visitor, along with the ticket number, the time, and
-   how many word-pieces were used.
+- An **LLM** is a very well-read robot you phone over the internet to read and write words.
+- An **API key** is a secret password (a credit card for the robot) — kept in an environment
+  variable, never in your code or shared.
+- A **prompt** is what you ask; a **system prompt** is a standing rule the robot always follows.
+- The robot measures its work in **tokens**, and you can watch how many each call uses.
+- You can put an LLM behind a **Flask** front desk (`/chat`) so other programs can use it.
 
-**What you get:** A working "ask the bank robot a question" web door that logs every call.
+## Where to next
 
-### The OpenAI and Gemini twins — the same robot, a different company
-
-There isn't just one well-read robot for hire. Three big companies each rent you one,
-and they all do the same job: you send words, they send words back. This chapter ships a
-matching pair of scripts for each company so you can use whichever one you have a key for.
-
-- **Anthropic's robot is named Claude** → `verify_api.py` + `llm_api.py`
-- **OpenAI's robot is named GPT** → `verify_api_openai.py` + `llm_api_openai.py`
-- **Google's robot is named Gemini** → `verify_api_gemini.py` + `llm_api_gemini.py`
-
-**In one sentence:** The OpenAI and Gemini scripts are exact copies of the Claude scripts —
-same test, same `/chat` door, same answer shape — just phoning a different company's robot.
-
-**What's the same in all three:**
-
-1. You still need a secret password (an **API key**), read from your computer's settings so
-   it never sits in the file. Each company gives you its own key, stored under its own name:
-   `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, or `GEMINI_API_KEY`.
-2. You still send a **prompt** (your question) and the same **system prompt** (the standing
-   "you are a Nawex Bank helper" instruction).
-3. You still get back the answer plus how many word-pieces (**tokens**) went in and out.
-4. The `/chat` web door still listens on port 5000 and replies with the same fields, so the
-   one `curl` command works no matter which robot you started.
-
-**What's a little different (just the robot's name tag):**
-
-1. The shopping list changes: `pip install openai flask` for GPT, or
-   `pip install google-genai flask` for Gemini.
-2. The model name changes: `gpt-4o` for OpenAI, `gemini-2.5-flash` for Gemini (swap in
-   `gpt-4o-mini` or `gemini-2.5-pro` to go cheaper or smarter) — just like you'd swap
-   `claude-opus-4-7` for a real Claude name.
-3. Each company words the phone call slightly differently inside the code, but you don't
-   have to care — the scripts hide that for you and hand back the same tidy answer.
-
-**What you get:** Three interchangeable ways to power the very same bank-helper door, so you
-can start with whichever account you already have — or compare the robots side by side.
-
-➡ Next: [chapter-17-rag](../chapter-17-rag) — ground the LLM in a private knowledge base.
+➡ [Chapter 17 — Give the robot your own notes to read (RAG)](../chapter-17-rag). Right now the
+robot answers from everything it ever read. Next you'll hand it *your own* notes so it answers
+from *your* facts instead of guessing.

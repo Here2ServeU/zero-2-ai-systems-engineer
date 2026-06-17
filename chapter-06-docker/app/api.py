@@ -33,7 +33,7 @@ def health():
 
 @app.route('/info')
 def info():
-    return jsonify({'name':'Nawex Fraud API',
+    return jsonify({'name':'Zero2AI Fraud API',
         'version':'1.0.0',
         'author':'Rev Dr Emmanuel Naweji',
         'program':'Zero2AI'})
