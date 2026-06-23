@@ -1,4 +1,5 @@
 # fraud_detection.py
+import os
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
@@ -6,7 +7,8 @@ from sklearn.metrics import (
     classification_report, confusion_matrix,
     accuracy_score)
 
-df = pd.read_csv('../data/fintech_transactions.csv')
+data_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'fintech_transactions.csv')
+df = pd.read_csv(data_path)
 X = df[['amount','time_of_day','merchant_loc']]
 y = df['is_fraud']
 
