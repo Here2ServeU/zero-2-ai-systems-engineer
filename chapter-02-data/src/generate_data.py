@@ -2,6 +2,9 @@
 import pandas as pd
 import numpy as np, os
 
+HERE = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(HERE, '..', 'data')
+
 np.random.seed(42)        # reproducibility
 n = 1000                  # number of synthetic transactions
 
@@ -14,6 +17,6 @@ df = pd.DataFrame({
     'time':     times.round(2),
     'is_fraud': is_fraud
 })
-os.makedirs('../data', exist_ok=True)
-df.to_csv('../data/transactions.csv', index=False)
+os.makedirs(DATA_DIR, exist_ok=True)
+df.to_csv(os.path.join(DATA_DIR, 'transactions.csv'), index=False)
 print(f'Generated {len(df)} rows, {is_fraud.sum()} fraud')
