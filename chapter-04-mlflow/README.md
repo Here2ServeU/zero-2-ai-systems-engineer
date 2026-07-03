@@ -48,31 +48,21 @@ Registered version: 1
 
 ## Let's do it, one small step at a time
 
-### Step 1 — Make sure Chapter 02's data exists
-
-This chapter reuses the table you made in Chapter 02. If you haven't run that yet, make it now:
-
-```bash
-cd chapter-02-data/src
-python generate_data.py
-cd ../..
-```
-
-**What you should see:** `Generated 1000 rows, 18 fraud`. Now the file
-`chapter-02-data/data/transactions.csv` exists, which this chapter will read.
-
-> If you already did Chapter 02 and the file is there, you can skip this step.
-
-### Step 2 — Go to this chapter's project folder
+### Step 1 — Go to this chapter's project folder
 
 ```bash
 cd chapter-04-mlflow
 ```
 
 **What you should see:** your prompt shows you're inside `chapter-04-mlflow`. Type `ls` and you
-should see `train_with_tracking.py` and `register_best_model.py`.
+should see a `src` folder and a `README.md`. The three scripts live inside `src` — run `ls src`
+and you'll see `generate_data.py`, `train_with_tracking.py`, and `register_best_model.py`.
 
-### Step 3 — Make a clean toolbox just for this project
+> You will run every command from *this* folder (`chapter-04-mlflow`), pointing at the scripts
+> with `src/` in front — like `python src/generate_data.py`. Staying in one folder keeps your
+> data and your saved experiments together in the same place.
+
+### Step 2 — Make a clean toolbox just for this project
 
 ```bash
 python3 -m venv venv && source venv/bin/activate   # Windows: venv\Scripts\activate
@@ -80,7 +70,7 @@ python3 -m venv venv && source venv/bin/activate   # Windows: venv\Scripts\activ
 
 **What you should see:** your prompt now starts with `(venv)`.
 
-### Step 4 — Install the helpers (now including MLflow)
+### Step 3 — Install the helpers (now including MLflow)
 
 ```bash
 pip install mlflow scikit-learn pandas numpy
@@ -89,15 +79,37 @@ pip install mlflow scikit-learn pandas numpy
 **What you should see:** lots of lines, ending in `Successfully installed mlflow... scikit-learn... pandas... numpy...`.
 The new one this time is **MLflow** — our self-writing notebook.
 
+### Step 4 — Make your practice data
+
+This chapter comes with its own tiny data maker, so you don't need any other chapter to run it.
+Make the table now:
+
+```bash
+python src/generate_data.py
+```
+
+**What you should see:** `Generated 1000 rows, 18 fraud`. A new file `data/transactions.csv`
+now sits right here in this chapter, and the training script will read it.
+
+**What `generate_data.py` does, in plain words** (open it in VS Code to follow along):
+
+1. It invents 1,000 pretend purchases, each with an `amount` and a `time` of day.
+2. It marks a purchase as fraud (`is_fraud = 1`) when it's both big and in the dead of night —
+   over 500 dollars *and* before 5 a.m. That comes out to 18 fakes out of 1,000.
+3. It saves the whole table to `data/transactions.csv` for the next step to read.
+
+> The same random seed is baked in, so you'll get the exact same 1,000 rows every time — handy
+> when you want your results to match the book.
+
 ### Step 5 — Run three experiments with different dials
 
 Each command trains the model once with different **hyperparameters** (the dials). MLflow
 records each run automatically. Run them one at a time:
 
 ```bash
-python train_with_tracking.py --max_depth 3 --min_samples 2
-python train_with_tracking.py --max_depth 8 --min_samples 5
-python train_with_tracking.py --max_depth 6 --criterion entropy
+python src/train_with_tracking.py --max_depth 3 --min_samples 2
+python src/train_with_tracking.py --max_depth 8 --min_samples 5
+python src/train_with_tracking.py --max_depth 6 --criterion entropy
 ```
 
 **What you should see:** each command prints one line like `Recall: 0.800`. You won't see the
@@ -107,7 +119,7 @@ scores written to a file — MLflow tucked them away for you behind the scenes.
 
 1. It opens a list of dials you can set before training: `--max_depth`, `--min_samples`, and
    `--criterion`. These are the **hyperparameters**. If you don't set one, it uses a safe default.
-2. It reads the big table of purchases (`transactions.csv`) from the Chapter 02 folder.
+2. It reads the big table of purchases (`transactions.csv`) from this chapter's own `data` folder.
 3. It picks two clues — the `amount` and the `time` — and the answer to learn, `is_fraud`.
 4. It does the **train/test split**: a big pile to study from, a small pile to quiz with.
 5. `mlflow.start_run()` — It tells MLflow, "Start a new try and keep score," then writes down
@@ -145,7 +157,7 @@ When you're done looking, go back to the terminal and press **Ctrl+C** to stop t
 With the web page stopped, crown the best run:
 
 ```bash
-python register_best_model.py
+python src/register_best_model.py
 ```
 
 **What you should see:**
@@ -168,19 +180,19 @@ Registered version: 1
 
 ## Try it yourself (mini challenges)
 
-- 🔧 **Add a fourth try.** Run `python train_with_tracking.py --max_depth 10 --min_samples 10`,
+- 🔧 **Add a fourth try.** Run `python src/train_with_tracking.py --max_depth 10 --min_samples 10`,
   then refresh the MLflow web page. A new run should appear.
 - 🔧 **Change the deepest dial.** Try `--max_depth 1`. In the web page, does its recall drop
   compared with the deeper trees?
-- 🔧 **Crown a new winner.** After adding more tries, run `python register_best_model.py` again.
+- 🔧 **Crown a new winner.** After adding more tries, run `python src/register_best_model.py` again.
   Watch the version number climb to `2`, `3`, and so on.
 - 🔧 **Spot the columns.** In the Compare view, find the `max_depth`, `min_samples`, and
   `recall` columns side by side. This is exactly the picture your hand-written log could never show clearly.
 
 ## If something breaks
 
-- **`No such file or directory: '../chapter-02-data/data/transactions.csv'`** → The Chapter 02
-  data is missing. Do Step 1 to create it.
+- **`No such file or directory: ... data/transactions.csv`** → You haven't made the data yet.
+  Run Step 4 (`python src/generate_data.py`) first.
 - **`No module named mlflow`** → Your toolbox isn't on, or MLflow isn't installed. Confirm your
   prompt shows `(venv)`, then redo Step 3 and Step 4.
 - **`mlflow: command not found`** → Same fix: make sure `(venv)` is on and you ran the
