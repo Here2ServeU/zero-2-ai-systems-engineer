@@ -202,6 +202,92 @@ Registered version: 1
 - **`register_best_model.py` errors about no runs** → You haven't trained anything yet. Run the
   experiments in Step 5 first.
 
+### Nuclear option — rebuild your toolbox from scratch
+
+If your `venv` gets into a weird state (wrong Python version, half-installed packages, strange
+import errors that survive a reinstall), the cleanest fix is to throw the whole `venv` away and
+build a fresh one. This deactivates the broken environment, deletes it, recreates it on **Python
+3.12**, upgrades `pip`, and reinstalls the three packages this chapter needs.
+
+**Windows (PowerShell):**
+
+```powershell
+deactivate
+Remove-Item -Recurse -Force .\venv
+py -3.12 -m venv venv
+.\venv\Scripts\Activate.ps1
+python --version
+python -m pip --version
+cls
+python -m pip install --upgrade pip
+python -m pip install mlflow pandas scikit-learn
+```
+
+**macOS / Linux (bash or zsh):**
+
+```bash
+deactivate
+rm -rf venv
+python3.12 -m venv venv
+source venv/bin/activate
+python --version
+python -m pip --version
+clear
+python -m pip install --upgrade pip
+python -m pip install mlflow pandas scikit-learn
+```
+
+**What each line does, in plain words:**
+
+| Step | Windows | macOS / Linux | What it does |
+|------|---------|---------------|--------------|
+| Turn off the old toolbox | `deactivate` | `deactivate` | Steps out of the current `venv` (safe to ignore if none is active). |
+| Delete the old toolbox | `Remove-Item -Recurse -Force .\venv` | `rm -rf venv` | Removes the whole `venv` folder and everything inside it. |
+| Build a fresh toolbox | `py -3.12 -m venv venv` | `python3.12 -m venv venv` | Creates a brand-new empty `venv` using Python 3.12. |
+| Turn on the new toolbox | `.\venv\Scripts\Activate.ps1` | `source venv/bin/activate` | Activates it — your prompt now starts with `(venv)`. |
+| Check the Python version | `python --version` | `python --version` | Confirms you're on Python 3.12. |
+| Check pip is present | `python -m pip --version` | `python -m pip --version` | Confirms the package installer is ready. |
+| Clear the screen | `cls` | `clear` | Tidies the terminal (purely cosmetic). |
+| Upgrade pip | `python -m pip install --upgrade pip` | `python -m pip install --upgrade pip` | Gets the newest installer so packages install cleanly. |
+| Reinstall the packages | `python -m pip install mlflow pandas scikit-learn` | `python -m pip install mlflow pandas scikit-learn` | Puts MLflow and its friends back into the fresh toolbox. |
+
+> **Why Python 3.12?** If `py -3.12` (Windows) or `python3.12` (macOS/Linux) says it can't find
+> that version, install Python 3.12 first, or swap in whichever 3.11–3.12 you have. Very new or
+> very old Python versions sometimes trip up MLflow's dependencies, so pinning a known-good one
+> removes a whole class of install headaches.
+
+## A real use case — the MLflow UI dashboard
+
+Everything above records your runs; the **MLflow UI** is where that record pays off. Picture a
+teammate asking: *"Which fraud model should we ship — and can you prove it's the best one?"*
+Instead of digging through notes, you open the dashboard and answer in about a minute.
+
+Start it from this chapter's folder (with `(venv)` active):
+
+```bash
+mlflow ui
+```
+
+Then open `http://127.0.0.1:5000` in your browser. Here's how you'd actually use it:
+
+1. **Line up the contenders.** Click into the `fraud-detection-v1` experiment. Every run from
+   Step 5 is a row, with its `max_depth`, `min_samples`, `criterion`, and the `accuracy`,
+   `recall`, and `f1` scores in plain columns — the side-by-side view a hand-written log could
+   never give you.
+2. **Sort by what matters.** For fraud, catching real fraud matters most, so click the `recall`
+   column to sort highest-first. The winner floats to the top instantly.
+3. **Compare head-to-head.** Tick the boxes on two or three runs and click **Compare**. MLflow
+   draws the dials and scores next to each other so you can see *exactly* which setting moved the
+   needle — e.g. "going from `max_depth 3` to `8` lifted recall but barely touched accuracy."
+4. **Prove it and hand it off.** Click the winning run to see its saved model, parameters, and
+   metrics on one page. That page *is* your evidence. It's also the run you crown in Step 7 with
+   `register_best_model.py`, so the model on the trophy shelf traces straight back to the numbers
+   your teammate just saw.
+
+> This is the everyday loop of a real ML engineer: train a few variants, open the dashboard, sort
+> by the metric that matters, compare, and register the winner — with a paper trail anyone can check.
+> Press **Ctrl+C** in the terminal to stop the dashboard when you're done.
+
 ## What you just learned
 
 - **MLflow** is a self-writing lab notebook — it does the **experiment tracking** for you.
