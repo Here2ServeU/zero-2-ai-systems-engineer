@@ -12,9 +12,20 @@ provider "aws" {
   region = "us-east-1"
 }
 
+# Look up the newest Amazon Linux 2023 image, so the ID is never out of date
+data "aws_ami" "amazon_linux" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["al2023-ami-2023.*-x86_64"]
+  }
+}
+
 resource "aws_instance" "zero2ai_server" {
-  ami           = "ami-0c55b159cbfafe1f0"
-  instance_type = "t2.micro"
+  ami           = data.aws_ami.amazon_linux.id
+  instance_type = "t3.micro"
 
   tags = {
     Name        = "zero2ai-ai-server"

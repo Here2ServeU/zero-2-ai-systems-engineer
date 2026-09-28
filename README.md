@@ -44,7 +44,7 @@ in plain English.
 
 ### Part 2 — Make it run anywhere
 6. [Chapter 06 — Pack your program into a box (Docker)](chapter-06-docker) · 💻 🧑‍🤝‍🧑
-7. [Chapter 07 — Rent a computer with a wish-list (Terraform)](chapter-07-terraform) · 👀 💳
+7. [Chapter 07 — Set up AWS and build your first cloud server (Terraform)](chapter-07-terraform) · 💳 🌐 🧑‍🤝‍🧑
 8. [Chapter 08 — Build bigger in the cloud](chapter-08-cloud) · 👀 💳
 9. [Chapter 09 — A robot helper that checks your work (CI/CD)](chapter-09-cicd) · 🌐 🧑‍🤝‍🧑
 10. [Chapter 10 — Run many copies safely (Kubernetes)](chapter-10-kubernetes) · 🧑‍🤝‍🧑
