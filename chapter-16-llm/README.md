@@ -295,22 +295,22 @@ curl -X POST http://localhost:5000/chat \
  "request_id":"a1b2c3d4","ts":"2026-06-16T12:00:00"}
 ```
 
-🎉 You just phoned a real smart writing robot and built a little front desk around it — the same
+You just phoned a real smart writing robot and built a little front desk around it — the same
 shape real apps use to put an LLM behind a website door.
 
 ---
 
 ## Try it yourself (mini challenges)
 
-- 🔧 **Change the system prompt.** In `llm_api.py`, edit `SYSTEM_PROMPT` to make the robot a
+- **Change the system prompt.** In `llm_api.py`, edit `SYSTEM_PROMPT` to make the robot a
   helper for a *library* instead of a bank ("You are a friendly library assistant..."). Restart
   Terminal 1 and ask it about borrowing books.
-- 🔧 **Ask a non-banking question and watch it refuse.** With the original bank prompt, send
+- **Ask a non-banking question and watch it refuse.** With the original bank prompt, send
   `{"question":"What's a good recipe for soup?"}`. The robot should *politely decline* because
   the system prompt told it to stay on banking topics. That's the system prompt doing its job.
-- 🔧 **Shrink the answer.** Lower `max_tokens` from `512` to `60` and ask again. Notice the
+- **Shrink the answer.** Lower `max_tokens` from `512` to `60` and ask again. Notice the
   answer gets cut shorter — and the output token count drops.
-- 🔧 **Read the logbook.** After a few questions, peek at **Terminal 1**: each call wrote a line
+- **Read the logbook.** After a few questions, peek at **Terminal 1**: each call wrote a line
   with its ticket number and how many tokens went in and out.
 
 ## If something breaks
@@ -342,6 +342,6 @@ shape real apps use to put an LLM behind a website door.
 
 ## Where to next
 
-➡ [Chapter 17 — Give the robot your own notes to read (RAG)](../chapter-17-rag). Right now the
+[Chapter 17 — Give the robot your own notes to read (RAG)](../chapter-17-rag). Right now the
 robot answers from everything it ever read. Next you'll hand it *your own* notes so it answers
 from *your* facts instead of guessing.

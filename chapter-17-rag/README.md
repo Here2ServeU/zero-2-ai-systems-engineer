@@ -234,24 +234,24 @@ def answer(question):
   `max_tokens=600` lets the answer be a healthy paragraph or two.
 - It returns the answer, the exact notes it leaned on (its **sources**), and the token counts.
 
-🎉 You just built a full RAG pipeline: the robot answered a question using *your* notebook, not
+You just built a full RAG pipeline: the robot answered a question using *your* notebook, not
 its own guesses — and pointed back to the note it used.
 
 ---
 
 ## Try it yourself (mini challenges)
 
-- 🔧 **Add a line to the notes and ask about it.** Open `knowledge_base.txt` and add a new fact,
+- **Add a line to the notes and ask about it.** Open `knowledge_base.txt` and add a new fact,
   for example: `The maximum daily ATM withdrawal limit is 500 dollars.` Save it. Then **re-run
   `python index_corpus.py`** (so the cabinet learns the new note), and ask about it by editing
   the question in `rag_query.py` to `q = 'What is the daily ATM withdrawal limit?'`. The robot
   should answer from your new line.
-- 🔧 **Ask something NOT in the notes.** Change the question to `q = 'What is the weather today?'`
+- **Ask something NOT in the notes.** Change the question to `q = 'What is the weather today?'`
   and run `rag_query.py`. Because of the system prompt, the robot should say the notes don't
   cover that — instead of making something up.
-- 🔧 **Change how many notes it reads.** In `rag_query.py`, change `retrieve(question, k=3)` to
+- **Change how many notes it reads.** In `rag_query.py`, change `retrieve(question, k=3)` to
   `k=1`. With fewer notes, does the answer get thinner? Try `k=5` too.
-- 🔧 **Peek at the sources.** In `rag_query.py`'s `__main__` block, add
+- **Peek at the sources.** In `rag_query.py`'s `__main__` block, add
   `print(result['sources'])` to see exactly which notes the robot was handed.
 
 ## If something breaks
@@ -282,6 +282,6 @@ its own guesses — and pointed back to the note it used.
 
 ## Where to next
 
-➡ [Chapter 18 — Run the smart robot for real (Production LLM)](../chapter-18-prodllm). You'll add
+[Chapter 18 — Run the smart robot for real (Production LLM)](../chapter-18-prodllm). You'll add
 the grown-up care — spending limits, logging, safety filters — so the robot can serve real people
 reliably.

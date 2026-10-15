@@ -78,7 +78,7 @@ is how you talk to Kubernetes.
 > normal first-time friction — this is the moment a helper helps most. Don't push past it; get
 > the node `Ready` before going on.
 
-> 📦 **About the image.** These files run an app image called `zero2ai-fraud-api:v1.0`, built back
+> **About the image.** These files run an app image called `zero2ai-fraud-api:v1.0`, built back
 > in Chapter/Chapter 06. On a local cluster, make sure that image is available to it (on Docker
 > Desktop, having built it locally is usually enough). If you haven't built it, you can still
 > read along and learn what each file does.
@@ -202,21 +202,21 @@ kubectl get pods                                         # watch 5 appear
 kubectl scale deployment zero2ai-fraud-api --replicas=2   # back to 2
 ```
 
-🎉 You just ran many copies of a real app, watched one heal itself, and changed how many run —
+You just ran many copies of a real app, watched one heal itself, and changed how many run —
 all with a few short commands.
 
 ---
 
 ## Try it yourself (mini challenges)
 
-- 🔧 **Change the copy count.** In `deployment.yaml`, find the line that sets how many copies run.
+- **Change the copy count.** In `deployment.yaml`, find the line that sets how many copies run.
   Change `2` to `3`, then run `kubectl apply -f deployment.yaml` again and watch a third copy
   appear.
-- 🔧 **Find the health check.** Which lines make the manager poke your app to see if it's alive?
+- **Find the health check.** Which lines make the manager poke your app to see if it's alive?
   Which path and port does it knock on?
-- 🔧 **Find the outside door.** In `service.yaml`, which line sets the door number people outside
+- **Find the outside door.** In `service.yaml`, which line sets the door number people outside
   knock on? What would the new `curl` address be if you changed it to `30090`?
-- 🔧 **Watch healing happen.** Delete a pod (`kubectl delete pod <name>`) and immediately run
+- **Watch healing happen.** Delete a pod (`kubectl delete pod <name>`) and immediately run
   `kubectl get pods` a couple of times. Catch the new copy being born.
 
 ## If something breaks
@@ -247,5 +247,5 @@ all with a few short commands.
 
 ## Where to next
 
-➡ [Chapter 11 — Watch your program's health (Monitoring)](../chapter-11-monitoring). Now that many
+[Chapter 11 — Watch your program's health (Monitoring)](../chapter-11-monitoring). Now that many
 copies are running, you'll learn to watch their health on charts you can glance at any time.

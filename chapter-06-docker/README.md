@@ -129,7 +129,7 @@ curl http://localhost:5000/health
 {"status":"healthy","ts":"2026-06-16T12:00:00"}
 ```
 
-🎉 Your fraud front desk is now answering from *inside the lunchbox*. The very same program
+Your fraud front desk is now answering from *inside the lunchbox*. The very same program
 would now run identically on any computer that has Docker.
 
 You can also peek at the logbook inside the box:
@@ -166,13 +166,13 @@ http://localhost:5000/health` works exactly the same. `compose down` tidies it a
 
 ## Try it yourself (mini challenges)
 
-- 🔧 **Change the version tag.** Build again with `docker build -t zero2ai-fraud-api:v1.1 .`,
+- **Change the version tag.** Build again with `docker build -t zero2ai-fraud-api:v1.1 .`,
   then run `docker ps` (after starting it) and notice the new `v1.1` label.
-- 🔧 **Talk to the boxed model.** With the container running, send a `/predict` request exactly
+- **Talk to the boxed model.** With the container running, send a `/predict` request exactly
   like Chapter 05's Step 6. The boxed front desk answers FRAUD or LEGIT just the same.
-- 🔧 **List your lunchboxes.** Run `docker images` to see every image you've built, with names
+- **List your lunchboxes.** Run `docker images` to see every image you've built, with names
   and tags.
-- 🔧 **Watch it self-heal.** Start it with `docker compose up -d`, then `docker stop fraud-api`.
+- **Watch it self-heal.** Start it with `docker compose up -d`, then `docker stop fraud-api`.
   Wait a moment and run `docker ps` — Compose is set to restart it automatically.
 
 ## If something breaks
@@ -206,5 +206,5 @@ http://localhost:5000/health` works exactly the same. `compose down` tidies it a
 
 ## Where to next
 
-➡ [Chapter 07 — Rent a computer with a wish-list (Terraform)](../chapter-07-terraform). You'll
+[Chapter 07 — Rent a computer with a wish-list (Terraform)](../chapter-07-terraform). You'll
 learn how to ask the cloud for a real computer to run your lunchbox on.

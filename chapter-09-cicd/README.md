@@ -182,19 +182,19 @@ git push
 4. Wait for it to finish: a green check ✅ means everything passed; a red X ❌ means a step
    failed — click it to read which one and why.
 
-🎉 You just hired a tireless helper that re-checks your project every single time you save it.
+You just hired a tireless helper that re-checks your project every single time you save it.
 
 ---
 
 ## Try it yourself (mini challenges)
 
-- 🔧 **Change one line and watch.** Edit a comment or a `print(...)` line in a Chapter 2 file,
+- **Change one line and watch.** Edit a comment or a `print(...)` line in a Chapter 2 file,
   then push. Watch a brand-new run appear in the Actions tab.
-- 🔧 **Read the trigger.** In `ci.yml`, find the part that decides *what wakes the robot up*.
+- **Read the trigger.** In `ci.yml`, find the part that decides *what wakes the robot up*.
   What two things start it? Which branch does it watch?
-- 🔧 **Find a tool.** Which step installs `pandas` and `scikit-learn`? What command does the
+- **Find a tool.** Which step installs `pandas` and `scikit-learn`? What command does the
   installing?
-- 🔧 **Break it on purpose (safely).** Introduce a tiny typo in a Chapter 2 script, push, and
+- **Break it on purpose (safely).** Introduce a tiny typo in a Chapter 2 script, push, and
   watch the robot turn red and tell you. Then fix it and watch it go green again. Seeing the
   robot *catch* a mistake is the whole point.
 
@@ -225,5 +225,5 @@ git push
 
 ## Where to next
 
-➡ [Chapter 10 — Run many copies safely (Kubernetes)](../chapter-10-kubernetes). You'll meet a
+[Chapter 10 — Run many copies safely (Kubernetes)](../chapter-10-kubernetes). You'll meet a
 playground manager that runs many copies of your app and restarts any that fall over.

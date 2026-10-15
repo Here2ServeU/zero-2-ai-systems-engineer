@@ -188,13 +188,13 @@ Anomalies: 60 (4.0%)
 
 ## Try it yourself (mini challenges)
 
-- 🔧 **Make fraud rarer.** In `create_fintech_data.py`, change `amounts>600` to `amounts>900`,
+- **Make fraud rarer.** In `create_fintech_data.py`, change `amounts>600` to `amounts>900`,
   rerun Steps 4 and 5, and watch the "fraud missed" count. Rarer fraud is harder to catch.
-- 🔧 **Loosen the detective.** In `fraud_detection.py`, change `max_depth=6` to `max_depth=2`.
+- **Loosen the detective.** In `fraud_detection.py`, change `max_depth=6` to `max_depth=2`.
   Rerun it. Does it miss more fraud (more false negatives)?
-- 🔧 **Expect more oddities.** In `anomaly_detection.py`, change `contamination=0.04` to `0.10`.
+- **Expect more oddities.** In `anomaly_detection.py`, change `contamination=0.04` to `0.10`.
   Rerun it. The "Anomalies" count should jump: you told it to expect more.
-- 🔧 **Hide more weirdos.** In `anomaly_detection.py`, change the secret `50` (in the
+- **Hide more weirdos.** In `anomaly_detection.py`, change the secret `50` (in the
   `np.random.choice(n, 50, ...)` line) to `150`, rerun, and see if the finder notices.
 
 ## If something breaks
@@ -221,5 +221,5 @@ Anomalies: 60 (4.0%)
 
 ## Where to next
 
-➡ [Chapter 04: Keep a tidy notebook of your experiments](../chapter-04-mlflow). You'll stop
+[Chapter 04: Keep a tidy notebook of your experiments](../chapter-04-mlflow). You'll stop
 writing your scores in a file by hand and let a tool keep the notebook for you automatically.
