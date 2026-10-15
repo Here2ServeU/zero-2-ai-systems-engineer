@@ -190,13 +190,13 @@ swap this manual file for a tool that keeps the notebook for you automatically.
 
 ## Try it yourself (mini challenges)
 
-- 🔧 **Catch more fraud.** In `generate_data.py`, change `n = 1000` to `n = 5000` and rerun
+- **Catch more fraud.** In `generate_data.py`, change `n = 1000` to `n = 5000` and rerun
   both programs. More examples often means the model learns better. Did recall change?
-- 🔧 **Change the fraud rule.** Change `amounts > 800` to `amounts > 400` in `generate_data.py`,
+- **Change the fraud rule.** Change `amounts > 800` to `amounts > 400` in `generate_data.py`,
   rerun both, and watch how the counts and scores shift.
-- 🔧 **Give the robot fewer questions.** In `train_model.py`, change `max_depth=5` to
+- **Give the robot fewer questions.** In `train_model.py`, change `max_depth=5` to
   `max_depth=1`. Rerun it. A robot allowed only one question usually scores worse — see for yourself.
-- 🔧 **Build up your log.** Run `python train_model.py` three times, then `cat ../logs/experiments.txt`.
+- **Build up your log.** Run `python train_model.py` three times, then `cat ../logs/experiments.txt`.
   Notice it now has three lines. You're keeping a history by hand.
 
 ## If something breaks
@@ -223,5 +223,5 @@ swap this manual file for a tool that keeps the notebook for you automatically.
 
 ## Where to next
 
-➡ [Chapter 03 — Teach the computer to spot trouble](../chapter-03-models). You'll grow this into
+[Chapter 03 — Teach the computer to spot trouble](../chapter-03-models). You'll grow this into
 two real-world detectors: one for bank fraud, and one that finds odd hospital readings all by itself.

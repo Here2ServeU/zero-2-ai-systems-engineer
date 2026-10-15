@@ -232,13 +232,13 @@ Registered version: 1
 
 ## Try it yourself (mini challenges)
 
-- 🔧 **Add a fourth try.** Run `python src/train_with_tracking.py --max_depth 10 --min_samples 10`,
+- **Add a fourth try.** Run `python src/train_with_tracking.py --max_depth 10 --min_samples 10`,
   then refresh the MLflow web page. A new run should appear.
-- 🔧 **Change the deepest setting.** Try `--max_depth 1`. In the web page, does its recall drop
+- **Change the deepest setting.** Try `--max_depth 1`. In the web page, does its recall drop
   compared with the deeper trees?
-- 🔧 **Crown a new winner.** After adding more tries, run `python src/register_best_model.py` again.
+- **Crown a new winner.** After adding more tries, run `python src/register_best_model.py` again.
   Watch the version number climb to `2`, `3`, and so on.
-- 🔧 **Spot the columns.** In the Compare view, find the `max_depth`, `min_samples`, and
+- **Spot the columns.** In the Compare view, find the `max_depth`, `min_samples`, and
   `recall` columns side by side. This is exactly the picture a hand-written log could never show
   as clearly.
 
@@ -1042,5 +1042,5 @@ does.
 
 ## Where to next
 
-➡ [Chapter 05 — Let other programs talk to your model](../chapter-05-api). You'll wrap your fraud
+[Chapter 05 — Let other programs talk to your model](../chapter-05-api). You'll wrap your fraud
 model in a "front desk" so other programs can send it a purchase and get back an answer.

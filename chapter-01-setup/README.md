@@ -138,16 +138,16 @@ Hello, Sam!
 Let's build something real.
 ```
 
-🎉 You just wrote and ran a real program. Every giant system later in this book is built from
+You just wrote and ran a real program. Every giant system later in this book is built from
 small steps exactly like this one: make a file, write code, save, run it.
 
 ---
 
 ## Try it yourself (mini challenges)
 
-- 🔧 **Change the name.** Put your best friend's name in the box and run it again.
-- 🔧 **Add a third line.** Make it print your favorite food. (Hint: copy a `print(...)` line.)
-- 🔧 **Break it on purpose.** Delete one of the quotation marks and run it. Read the error.
+- **Change the name.** Put your best friend's name in the box and run it again.
+- **Add a third line.** Make it print your favorite food. (Hint: copy a `print(...)` line.)
+- **Break it on purpose.** Delete one of the quotation marks and run it. Read the error.
   Then put the mark back. Seeing errors — and fixing them — is a normal part of coding.
 
 ## If something breaks
@@ -172,5 +172,5 @@ small steps exactly like this one: make a file, write code, save, run it.
 
 ## Where to next
 
-➡ [Chapter 02 — Your very first tiny AI experiment](../chapter-02-data). You'll make the
+[Chapter 02 — Your very first tiny AI experiment](../chapter-02-data). You'll make the
 computer *learn from examples* for the first time.

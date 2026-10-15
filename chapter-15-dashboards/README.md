@@ -330,13 +330,13 @@ and removes the three lunchboxes so nothing keeps running in the background.
 
 ## Try it yourself (mini challenges)
 
-- 🔧 **Open Grafana in the browser.** Just getting to **http://localhost:3000** and logging in
+- **Open Grafana in the browser.** Just getting to **http://localhost:3000** and logging in
   with `admin` / `zero2ai123` is a real win. Look around the menus.
-- 🔧 **Refresh the API a few times and watch a chart move.** Run the `curl` command from Step 6
+- **Refresh the API a few times and watch a chart move.** Run the `curl` command from Step 6
   five or ten times, then watch the `fraud_predictions_total` chart climb.
-- 🔧 **Send a "legit" payment.** Change the `curl` to `{"amount": 20, "hour": 14}` and send it.
+- **Send a "legit" payment.** Change the `curl` to `{"amount": 20, "hour": 14}` and send it.
   Watch the `legit` count grow instead of the `fraud` one.
-- 🔧 **Peek at Prometheus directly.** Open **http://localhost:9090**, type `active_requests`
+- **Peek at Prometheus directly.** Open **http://localhost:9090**, type `active_requests`
   into its search box, and press Execute to see the raw number.
 
 ## If something breaks
@@ -367,5 +367,5 @@ and removes the three lunchboxes so nothing keeps running in the background.
 
 ## Where to next
 
-➡ [Chapter 16 — Talk to a smart writing robot (LLM)](../chapter-16-llm). You'll meet large
+[Chapter 16 — Talk to a smart writing robot (LLM)](../chapter-16-llm). You'll meet large
 language models and send your first prompt to one.

@@ -68,17 +68,17 @@ why, and how to keep it that way:
 
 - 💳 **AWS asks for a credit or debit card** when you sign up. You may see a small temporary charge
   (about $1) that is returned. It is only a check that the card works.
-- 👤 **You must be 18 or older to own an AWS account.** If you are younger, a parent or guardian
+- **You must be 18 or older to own an AWS account.** If you are younger, a parent or guardian
   must create the account and enter the card details. They should sit with you for
   **Parts 1–3**. After that you can do most of the work while they check in.
-- 🆓 **New accounts get free credits.** AWS gives new accounts credits to spend on eligible
+- **New accounts get free credits.** AWS gives new accounts credits to spend on eligible
   services. The small server in this chapter (`t3.micro`) is eligible. Running it for an hour
   costs about one cent, which the credits cover.
-- 🔔 **You will set a budget alert (Part 3) before you build anything.** A budget sends you an
+- **You will set a budget alert (Part 3) before you build anything.** A budget sends you an
   email. **It does not stop spending by itself.** You still have to delete what you build.
-- 🧹 **Always run `terraform destroy` when you finish.** A server you forget about keeps running,
+- **Always run `terraform destroy` when you finish.** A server you forget about keeps running,
   and keeps costing money, until you delete it.
-- 🔑 **Never share your password, MFA codes, or access keys.** Never paste them into chat
+- **Never share your password, MFA codes, or access keys.** Never paste them into chat
   messages, screenshots, or GitHub. Anyone who has your access keys can spend money on your
   account.
 
@@ -195,7 +195,7 @@ actual or forecast costs pass the limits.
 3. Find **Alert preferences**, click **Edit**, and tick **Receive AWS Free Tier alerts**.
    Confirm your email address and click **Update**.
 
-> 📌 **Remember:** budgets and alerts **warn** you. They don't delete anything or stop charges.
+> **Remember:** budgets and alerts **warn** you. They don't delete anything or stop charges.
 > If you ever get an alert email, sign in and delete whatever is running. Part 8 shows how to check.
 
 ---
@@ -232,7 +232,7 @@ leaked, it could not change your billing, your password, or your MFA.
 7. Click **Download .csv file** and keep it somewhere private on your computer (not inside this
    project folder). Then click **Done**.
 
-> 🔑 **The secret access key works like a password.** Never put it in a code file, never commit
+> **The secret access key works like a password.** Never put it in a code file, never commit
 > it to GitHub, never share it in a screenshot. If you think it has leaked, return to this page,
 > click **Actions → Deactivate**, then **Delete**, and create a new one.
 
@@ -298,7 +298,7 @@ aws sts get-caller-identity
 ```
 
 If the last line ends in `user/terraform-student`, your laptop is connected to AWS as your
-everyday user. 🎉
+everyday user.
 
 ---
 
@@ -502,7 +502,7 @@ Destroy complete! Resources: 1 destroyed.
 to **Shutting-down** and then **Terminated**. Terminated servers stay in the list for about an
 hour and then disappear. They don't cost anything.
 
-> ✅ You just used infrastructure as code to create and delete a cloud server. Many professional
+> You just used infrastructure as code to create and delete a cloud server. Many professional
 > cloud engineers do exactly these four steps every day.
 
 ---
@@ -525,10 +525,10 @@ Every time you use AWS from now on:
 
 Do each one, then **run `terraform destroy` before moving on.**
 
-- 🏷️ **Rename the server.** Change `Name = "zero2ai-ai-server"` to a name of your choice. Run
+- **Rename the server.** Change `Name = "zero2ai-ai-server"` to a name of your choice. Run
   `terraform apply`. Look at the plan: does Terraform replace the server or update it in place?
   Check the new name in the EC2 console. Then destroy.
-- 📤 **Add a second output.** Under the existing output, add:
+- **Add a second output.** Under the existing output, add:
 
   ```hcl
   output "server_id" {
@@ -538,9 +538,9 @@ Do each one, then **run `terraform destroy` before moving on.**
 
   Run `terraform apply`. You'll see the server's ID (it starts with `i-`) printed as well.
   Then destroy.
-- 🔎 **Read without building.** Run `terraform plan` after you have destroyed everything. Why
+- **Read without building.** Run `terraform plan` after you have destroyed everything. Why
   does it say `1 to add` again?
-- 🧠 **Think it through.** You forgot to run `destroy` and left a `t3.micro` server running.
+- **Think it through.** You forgot to run `destroy` and left a `t3.micro` server running.
   It costs about $0.01 per hour. How much would it cost after one month (about 730 hours)?
   Which of your safety nets from Part 3 would warn you first?
 
@@ -588,5 +588,5 @@ Do each one, then **run `terraform destroy` before moving on.**
 
 ## Where to next
 
-➡ [Chapter 08 — Build bigger in the cloud](../chapter-08-cloud). You'll see how professionals
+[Chapter 08 — Build bigger in the cloud](../chapter-08-cloud). You'll see how professionals
 split Terraform files into reusable pieces and store Terraform's records safely online.

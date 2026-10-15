@@ -82,4 +82,4 @@ Chapter 01 installs everything else, slowly, one piece at a time.
 Open the [GLOSSARY](GLOSSARY.md) in a second tab. Whenever you meet a bold word you don't
 know, look it up there.
 
-➡ Start now: [Chapter 01 — Set up your computer and say hello](chapter-01-setup)
+Start now: [Chapter 01 — Set up your computer and say hello](chapter-01-setup)

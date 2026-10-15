@@ -256,15 +256,15 @@ scary.
 
 ## Try it yourself (mini challenges)
 
-- 🔧 **Change the canary percentage.** In `router.py`, change `CANARY = 0.20` to `0.50`, save,
+- **Change the canary percentage.** In `router.py`, change `CANARY = 0.20` to `0.50`, save,
   and run the Step 3 command again. Now about half the visitors should get the new model.
-- 🔧 **Flip the flag and watch which version answers.** Run the Step 4 command twice in a row.
+- **Flip the flag and watch which version answers.** Run the Step 4 command twice in a row.
   Notice the first run says `ON True` and the second says `OFF False` — each call flips the
   switch back and forth.
-- 🔧 **Try a small payment through the new model.** Run
+- **Try a small payment through the new model.** Run
   `python -c "from models import new_model; print(new_model({'value': 10}))"`. Because 10 is
   not over 50, it should print `safe`. Now try `{'value': 99}` and watch it say `risk`.
-- 🔧 **Roll back from green.** In a Python shell, call `s.switch_environment()` (to green) and
+- **Roll back from green.** In a Python shell, call `s.switch_environment()` (to green) and
   then `s.get_active()`, then `s.rollback()` and `s.get_active()` again. Watch it return to
   blue.
 
@@ -296,5 +296,5 @@ scary.
 
 ## Where to next
 
-➡ [Chapter 15 — Dashboards you can watch (Grafana)](../chapter-15-dashboards). You'll turn your
+[Chapter 15 — Dashboards you can watch (Grafana)](../chapter-15-dashboards). You'll turn your
 program's numbers into live charts you can watch like a car dashboard.

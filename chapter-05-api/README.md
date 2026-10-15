@@ -155,20 +155,20 @@ curl -X POST http://localhost:5000/predict \
 {"label":"FRAUD","confidence":0.97,"req_id":"a1b2c3d4",...}
 ```
 
-🎉 You just let another program (curl) talk to your model over the internet. That same doorway
+You just let another program (curl) talk to your model over the internet. That same doorway
 is how a real website or app would use your fraud detector.
 
 ---
 
 ## Try it yourself (mini challenges)
 
-- 🔧 **Make it say LEGIT.** Send a different payment: a small `amount` like `20`, at `hour`
+- **Make it say LEGIT.** Send a different payment: a small `amount` like `20`, at `hour`
   `14` (2 p.m.), `is_late_night` `0`, `is_large_txn` `0`. Watch the label flip to **LEGIT**.
-- 🔧 **Break a rule on purpose.** Send a payment with `hour` set to `99`. The front desk should
+- **Break a rule on purpose.** Send a payment with `hour` set to `99`. The front desk should
   refuse it and tell you `hour must be 0-23`. (That's the rulebook protecting your model.)
-- 🔧 **Leave out a clue.** Remove `amount` from the JSON and send it. Read how the front desk
+- **Leave out a clue.** Remove `amount` from the JSON and send it. Read how the front desk
   politely lists what's missing instead of crashing.
-- 🔧 **Visit `/info` again** after a few `/predict` calls, and peek at **Terminal 1**: every
+- **Visit `/info` again** after a few `/predict` calls, and peek at **Terminal 1**: every
   request you sent was written in the logbook with its ticket number.
 
 ## If something breaks
@@ -199,5 +199,5 @@ is how a real website or app would use your fraud detector.
 
 ## Where to next
 
-➡ [Chapter 06 — Pack your program into a box (Docker)](../chapter-06-docker). You'll wrap this
+[Chapter 06 — Pack your program into a box (Docker)](../chapter-06-docker). You'll wrap this
 exact front desk into a "lunchbox" so it runs the same on any computer.

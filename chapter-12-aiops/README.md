@@ -190,7 +190,7 @@ Status: WARNING
 Action: Scale up now
 ```
 
-The guard noticed the numbers climbing and said "Scale up now" all by itself. 🎉
+The guard noticed the numbers climbing and said "Scale up now" all by itself.
 
 ### Step 5 — Write the part that acts on the warning
 
@@ -251,20 +251,20 @@ Triggering automated response:
   - Incident ticket opened
 ```
 
-That's a program reacting to its own trouble, hands-free. 🎉
+That's a program reacting to its own trouble, hands-free.
 
 ---
 
 ## Try it yourself (mini challenges)
 
-- 🔧 **Make it calm down.** In `aiops_engine.py`, change the `cpu` and `mem` lists to numbers
+- **Make it calm down.** In `aiops_engine.py`, change the `cpu` and `mem` lists to numbers
   that stay flat (for example, all `50`s). Run it again — now it should say `Status: STABLE`.
-- 🔧 **Change the line so it triggers (or doesn't).** The trend warning fires when the slope is
+- **Change the line so it triggers (or doesn't).** The trend warning fires when the slope is
   above `1.5`. Change `if cpu_trend > 1.5` to `if cpu_trend > 0.1` and watch even a gentle climb
   set off a warning. Then try `> 10.0` and watch the warning disappear.
-- 🔧 **Force a spike.** In the `cpu` list, change one middle number to something huge like `200`.
+- **Force a spike.** In the `cpu` list, change one middle number to something huge like `200`.
   Run it and watch a `CPU spike` warning appear (that's the anomaly spotter at work).
-- 🔧 **Read the response only.** In `automated_response.py`, change `cpu_now` and `mem_now` to
+- **Read the response only.** In `automated_response.py`, change `cpu_now` and `mem_now` to
   flat, low numbers. Run it and confirm it prints `All systems stable.` instead of the alert.
 
 ## If something breaks
@@ -296,6 +296,6 @@ That's a program reacting to its own trouble, hands-free. 🎉
 
 ## Where to next
 
-➡ [Chapter 13 — Notice when the world changes (Drift & retraining)](../chapter-13-retraining).
+[Chapter 13 — Notice when the world changes (Drift & retraining)](../chapter-13-retraining).
 Your system can watch its machines now; next it learns to notice when the *data* itself has
 quietly changed.

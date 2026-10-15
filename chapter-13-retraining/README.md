@@ -146,7 +146,7 @@ python drift_detector.py
 {'drift_detected': True, 'ks_statistic': 0.62, 'p_value': 0.0, 'interpretation': 'DRIFT DETECTED: retrain required'}
 ```
 
-`drift_detected` is `True` — the detector noticed the world moved. 🎉 (The exact numbers will
+`drift_detected` is `True` — the detector noticed the world moved. (The exact numbers will
 wiggle a little each run because the data is randomly generated. That's fine.)
 
 ### Step 5 — Write the retraining helper
@@ -242,7 +242,7 @@ python retrain_pipeline.py
 PROMOTED: recall=0.95
 ```
 
-That means the fresh model passed its quiz and was kept. 🎉 You'll also notice a new folder
+That means the fresh model passed its quiz and was kept. You'll also notice a new folder
 called `mlruns` appear — that's MLflow's saved notebook.
 
 ### Step 6 — Check the exit code (optional but cool)
@@ -264,15 +264,15 @@ reading any words.
 
 ## Try it yourself (mini challenges)
 
-- 🔧 **Feed it shifted data and watch drift get flagged.** In `drift_detector.py`, change
+- **Feed it shifted data and watch drift get flagged.** In `drift_detector.py`, change
   `new_data` to `np.random.normal(205, 50, 500)` (very close to the baseline's 200). Run it —
   now drift should *not* be detected. Then change it back to `300` and watch it flag drift again.
-- 🔧 **Move the drift line.** Change `threshold=0.05` to `threshold=0.5`. A bigger threshold is
+- **Move the drift line.** Change `threshold=0.05` to `threshold=0.5`. A bigger threshold is
   more suspicious and flags drift more easily.
-- 🔧 **Make the model fail its quiz.** In `retrain_pipeline.py`, raise the bar to an impossible
+- **Make the model fail its quiz.** In `retrain_pipeline.py`, raise the bar to an impossible
   `RECALL_THRESHOLD = 0.999`. Run it and watch it print `REJECTED`. Then run `echo $?` and see
   the exit code change to `1`.
-- 🔧 **Make the tree simpler.** Change `max_depth=6` to `max_depth=1`. A very shallow tree may
+- **Make the tree simpler.** Change `max_depth=6` to `max_depth=1`. A very shallow tree may
   catch fewer fraud cases, lowering recall. Run it and compare the recall number.
 
 ## If something breaks
@@ -306,6 +306,6 @@ reading any words.
 
 ## Where to next
 
-➡ [Chapter 14 — Release changes without scary surprises](../chapter-14-deployment). You now know
+[Chapter 14 — Release changes without scary surprises](../chapter-14-deployment). You now know
 *when* to ship a new model; next you'll learn *how* to ship it safely, without scaring your
 users.

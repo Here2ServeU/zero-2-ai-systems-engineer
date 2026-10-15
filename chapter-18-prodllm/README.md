@@ -219,22 +219,22 @@ llm_tokens_total{type="input"} 14.0
 - `llm_tokens_total{type="..."}` — total word-pieces in and out.
 - These are the same kind of **metrics** a dashboard (Grafana) would chart.
 
-🎉 You just ran the robot the way a real product does: it won't leak secrets, won't overspend,
+You just ran the robot the way a real product does: it won't leak secrets, won't overspend,
 won't pay twice for the same question, and keeps trying when the network hiccups.
 
 ---
 
 ## Try it yourself (mini challenges)
 
-- 🔧 **Lower the budget and hit the cap.** Change `DAILY_TOKEN_LIMIT = 50000` to a tiny number
+- **Lower the budget and hit the cap.** Change `DAILY_TOKEN_LIMIT = 50000` to a tiny number
   like `50`, restart Terminal 1, and send a couple of *different* questions for the same
   `user_id`. After the first, you should get `Daily token budget exceeded`.
-- 🔧 **Add your own blocked word.** Add `'secret code:'` to `BLOCKED_PATTERNS`, restart, and send
+- **Add your own blocked word.** Add `'secret code:'` to `BLOCKED_PATTERNS`, restart, and send
   a prompt containing it. The safety filter should refuse it.
-- 🔧 **Prove the cache saves money.** Ask one question, note its token counts in Terminal 1's
+- **Prove the cache saves money.** Ask one question, note its token counts in Terminal 1's
   logbook, then ask the *exact same* question again. The second time the service shouldn't phone
   the robot at all — watch the metrics' `cache_hit` count go up.
-- 🔧 **Switch users.** Send the same big question as `"user_id":"bob"` after `alice` hit her cap.
+- **Switch users.** Send the same big question as `"user_id":"bob"` after `alice` hit her cap.
   Notice each person has their *own* separate budget.
 
 ## If something breaks
@@ -266,7 +266,7 @@ won't pay twice for the same question, and keeps trying when the network hiccups
 
 ## Where to next
 
-You've finished all 18 chapters — congratulations! 🎉 Head back to the
+You've finished all 18 chapters — congratulations! Head back to the
 [book index](../README.md) to see the whole journey you completed.
 
 Your next big challenge is the **graduation projects** described there: **NexaGuard** (a full

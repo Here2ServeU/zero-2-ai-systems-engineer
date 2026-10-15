@@ -276,7 +276,7 @@ python anomaly_detection.py
 Anomaly at index 6: 2.5s (z=2.83)
 ```
 
-The spotter found the one slow visit all by itself. 🎉
+The spotter found the one slow visit all by itself.
 
 ### Step 9 — Stop the program when you're done
 
@@ -287,16 +287,16 @@ doors.
 
 ## Try it yourself (mini challenges)
 
-- 🔧 **Watch a metric climb.** With the program running (Terminal 1), knock on
+- **Watch a metric climb.** With the program running (Terminal 1), knock on
   `curl http://localhost:5000/health` ten times in Terminal 2, then read
   `curl http://localhost:8000` and find the new, bigger `api_requests_total` number.
-- 🔧 **Time a real prediction.** In Terminal 2, send the `/predict` door an amount:
+- **Time a real prediction.** In Terminal 2, send the `/predict` door an amount:
   `curl -X POST http://localhost:5000/predict -H "Content-Type: application/json" -d '{"amount": 900}'`.
   You should get `{"prediction":1}`. Then read the metrics and look for
   `api_request_duration_seconds`.
-- 🔧 **Make a second anomaly.** In `anomaly_detection.py`, change one of the `0.10` numbers to
+- **Make a second anomaly.** In `anomaly_detection.py`, change one of the `0.10` numbers to
   `3.00` and run it again. Now *two* readings get flagged.
-- 🔧 **Move the line.** Change `threshold=2.0` to `threshold=3.0` and run it. The 2.50 reading
+- **Move the line.** Change `threshold=2.0` to `threshold=3.0` and run it. The 2.50 reading
   may no longer be flagged, because you raised the bar for "weird."
 
 ## If something breaks
@@ -325,5 +325,5 @@ doors.
 
 ## Where to next
 
-➡ [Chapter 12 — Teach the system to fix itself (AIOps)](../chapter-12-aiops). Now that your
+[Chapter 12 — Teach the system to fix itself (AIOps)](../chapter-12-aiops). Now that your
 program can *notice* trouble, you'll teach it to *react* on its own.
