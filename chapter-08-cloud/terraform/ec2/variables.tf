@@ -117,3 +117,14 @@ variable "allowed_ssh_cidrs" {
   default     = []
   description = "Extra IP addresses allowed to SSH in, as CIDRs like \"203.0.113.10/32\". Your own IP is added automatically when allow_my_ip is true."
 }
+
+variable "allowed_all_traffic_cidrs" {
+  type        = list(string)
+  default     = []
+  description = <<-EOT
+    CIDRs allowed to send ALL inbound traffic (every protocol and port) to the servers.
+    Empty (the default) = no all-traffic rule. Use trusted ranges only, e.g. this
+    environment's VPC range ("10.10.0.0/16") or one address ("203.0.113.10/32").
+    Avoid "0.0.0.0/0": it opens every port to the whole internet.
+  EOT
+}
