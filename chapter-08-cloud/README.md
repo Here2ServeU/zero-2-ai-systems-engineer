@@ -235,6 +235,9 @@ The rest of the module creates:
 - A **security group** (firewall). All outbound traffic is allowed. Inbound **SSH** (port 22)
   is allowed **only** from the addresses in `allowed_ssh_cidrs`. The `ec2` stack fills that list
   with your own public IP automatically (Part 4), so nobody else can reach port 22.
+  An optional inbound **All traffic** rule (every protocol and port) is created only for the
+  addresses in `allowed_all_traffic_cidrs`. It's empty by default, so the rule doesn't exist
+  until you add a range.
 - A **key pair**, when `create_key_pair = true`. The `ec2` stack turns this on and passes in the
   **public** key you made with `ssh-keygen` (Part 4).
 - `instance_count` **servers**, spread across the subnets. Each one uses the looked-up AMI, has
@@ -447,6 +450,23 @@ not yours. Set `allow_my_ip = false` there and list the allowed addresses explic
 
 > Your home IP can change. If SSH stops working another day, just run `apply` again: the
 > lookup picks up your new IP and updates the rule.
+
+#### Optional: allow all inbound traffic from a trusted range
+
+Sometimes servers need to reach each other on many ports (for example, an app talking to a
+database). Instead of adding one rule per port, you can add an inbound **All traffic** rule
+(protocol `-1` = every protocol and port) for a range you trust. List it in the `.tfvars` file:
+
+```hcl
+# dev.tfvars: let dev's servers talk to each other on any port
+allowed_all_traffic_cidrs = ["10.10.0.0/16"]
+```
+
+Run `plan` and you'll see one extra `aws_vpc_security_group_ingress_rule.all_traffic` per range.
+To remove the rule, set the list back to `[]` and run `apply`.
+
+> ⚠️ Never put `"0.0.0.0/0"` here. That opens **every** port on your servers to the whole
+> internet. Use your VPC range or a single `/32` address.
 
 ### Rotating a key
 
