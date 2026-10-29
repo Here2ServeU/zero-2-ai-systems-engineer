@@ -104,4 +104,6 @@ module "ec2" {
   create_key_pair   = true
   public_key        = local.ssh_public_key
   allowed_ssh_cidrs = local.allowed_ssh_cidrs
+
+  allowed_all_traffic_cidrs = var.allowed_all_traffic_cidrs
 }
