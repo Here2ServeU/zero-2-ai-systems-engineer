@@ -85,3 +85,14 @@ variable "allowed_ssh_cidrs" {
   default     = []
   description = "CIDRs allowed to SSH in, e.g. [\"203.0.113.10/32\"]. Empty = SSH closed."
 }
+
+variable "allowed_all_traffic_cidrs" {
+  type        = list(string)
+  default     = []
+  description = "CIDRs allowed to send ALL inbound traffic (every protocol and port), e.g. [\"10.10.0.0/16\"]. Empty = no all-traffic rule."
+
+  validation {
+    condition     = alltrue([for c in var.allowed_all_traffic_cidrs : can(cidrhost(c, 0))])
+    error_message = "Each entry in allowed_all_traffic_cidrs must be a valid IPv4 CIDR, like \"10.10.0.0/16\" or \"203.0.113.10/32\"."
+  }
+}
