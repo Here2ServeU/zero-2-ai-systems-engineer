@@ -18,8 +18,9 @@ data "aws_ami" "selected" {
   }
 }
 
-# Firewall for the instances. Outbound is open (package installs, updates);
-# inbound SSH only from the CIDRs you list. Empty list = no SSH at all.
+# Firewall for the instances. Outbound is open (package installs, updates).
+# Inbound: SSH only from allowed_ssh_cidrs, and all traffic (every protocol
+# and port) only from allowed_all_traffic_cidrs. Empty lists = closed.
 resource "aws_security_group" "this" {
   name        = "${var.name_prefix}-sg"
   description = "Access rules for ${var.name_prefix} instances"
@@ -39,6 +40,18 @@ resource "aws_vpc_security_group_ingress_rule" "ssh" {
   ip_protocol       = "tcp"
   from_port         = 22
   to_port           = 22
+}
+
+# Inbound "All traffic" rule: every protocol and port, one rule per CIDR.
+# ip_protocol = "-1" means all protocols (ports don't apply). Keep this list
+# small and trusted, e.g. your VPC range or one /32 address.
+resource "aws_vpc_security_group_ingress_rule" "all_traffic" {
+  for_each = toset(var.allowed_all_traffic_cidrs)
+
+  security_group_id = aws_security_group.this.id
+  description       = "All inbound traffic from ${each.value}"
+  cidr_ipv4         = each.value
+  ip_protocol       = "-1"
 }
 
 resource "aws_vpc_security_group_egress_rule" "all" {
