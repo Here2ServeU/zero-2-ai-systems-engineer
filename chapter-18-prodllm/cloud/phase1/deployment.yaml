@@ -1,0 +1,28 @@
+# Phase 1: Chapter 18's service on EKS, key from the llm-api-keys Secret.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prod-llm-p1
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: prod-llm-p1}
+  template:
+    metadata:
+      labels: {app: prod-llm-p1}
+    spec:
+      containers:
+      - name: app
+        image: __IMAGE__
+        envFrom:
+        - secretRef:
+            name: llm-api-keys
+        ports:
+        - {name: http, containerPort: 5000}
+        - {name: metrics, containerPort: 8000}
+        resources:
+          requests: {cpu: 50m, memory: 128Mi}
+          limits: {memory: 256Mi}
+        readinessProbe:
+          httpGet: {path: /health, port: 5000}
+          periodSeconds: 5

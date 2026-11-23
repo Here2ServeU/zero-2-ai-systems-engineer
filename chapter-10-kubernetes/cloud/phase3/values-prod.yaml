@@ -1,0 +1,6 @@
+# Extra settings only for ENV=prod (deploy.sh adds this file automatically).
+autoscaling:
+  minReplicas: 3
+  maxReplicas: 10
+pdb:
+  minAvailable: 2

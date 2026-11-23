@@ -1,0 +1,67 @@
+# Phase 3: the "fully fledged" version: everything from Chapters 10-17 at once.
+#
+# Honest limits of this chapter's code, and the production fix:
+#   - CACHE and USER_BUDGETS live in each copy's memory. With 2+ copies,
+#     each copy has its own cache and budget. Real fix: Redis (Amazon
+#     ElastiCache) shared by every copy.
+#   - Flask's built-in server; one process per copy because the metrics
+#     server runs inside it (see Chapter 11's note).
+
+envFromSecrets: []
+externalSecret:
+  enabled: true
+  remoteKey: zero2ai/dev/llm-api-keys      # deploy.sh sets the right env
+  keys: ["ANTHROPIC_API_KEY"]
+
+resources:
+  requests: {cpu: 100m, memory: 192Mi}
+  limits: {memory: 384Mi}
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
+pdb:
+  enabled: true
+topologySpread:
+  enabled: true
+networkPolicy:
+  enabled: true
+ingress:
+  enabled: true
+  healthcheckPath: /health
+  # Add --set ingress.certificateArn=<ACM ARN> for HTTPS. Put auth in front
+  # of a public LLM endpoint before sharing the address with anyone.
+
+prometheusRule:
+  enabled: true
+  rules:
+    - alert: LLMErrorRateHigh
+      expr: |
+        sum(rate(llm_calls_total{service="prod-llm", status="error"}[5m]))
+          / sum(rate(llm_calls_total{service="prod-llm"}[5m])) > 0.05
+      for: 5m
+      labels: {severity: critical}
+      annotations:
+        summary: "More than 5% of LLM calls are failing"
+        description: "Check the provider's status page and the pods' logs."
+    - alert: LLMLatencyHigh
+      expr: histogram_quantile(0.95, sum by (le) (rate(llm_latency_seconds_bucket{service="prod-llm"}[10m]))) > 15
+      for: 10m
+      labels: {severity: warning}
+      annotations:
+        summary: "p95 LLM latency above 15 seconds"
+    - alert: LLMTokenSpendHigh
+      expr: sum(increase(llm_tokens_total{service="prod-llm"}[1h])) > 500000
+      labels: {severity: warning}
+      annotations:
+        summary: "More than 500k tokens used in the last hour: check costs"
+    - alert: LLMBudgetRejectionsSpiking
+      expr: sum(increase(llm_calls_total{service="prod-llm", status="budget_exceeded"}[15m])) > 50
+      labels: {severity: info}
+      annotations:
+        summary: "Many requests blocked by the per-user daily budget"
+    - alert: LLMSafetyFilterBlocks
+      expr: sum(increase(llm_calls_total{service="prod-llm", status="blocked"}[15m])) > 20
+      labels: {severity: info}
+      annotations:
+        summary: "Safety filter blocked 20+ messages in 15 minutes: possible abuse"

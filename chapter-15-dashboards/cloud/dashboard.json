@@ -1,0 +1,52 @@
+{
+  "title": "Zero2AI Fraud API (Chapter 15)",
+  "uid": "zero2ai-fraud-ch15",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "time": {"from": "now-30m", "to": "now"},
+  "tags": ["zero2ai", "chapter-15"],
+  "panels": [
+    {
+      "id": 1, "type": "timeseries", "title": "Predictions per second (fraud vs legit)",
+      "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"refId": "A", "expr": "sum by (result) (rate(fraud_predictions_total[1m]))", "legendFormat": "{{result}}"}]
+    },
+    {
+      "id": 2, "type": "timeseries", "title": "Model latency p50 / p95 (seconds)",
+      "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {"unit": "s"}, "overrides": []},
+      "targets": [
+        {"refId": "A", "expr": "histogram_quantile(0.50, sum by (le) (rate(model_inference_seconds_bucket[5m])))", "legendFormat": "p50"},
+        {"refId": "B", "expr": "histogram_quantile(0.95, sum by (le) (rate(model_inference_seconds_bucket[5m])))", "legendFormat": "p95"}
+      ]
+    },
+    {
+      "id": 3, "type": "stat", "title": "Fraud share (last 5 min)",
+      "gridPos": {"x": 0, "y": 8, "w": 6, "h": 6},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {"unit": "percentunit", "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "orange", "value": 0.1}, {"color": "red", "value": 0.2}]}}, "overrides": []},
+      "targets": [{"refId": "A", "expr": "sum(rate(fraud_predictions_total{result=\"fraud\"}[5m])) / sum(rate(fraud_predictions_total[5m]))"}]
+    },
+    {
+      "id": 4, "type": "stat", "title": "Requests in progress",
+      "gridPos": {"x": 6, "y": 8, "w": 6, "h": 6},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"refId": "A", "expr": "sum(active_requests)"}]
+    },
+    {
+      "id": 5, "type": "stat", "title": "Healthy copies",
+      "gridPos": {"x": 12, "y": 8, "w": 6, "h": 6},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"refId": "A", "expr": "sum(up{namespace=\"zero2ai\", service=~\"monitored-api.*\"})"}]
+    },
+    {
+      "id": 6, "type": "timeseries", "title": "CPU used per copy (cores)",
+      "gridPos": {"x": 18, "y": 8, "w": 6, "h": 6},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"refId": "A", "expr": "sum by (pod) (rate(container_cpu_usage_seconds_total{namespace=\"zero2ai\", pod=~\"monitored-api.*\", container!=\"\"}[2m]))", "legendFormat": "{{pod}}"}]
+    }
+  ]
+}

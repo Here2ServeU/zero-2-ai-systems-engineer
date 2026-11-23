@@ -1,0 +1,32 @@
+# Phase 1: the "blue" kitchen. Same fraud API image for blue and green; only
+# APP_VERSION / APP_COLOR differ, so /info tells you which one answered.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fraud-blue-p1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fraud-bg
+      color: blue
+  template:
+    metadata:
+      labels:
+        app: fraud-bg
+        color: blue
+    spec:
+      containers:
+      - name: fraud-api
+        image: __IMAGE__
+        env:
+        - {name: APP_VERSION, value: "1.0.0"}
+        - {name: APP_COLOR, value: "blue"}
+        ports:
+        - containerPort: 5000
+        resources:
+          requests: {cpu: 100m, memory: 256Mi}
+          limits: {memory: 512Mi}
+        readinessProbe:
+          httpGet: {path: /health, port: 5000}
+          periodSeconds: 5

@@ -18,6 +18,11 @@ SYSTEM_PROMPT = (
     'paragraphs. If the question is outside '
     'banking topics, politely decline.')
 
+@app.route('/health')
+def health():
+    # Kubernetes asks this to check the copy is alive (cloud track).
+    return jsonify({'status':'healthy'})
+
 @app.route('/chat', methods=['POST'])
 def chat():
     rid = str(uuid.uuid4())[:8]

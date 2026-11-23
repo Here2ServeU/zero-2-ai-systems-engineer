@@ -1,0 +1,4 @@
+cloud/
+venv/
+__pycache__/
+*.md

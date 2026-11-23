@@ -1,0 +1,23 @@
+# Phase 2: the robot night guard on a schedule, watching REAL numbers.
+# No web app here: just a CronJob that wakes up every 5 minutes.
+deployment:
+  enabled: false
+service:
+  enabled: false
+tests:
+  enabled: false
+
+cronJob:
+  enabled: true
+  schedule: "*/5 * * * *"
+  command: ["python", "aiops_watcher.py"]
+
+env:
+  PROMETHEUS_URL: http://kube-prometheus-stack-prometheus.monitoring:9090
+  TARGET_DEPLOYMENT: metrics-api       # the Chapter 11 app (deploy.sh makes sure it's running)
+  TARGET_NAMESPACE: zero2ai
+  ALLOW_SCALE: "false"                 # Phase 2 = report only
+
+resources:
+  requests: {cpu: 50m, memory: 64Mi}
+  limits: {memory: 128Mi}

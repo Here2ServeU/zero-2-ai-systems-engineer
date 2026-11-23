@@ -1,0 +1,55 @@
+# Checks the cloud track (Chapters 10-18) on every push and pull request:
+# Terraform formatting + validation, Helm chart renders for every chapter,
+# shell script syntax, and Python syntax. No AWS account or cluster needed.
+name: Cloud track checks
+
+on:
+  push:
+    branches: [main]
+    paths: ['chapter-08-cloud/terraform/**', 'platform/**', 'chapter-1*/**', 'chapter-06-docker/**', '.github/workflows/cloud-track-validate.yml']
+  pull_request:
+    paths: ['chapter-08-cloud/terraform/**', 'platform/**', 'chapter-1*/**', 'chapter-06-docker/**', '.github/workflows/cloud-track-validate.yml']
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - name: terraform fmt
+        run: terraform fmt -check -recursive -diff chapter-08-cloud/terraform
+      - name: terraform validate (every stack)
+        run: |
+          for stack in ec2 eks eks-addons backend; do
+            echo "::group::$stack"
+            terraform -chdir=chapter-08-cloud/terraform/$stack init -backend=false -input=false
+            terraform -chdir=chapter-08-cloud/terraform/$stack validate
+            echo "::endgroup::"
+          done
+
+  helm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+      - name: Install kubeconform
+        run: |
+          curl -sSL https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz | tar xz
+          sudo mv kubeconform /usr/local/bin/
+      - name: Render the chart for every chapter and phase
+        run: bash platform/scripts/validate-chart.sh
+
+  scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Shell syntax + shellcheck (errors only)
+        run: |
+          files=$(git ls-files '*.sh')
+          for f in $files; do bash -n "$f"; done
+          shellcheck -S error -x $files
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Python syntax
+        run: python -m py_compile $(git ls-files 'chapter-*/*.py' 'chapter-*/**/*.py')

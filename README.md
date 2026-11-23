@@ -47,7 +47,7 @@ in plain English.
 7. [Chapter 07 — Set up AWS and build your first cloud server (Terraform)](chapter-07-terraform) · 💳 🌐 🧑‍🤝‍🧑
 8. [Chapter 08 — Build bigger in the cloud](chapter-08-cloud) · 💳 🌐 🧑‍🤝‍🧑
 9. [Chapter 09 — A robot helper that checks your work (CI/CD)](chapter-09-cicd) · 🌐 🧑‍🤝‍🧑
-10. [Chapter 10 — Run many copies safely (Kubernetes)](chapter-10-kubernetes) · 🧑‍🤝‍🧑
+10. [Chapter 10 — Run many copies safely (Kubernetes)](chapter-10-kubernetes) · 🧑‍🤝‍🧑 · ☁️ cloud track starts here
 
 ### Part 3 — Make it watch and heal itself
 11. [Chapter 11 — Watch your program's health (Monitoring)](chapter-11-monitoring) · 💻
@@ -61,9 +61,22 @@ in plain English.
 17. [Chapter 17 — Give the robot your own notes to read (RAG)](chapter-17-rag) · 💳 🌐
 18. [Chapter 18 — Run the smart robot for real (Production LLM)](chapter-18-prodllm) · 💳 🌐
 
-> **The big graduation projects.** After the chapters, the book includes two full systems to
-> build — **NexaGuard** (catching bank fraud) and **ClarityAI** (helping in healthcare). They
-> are advanced. Come back to them once these 18 chapters feel comfortable.
+### ☁️ The cloud track (Chapters 10–18)
+
+From Chapter 10 on, every chapter also runs on a real **AWS EKS** cluster, built with
+**Terraform** and deployed with **Helm**, in three phases:
+
+| Phase | What you do |
+|---|---|
+| **1 — Lift and shift** | Run what you ran on your laptop, on EKS, with plain YAML. |
+| **2 — Package with Helm** | Install it as a Helm chart (templates + values) and test it like you did locally. |
+| **3 — Production** | Same chart, production values: load balancer, autoscaling, disruption budgets, network policy, alerts, managed secrets, dev/qa/prod. |
+
+Start at **[platform/README.md](platform/README.md)** (build the cluster once), then each
+chapter's `cloud/README.md`. 💳 It costs money while it runs; every chapter shows how to tear
+it down.
+
+> **Capstone project.** A capstone that brings everything together is coming soon.
 
 ## What you need before Chapter 01
 

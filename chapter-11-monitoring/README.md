@@ -323,6 +323,14 @@ doors.
 - A simple **anomaly** spotter can automatically point at the one strange reading using a
   **z-score** and a **threshold**.
 
+## ☁️ Cloud track (EKS + Terraform + Helm)
+
+This chapter also runs on a real cloud cluster, in three phases (plain YAML → Helm chart →
+production settings): Prometheus on EKS collects every copy's metrics automatically (ServiceMonitor), then Phase 3 adds alert rules.
+
+Guide: **[cloud/README.md](cloud/README.md)** · Build the shared platform once first:
+[platform/README.md](../platform/README.md). 💳 Costs money while it runs — destroy it when done.
+
 ## Where to next
 
 [Chapter 12 — Teach the system to fix itself (AIOps)](../chapter-12-aiops). Now that your

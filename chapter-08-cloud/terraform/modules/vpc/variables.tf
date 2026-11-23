@@ -29,3 +29,26 @@ variable "subnet_tags" {
   default     = {}
   description = "Extra tags added to every public subnet (e.g. Kubernetes discovery tags in Chapter 10)."
 }
+
+variable "private_subnet_count" {
+  type        = number
+  default     = 0
+  description = "Number of private subnets (no public IPs), one per AZ. 0 = none (Chapter 08 default). EKS prod uses 2 or 3."
+
+  validation {
+    condition     = var.private_subnet_count >= 0 && var.private_subnet_count <= 6
+    error_message = "private_subnet_count must be between 0 and 6."
+  }
+}
+
+variable "enable_nat_gateway" {
+  type        = bool
+  default     = false
+  description = "Create one NAT gateway so private subnets can reach the internet. Costs ~$32/month plus data. Only used when private_subnet_count > 0."
+}
+
+variable "private_subnet_tags" {
+  type        = map(string)
+  default     = {}
+  description = "Extra tags added to every private subnet (e.g. kubernetes.io/role/internal-elb in Chapter 10)."
+}

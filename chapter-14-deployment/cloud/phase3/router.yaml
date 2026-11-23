@@ -1,0 +1,12 @@
+# Phase 3: canary release through the public ALB. The load balancer itself
+# splits traffic by weight between the blue and green Services:
+#   canaryWeight: 10  -> 90% blue, 10% green
+# Move it up step by step (bash canary.sh 25 / 50 / 100) or back to 0.
+ingress:
+  enabled: true
+  healthcheckPath: /health
+  weighted:
+    enabled: true
+    stableService: fraud-blue
+    canaryService: fraud-green
+    canaryWeight: 10

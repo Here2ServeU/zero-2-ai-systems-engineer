@@ -56,6 +56,11 @@ def call_anthropic(prompt):
 app = Flask(__name__)
 start_http_server(8000)
 
+@app.route('/health')
+def health():
+    # Kubernetes asks this to check the copy is alive (cloud track).
+    return jsonify({'status':'healthy'})
+
 @app.route('/llm', methods=['POST'])
 def llm():
     rid = str(uuid.uuid4())[:8]

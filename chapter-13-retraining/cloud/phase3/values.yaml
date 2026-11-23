@@ -1,0 +1,23 @@
+# Phase 3: production retraining.
+cronJob:
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 5
+
+# A failed run means drift was found but the new model was NOT good enough:
+# a human should look. Alert on it.
+prometheusRule:
+  enabled: true
+  rules:
+    - alert: RetrainingRejectedModel
+      expr: sum(kube_job_status_failed{namespace="zero2ai", job_name=~"retrain-.*"}) > 0
+      for: 1m
+      labels: {severity: warning}
+      annotations:
+        summary: "A retraining run failed or its model was rejected (recall below 0.70)"
+        description: "kubectl -n zero2ai logs job/<name>; the old model is still serving."
+    - alert: MlflowDown
+      expr: sum(kube_deployment_status_replicas_available{namespace="zero2ai", deployment="mlflow"}) < 1
+      for: 5m
+      labels: {severity: critical}
+      annotations:
+        summary: "The MLflow tracking server is down; retraining runs cannot be recorded"

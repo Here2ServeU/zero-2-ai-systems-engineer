@@ -1,0 +1,33 @@
+# Phase 1: the metrics app from this chapter, running on EKS.
+# Two doors per copy: 5000 for visitors, 8000 for the metrics "fitness watch".
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metrics-api-p1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: metrics-api-p1
+  template:
+    metadata:
+      labels:
+        app: metrics-api-p1
+    spec:
+      containers:
+      - name: app
+        image: __IMAGE__
+        ports:
+        - name: http
+          containerPort: 5000
+        - name: metrics
+          containerPort: 8000
+        resources:
+          requests: {cpu: 50m, memory: 128Mi}
+          limits: {memory: 256Mi}
+        readinessProbe:
+          httpGet: {path: /health, port: 5000}
+          periodSeconds: 5
+        livenessProbe:
+          httpGet: {path: /health, port: 5000}
+          periodSeconds: 20

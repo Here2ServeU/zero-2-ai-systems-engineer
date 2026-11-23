@@ -1,0 +1,7 @@
+
+# Cloud track: last pushed image per environment (platform/scripts/lib.sh)
+.zero2ai/
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*

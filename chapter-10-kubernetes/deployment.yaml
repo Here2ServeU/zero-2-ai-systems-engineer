@@ -16,8 +16,20 @@ spec:
       containers:
       - name: fraud-api
         image: zero2ai-fraud-api:v1.0
+        # Use the image you built on your laptop. Never try to download it from
+        # the internet (it isn't there), which is what causes ErrImagePull.
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5000
+        # Readiness: "is this copy ready for visitors yet?" The front desk only
+        # sends traffic to copies that pass this check.
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        # Liveness: "is this copy still alive?" If not, it is replaced.
         livenessProbe:
           httpGet:
             path: /health

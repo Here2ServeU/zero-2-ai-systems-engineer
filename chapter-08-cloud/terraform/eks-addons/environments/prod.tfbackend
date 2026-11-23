@@ -1,0 +1,5 @@
+# Same bucket + lock table; separate key for the add-ons state.
+key            = "eks-addons/prod/terraform.tfstate"
+region         = "us-east-1"
+dynamodb_table = "zero2ai-terraform-locks"
+encrypt        = true

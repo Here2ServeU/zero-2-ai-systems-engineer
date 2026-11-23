@@ -264,12 +264,20 @@ won't pay twice for the same question, and keeps trying when the network hiccups
 - **Logging** (ticket numbers) and **metrics** (live counters) let you watch the service's
   health.
 
+## ☁️ Cloud track (EKS + Terraform + Helm)
+
+This chapter also runs on a real cloud cluster, in three phases (plain YAML → Helm chart →
+production settings): the fully fledged version: autoscaling, disruption budgets, network policy, public load balancer, vault secrets, and alerts on errors, latency and spend.
+
+Guide: **[cloud/README.md](cloud/README.md)** · Build the shared platform once first:
+[platform/README.md](../platform/README.md). 💳 Costs money while it runs — destroy it when done.
+
 ## Where to next
 
 You've finished all 18 chapters — congratulations! Head back to the
 [book index](../README.md) to see the whole journey you completed.
 
-Your next big challenge is the **graduation projects** described there: **NexaGuard** (a full
-system for catching bank fraud) and **ClarityAI** (helping in healthcare). They are advanced and
-bring together everything from these chapters — come back to them whenever you feel ready. You've
-built every piece you need to start.
+Your next big challenge is the **capstone project** (coming soon), which brings together
+everything from these chapters into one system. If you haven't yet, run each chapter's
+**cloud track** (Phases 1–3) on EKS: it's the best preparation. You've built every piece you
+need to start.

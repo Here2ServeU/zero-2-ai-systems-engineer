@@ -280,6 +280,14 @@ its own guesses — and pointed back to the note it used.
   robot using only those notes.
 - A strict **system prompt** ("use ONLY these notes, and cite them") keeps the answer honest.
 
+## ☁️ Cloud track (EKS + Terraform + Helm)
+
+This chapter also runs on a real cloud cluster, in three phases (plain YAML → Helm chart →
+production settings): RAG becomes a web API (`rag_api.py`); an init container builds the index in every copy so it scales out freely.
+
+Guide: **[cloud/README.md](cloud/README.md)** · Build the shared platform once first:
+[platform/README.md](../platform/README.md). 💳 Costs money while it runs — destroy it when done.
+
 ## Where to next
 
 [Chapter 18 — Run the smart robot for real (Production LLM)](../chapter-18-prodllm). You'll add

@@ -79,7 +79,7 @@ is how you talk to Kubernetes.
 > the node `Ready` before going on.
 
 > **About the image.** These files run an app image called `zero2ai-fraud-api:v1.0`, built back
-> in Chapter/Chapter 06. On a local cluster, make sure that image is available to it (on Docker
+> in Chapter 06. On a local cluster, make sure that image is available to it (on Docker
 > Desktop, having built it locally is usually enough). If you haven't built it, you can still
 > read along and learn what each file does.
 
@@ -105,8 +105,20 @@ spec:
       containers:
       - name: fraud-api
         image: zero2ai-fraud-api:v1.0
+        # Use the image you built on your laptop. Never try to download it from
+        # the internet (it isn't there), which is what causes ErrImagePull.
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5000
+        # Readiness: "is this copy ready for visitors yet?" The front desk only
+        # sends traffic to copies that pass this check.
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        # Liveness: "is this copy still alive?" If not, it is replaced.
         livenessProbe:
           httpGet:
             path: /health
@@ -124,8 +136,12 @@ Step by step:
 4. The `labels` (`app: zero2ai-fraud-api`) — name tags so the manager knows which copies belong
    together.
 5. `image: zero2ai-fraud-api:v1.0` — each copy runs your app from this lunchbox recipe.
-6. `containerPort: 5000` — the app listens on door (port) `5000` inside each copy.
-7. `livenessProbe` — the **health check**. The manager keeps poking `/health` on port `5000` to
+6. `imagePullPolicy: IfNotPresent` — "use the image already on this machine." Without it, a
+   cluster may try to download `zero2ai-fraud-api:v1.0` from the internet, where it doesn't exist.
+7. `containerPort: 5000` — the app listens on door (port) `5000` inside each copy.
+8. `readinessProbe` — the **"ready for visitors?"** check. The front desk only sends visitors to
+   copies that pass it, so nobody reaches a copy that is still starting up.
+9. `livenessProbe` — the **health check**. The manager keeps poking `/health` on port `5000` to
    ask "are you still alive?" It waits 10 seconds before the first knock
    (`initialDelaySeconds: 10`), then knocks every 30 seconds (`periodSeconds: 30`). If a copy
    stops answering, the manager throws it out and starts a fresh one.
@@ -166,20 +182,65 @@ copies come and go.
 
 ## Let's run it
 
-With your node showing `Ready`, run these one at a time:
+### The quick way (one script does every step)
+
+From the top of the repo:
 
 ```bash
+bash chapter-10-kubernetes/scripts/local-up.sh     # build, load image, apply, wait for Ready
+bash chapter-10-kubernetes/scripts/local-test.sh   # call /health, /info and /predict
+```
+
+`local-up.sh` works on Docker Desktop, minikube, and kind. It notices which one you use and, for
+minikube and kind, **loads your image into the cluster** (they have their own private image
+shelf and can't see images on your laptop until you hand them over).
+
+### The step-by-step way
+
+With your node showing `Ready`, run these one at a time from inside `chapter-10-kubernetes/`:
+
+```bash
+# minikube only: hand your laptop's image to minikube
+minikube image load zero2ai-fraud-api:v1.0
+
 kubectl apply -f deployment.yaml   # ask for 2 copies
 kubectl apply -f service.yaml      # set up the front desk
-kubectl get pods                   # expect 2 copies, status "Running"
+kubectl get pods                   # expect 2 copies, status "Running" and READY 1/1
 ```
 
-`kubectl apply -f <file>` means "read this wish-file and make it real." Then visit the app
-through the front desk:
+`kubectl apply -f <file>` means "read this wish-file and make it real."
+
+### Visit the app (works on every cluster)
+
+Open a **tunnel** from your laptop to the front desk. Leave this running in one terminal:
 
 ```bash
-curl http://localhost:30080/health
+kubectl port-forward service/zero2ai-fraud-svc 8080:80
 ```
+
+In a **second** terminal:
+
+```bash
+curl http://localhost:8080/health
+```
+
+**What you should see:** `{"status":"healthy","ts":"..."}`.
+
+`port-forward` means "connect door `8080` on my laptop to door `80` on the front desk." It works
+on Docker Desktop, minikube, kind, **and on a real cloud cluster** (you'll use it again on AWS).
+
+> **Why not `curl http://localhost:30080/health`?** A NodePort opens door `30080` on the
+> *cluster's machine*. With **Docker Desktop**, that machine is your laptop, so
+> `localhost:30080` works. With **minikube** or **kind**, the cluster runs *inside a container*,
+> so door `30080` is on that container, not on your laptop, and you get
+> `curl: (7) Failed to connect to localhost port 30080`. Nothing is broken. Use port-forward
+> (above), or on minikube ask it for the real address:
+>
+> ```bash
+> minikube service zero2ai-fraud-svc --url   # prints an address; curl <that>/health
+> ```
+>
+> On Windows/macOS with minikube's Docker driver, keep that terminal open: it's a tunnel too.
 
 (`curl` knocks on a door from the terminal — you met it back in the API chapter.)
 
@@ -227,8 +288,18 @@ all with a few short commands.
   or restart it (`minikube start`, or toggle Docker Desktop's Kubernetes off and on).
 - **Pods stuck in `ErrImagePull` / `ImagePullBackOff`** → The cluster can't find the image
   `zero2ai-fraud-api:v1.0`. Build it locally (Chapter 06) so the local cluster can see it.
-- **`curl: ... Connection refused` on port 30080** → Give the pods a few seconds to reach
-  `Running`, and confirm the Service was applied: `kubectl get service`.
+- **`curl: (7) Failed to connect to localhost port 30080`** → You're on minikube or kind, where
+  the NodePort isn't on your laptop. Use the tunnel instead:
+  `kubectl port-forward service/zero2ai-fraud-svc 8080:80`, then `curl http://localhost:8080/health`
+  in a second terminal. (On minikube, `minikube service zero2ai-fraud-svc --url` also works.)
+- **port-forward says `error: unable to forward port` or pods show `0/1 READY`** → The copies
+  aren't healthy yet. Run `kubectl get pods` and `kubectl logs <pod-name>`. The app trains its
+  model at startup, so give it 10–20 seconds.
+- **Pods stuck in `ErrImageNeverPull` / `ErrImagePull` on minikube** → minikube can't see your
+  laptop's image. Run `minikube image load zero2ai-fraud-api:v1.0`, then
+  `kubectl rollout restart deployment zero2ai-fraud-api`.
+- **`curl` hangs on Windows Git Bash** → Try `curl.exe http://localhost:8080/health`, or open
+  that address in your browser.
 - **YAML error on `apply`** → Indentation again — two spaces per level, never tabs. Compare to
   the examples above.
 
@@ -244,6 +315,26 @@ all with a few short commands.
 - You can run a real, multi-copy, self-healing app **free on your own laptop** with Docker
   Desktop's Kubernetes or **minikube** — no cloud bill.
 - `kubectl apply`, `get pods`, `delete pod`, and `scale` are the everyday commands.
+- `kubectl port-forward` is the tunnel that reaches a Service from your laptop on **any** cluster.
+
+## ☁️ Take it to the cloud: the EKS track (Phases 1, 2, 3)
+
+You just ran the app on your laptop. Starting with this chapter, every chapter has a
+**cloud track** in its `cloud/` folder that runs the *same* thing on **AWS EKS** (Amazon's
+managed Kubernetes), built with **Terraform** and packaged with **Helm**:
+
+| Phase | What you do | Why it matters |
+|---|---|---|
+| **Phase 1 — Lift and shift** | Apply the same kind of YAML you used locally, on EKS. | Proves the app runs in the cloud, unchanged. |
+| **Phase 2 — Package with Helm** | Install it as a **Helm chart** (templates + values) and test it exactly like you did locally (port-forward + curl + `helm test`). | One command installs, upgrades, and rolls back. |
+| **Phase 3 — Production platform** | Same chart, production values: public load balancer, autoscaling, disruption budgets, security hardening, multiple environments. | This is how real teams run it. |
+
+> 💳 **Costs money.** An EKS cluster costs roughly **$0.10/hour** plus servers and a load
+> balancer. Get permission if the account isn't yours, and **destroy everything when you
+> finish** (the scripts include a one-line teardown).
+
+Start here: **[chapter-10-kubernetes/cloud/README.md](cloud/README.md)**. It sends you to
+[`platform/`](../platform/README.md) once to build the cluster, then walks Phase 1 → 3.
 
 ## Where to next
 

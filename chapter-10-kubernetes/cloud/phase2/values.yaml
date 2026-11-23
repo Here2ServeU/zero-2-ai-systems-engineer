@@ -1,0 +1,21 @@
+# Phase 2: the fraud API as a Helm release.
+# Everything not listed here comes from platform/helm/zero2ai-app/values.yaml.
+# The image repository and tag are filled in by deploy.sh.
+
+replicaCount: 2
+containerPort: 5000
+
+probes:
+  path: /health
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    memory: 512Mi
+
+# Inside the cluster only, like your laptop. Reach it with port-forward.
+service:
+  type: ClusterIP
+  port: 80

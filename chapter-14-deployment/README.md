@@ -294,6 +294,14 @@ scary.
 - Together these let you **deploy** changes without scary surprises — there's always a fast
   path back to safety.
 
+## ☁️ Cloud track (EKS + Terraform + Helm)
+
+This chapter also runs on a real cloud cluster, in three phases (plain YAML → Helm chart →
+production settings): blue/green with a Service selector and Helm, then a real canary split by the AWS load balancer and automatic rollback with `helm --atomic`.
+
+Guide: **[cloud/README.md](cloud/README.md)** · Build the shared platform once first:
+[platform/README.md](../platform/README.md). 💳 Costs money while it runs — destroy it when done.
+
 ## Where to next
 
 [Chapter 15 — Dashboards you can watch (Grafana)](../chapter-15-dashboards). You'll turn your

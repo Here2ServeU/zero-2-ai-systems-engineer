@@ -130,3 +130,41 @@ here. No definition assumes you already know another hard word.
 - **Embedding** — Turning a piece of text into numbers so the computer can find similar text.
 - **Vector database / ChromaDB** — A special store that holds those number-versions of text and
   finds the closest matches fast.
+
+## The cloud track (Chapters 10–18)
+
+- **EKS (Elastic Kubernetes Service)** — Kubernetes that AWS runs for you. Same `kubectl`
+  commands as on your laptop.
+- **ECR (Elastic Container Registry)** — Your private shelf for images in AWS. EKS pulls images
+  from here.
+- **Helm** — Kubernetes' package manager. Installs, upgrades and rolls back apps with one command.
+- **Chart** — A Helm package: a folder of YAML **templates** with blanks to fill in.
+- **Values file** — The answers that fill in a chart's blanks. Same chart + different values =
+  a different app or environment.
+- **Release / revision** — One installed copy of a chart, and each numbered upgrade of it. You
+  can `helm rollback` to any revision.
+- **`helm test`** — Runs a small check pod inside the cluster, like `curl /health` from inside.
+- **port-forward** — A tunnel from a door on your laptop to a Service in a cluster:
+  `kubectl port-forward service/<name> 8080:80`. Works on every cluster.
+- **LoadBalancer Service / NLB** — A Service that asks AWS for a real Network Load Balancer with
+  a public address.
+- **Ingress / ALB** — The public entrance for web traffic; on EKS it becomes an Application Load
+  Balancer, which can also split traffic by weight (canary).
+- **HPA (HorizontalPodAutoscaler)** — Adds copies when they're busy, removes them when quiet.
+- **PDB (PodDisruptionBudget)** — "Never take down more than this many copies at once" during
+  upgrades and maintenance.
+- **NetworkPolicy** — A firewall rule for pods: who may talk to whom.
+- **Cluster Autoscaler** — Adds or removes whole servers (nodes) when pods don't fit.
+- **Spot instances** — Spare AWS servers at a big discount that AWS may take back with 2
+  minutes' notice. Good for dev.
+- **NAT gateway** — Lets servers in private subnets reach the internet without being reachable
+  from it.
+- **ServiceMonitor** — Tells Prometheus which Service to collect metrics from.
+- **PrometheusRule** — Alert rules Prometheus checks continuously.
+- **Job / CronJob** — Run a task to the end once / on a timetable.
+- **Init container** — A container that runs to completion before the app starts in the same pod.
+- **RBAC** — Kubernetes permissions: a Role lists what's allowed, a RoleBinding gives it out.
+- **EKS Pod Identity** — Gives one pod's service account AWS permissions, with no access keys.
+- **AWS Secrets Manager** — AWS's vault for secrets like API keys.
+- **External Secrets Operator** — Copies secrets from the vault into Kubernetes Secrets and keeps
+  them up to date.

@@ -1,0 +1,24 @@
+# Phase 3: every copy builds its own small index at start-up, so copies are
+# identical and independent: scale out freely, no shared disk to manage.
+# (A big corpus would move to a managed vector database instead.)
+envFromSecrets: []
+externalSecret:
+  enabled: true
+  remoteKey: zero2ai/dev/llm-api-keys      # deploy.sh sets the right env
+  keys: ["ANTHROPIC_API_KEY"]
+
+replicaCount: 2
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 4
+  targetCPUUtilizationPercentage: 75
+pdb:
+  enabled: true
+topologySpread:
+  enabled: true
+networkPolicy:
+  enabled: true
+ingress:
+  enabled: true
+  healthcheckPath: /health

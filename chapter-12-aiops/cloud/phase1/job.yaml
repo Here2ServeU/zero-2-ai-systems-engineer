@@ -1,0 +1,19 @@
+# Phase 1: run the laptop demo once, in the cloud. A Job is "run this to the
+# end, then stop" (a Deployment is "keep running forever").
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: aiops-demo
+spec:
+  backoffLimit: 1
+  ttlSecondsAfterFinished: 3600
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: aiops
+        image: __IMAGE__
+        command: ["python", "automated_response.py"]
+        resources:
+          requests: {cpu: 50m, memory: 64Mi}
+          limits: {memory: 128Mi}

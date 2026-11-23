@@ -680,20 +680,26 @@ Chapter 10 uses the same layout. It doesn't start from scratch:
 terraform/
 ├── backend/          # same bucket + lock table (already created, don't recreate)
 ├── modules/
-│   ├── vpc/          # same VPC brick, with subnet_tags for Kubernetes
+│   ├── vpc/          # same VPC brick (+ optional private subnets & NAT, off by default)
 │   ├── ec2/
-│   └── ...           # new bricks for the cluster
+│   ├── eks/          # NEW: cluster, node group, core add-ons, admin access
+│   ├── ecr/          # NEW: image registries
+│   └── pod-identity-role/   # NEW: AWS permissions for one pod, no access keys
 ├── ec2/              # this chapter's stack
-└── eks/              # Chapter 10's stack: main.tf, variables.tf, environments/dev|qa|prod
+├── eks/              # Chapter 10's stack: environments/dev|qa|prod
+└── eks-addons/       # Chapter 10's Helm-installed add-ons: environments/dev|qa|prod
 ```
 
 - **Same backend:** the same S3 bucket and DynamoDB table, with state keys like
   `eks/dev/terraform.tfstate` next to `ec2/dev/terraform.tfstate`.
-- **Same modules:** the `vpc` brick is reused unchanged.
+- **Same modules:** the `vpc` brick is reused. Its new private-subnet and NAT settings are off by
+  default, so this chapter's `ec2` stack plans exactly as before.
 - **Same environments:** `dev`, `qa`, and `prod` `.tfvars` and `.tfbackend` files, and the same
   `init -reconfigure` → `plan` → `apply` → `destroy` routine.
 - **No name clashes:** names include the stack (`zero2ai-ec2-dev-...` vs `zero2ai-eks-dev-...`),
   so both stacks can exist in one account.
+
+The whole cloud track (Chapters 10–18) is explained in [platform/README.md](../platform/README.md).
 
 ---
 

@@ -1,0 +1,6 @@
+cloud/
+venv/
+vector_db/
+.env
+__pycache__/
+*.md

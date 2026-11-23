@@ -1,0 +1,42 @@
+# Phase 3: dashboards are for humans; ALERTS wake humans up.
+resources:
+  requests: {cpu: 100m, memory: 128Mi}
+  limits: {memory: 256Mi}
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+pdb:
+  enabled: true
+topologySpread:
+  enabled: true
+networkPolicy:
+  enabled: true
+ingress:
+  enabled: true
+  healthcheckPath: /health
+
+prometheusRule:
+  enabled: true
+  rules:
+    - alert: FraudShareHigh
+      expr: |
+        sum(rate(fraud_predictions_total{service="monitored-api", result="fraud"}[10m]))
+          / sum(rate(fraud_predictions_total{service="monitored-api"}[10m])) > 0.2
+      for: 10m
+      labels: {severity: warning}
+      annotations:
+        summary: "More than 20% of payments flagged as fraud for 10 minutes"
+        description: "Either an attack, or the model has drifted (Chapter 13)."
+    - alert: ModelLatencyHigh
+      expr: histogram_quantile(0.95, sum by (le) (rate(model_inference_seconds_bucket{service="monitored-api"}[5m]))) > 0.05
+      for: 5m
+      labels: {severity: warning}
+      annotations:
+        summary: "p95 model latency above 50 ms"
+    - alert: MonitoredApiDown
+      expr: sum(up{service="monitored-api"}) == 0
+      for: 2m
+      labels: {severity: critical}
+      annotations:
+        summary: "No copy of monitored-api is reachable"

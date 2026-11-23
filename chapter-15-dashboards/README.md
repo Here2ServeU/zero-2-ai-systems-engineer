@@ -365,6 +365,14 @@ and removes the three lunchboxes so nothing keeps running in the background.
 - Counters, gauges, and histograms are different kinds of **metrics**: a tally that only rises,
   a number that goes up and down, and a record of how long things take.
 
+## ☁️ Cloud track (EKS + Terraform + Helm)
+
+This chapter also runs on a real cloud cluster, in three phases (plain YAML → Helm chart →
+production settings): the app ships its own Grafana dashboard **as code** inside its Helm release, plus alert rules.
+
+Guide: **[cloud/README.md](cloud/README.md)** · Build the shared platform once first:
+[platform/README.md](../platform/README.md). 💳 Costs money while it runs — destroy it when done.
+
 ## Where to next
 
 [Chapter 16 — Talk to a smart writing robot (LLM)](../chapter-16-llm). You'll meet large

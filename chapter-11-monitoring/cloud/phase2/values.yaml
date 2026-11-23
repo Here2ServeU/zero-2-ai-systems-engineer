@@ -1,0 +1,14 @@
+# Phase 2: Chapter 11's metrics app as a Helm release.
+command: ["python", "app_with_metrics.py"]
+containerPort: 5000
+metricsPort: 8000          # adds the "metrics" port to the pod and Service
+
+replicaCount: 2
+resources:
+  requests: {cpu: 50m, memory: 128Mi}
+  limits: {memory: 256Mi}
+
+# Creates a ServiceMonitor, so Prometheus scrapes port 8000.
+serviceMonitor:
+  enabled: true
+  interval: 15s

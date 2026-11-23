@@ -1,7 +1,7 @@
 # api.py
 from flask import Flask, request, jsonify
 from model import load_model, predict_one, FEATURES
-import uuid, logging, datetime
+import uuid, logging, datetime, os
 
 logging.basicConfig(level=logging.INFO,
     format='%(asctime)s %(levelname)s %(message)s')
@@ -34,7 +34,10 @@ def health():
 @app.route('/info')
 def info():
     return jsonify({'name':'Zero2AI Fraud API',
-        'version':'1.0.0',
+        # APP_VERSION / APP_COLOR let Kubernetes (Chapters 10 and 14) label
+        # each copy, so you can see which version answered you.
+        'version':os.getenv('APP_VERSION','1.0.0'),
+        'color':os.getenv('APP_COLOR','blue'),
         'author':'Rev Dr Emmanuel Naweji',
         'program':'Zero2AI'})
 

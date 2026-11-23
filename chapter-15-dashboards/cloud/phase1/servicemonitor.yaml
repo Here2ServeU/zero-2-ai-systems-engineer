@@ -1,0 +1,11 @@
+# Replaces prometheus.yml's scrape_configs from your laptop: "collect from
+# every copy behind this Service, on the metrics port".
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: monitored-api-p1
+spec:
+  selector:
+    matchLabels: {app: monitored-api-p1}
+  endpoints:
+  - {port: metrics, interval: 15s}

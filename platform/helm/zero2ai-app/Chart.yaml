@@ -1,0 +1,12 @@
+apiVersion: v2
+name: zero2ai-app
+description: >-
+  One reusable Helm chart for every Zero2AI chapter app (Chapters 10-18).
+  Each chapter installs it with its own values file: same templates,
+  different settings.
+type: application
+version: 1.0.0
+appVersion: "v1.0"
+keywords: [zero2ai, flask, mlops, eks]
+maintainers:
+  - name: Rev Dr Emmanuel Naweji

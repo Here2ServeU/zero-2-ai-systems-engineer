@@ -1,0 +1,28 @@
+# Phase 3: keys live in AWS Secrets Manager, not in anyone's shell.
+#   1. bash ../../platform/scripts/put-llm-secret.sh <env>    (once)
+#   2. External Secrets copies them into a Kubernetes Secret every hour,
+#      so rotating a key = updating it in Secrets Manager. No redeploy.
+envFromSecrets: []
+externalSecret:
+  enabled: true
+  remoteKey: zero2ai/dev/llm-api-keys      # deploy.sh sets the right env
+  keys: ["ANTHROPIC_API_KEY"]              # deploy.sh sets it for your provider
+  refreshInterval: 1h
+
+replicaCount: 2
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 4
+pdb:
+  enabled: true
+topologySpread:
+  enabled: true
+networkPolicy:
+  enabled: true
+ingress:
+  enabled: true
+  healthcheckPath: /health
+  # A public chat endpoint spends YOUR money on every question. In real life,
+  # put authentication in front of it (Cognito / an API gateway) or keep it
+  # internal:  ingress.scheme: internal

@@ -304,6 +304,14 @@ reading any words.
   ships.
 - **MLflow** keeps a saved notebook of every run and model.
 
+## ☁️ Cloud track (EKS + Terraform + Helm)
+
+This chapter also runs on a real cloud cluster, in three phases (plain YAML → Helm chart →
+production settings): retraining runs as a weekly Kubernetes CronJob that logs to an MLflow server on EKS, with model files in S3 (Phase 3).
+
+Guide: **[cloud/README.md](cloud/README.md)** · Build the shared platform once first:
+[platform/README.md](../platform/README.md). 💳 Costs money while it runs — destroy it when done.
+
 ## Where to next
 
 [Chapter 14 — Release changes without scary surprises](../chapter-14-deployment). You now know

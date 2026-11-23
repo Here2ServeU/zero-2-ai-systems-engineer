@@ -1,0 +1,18 @@
+# Phase 1: run the laptop routine once in the cloud: drift check, retrain,
+# quiz the new model, promote it only if it passes.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: retrain-demo
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 3600
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: retrain
+        image: __IMAGE__
+        resources:
+          requests: {cpu: 250m, memory: 512Mi}
+          limits: {memory: 1Gi}

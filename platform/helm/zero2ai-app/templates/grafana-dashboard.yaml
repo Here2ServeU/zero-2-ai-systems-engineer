@@ -1,0 +1,12 @@
+{{- if and .Values.grafanaDashboard.enabled .Values.grafanaDashboard.json }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "app.fullname" . }}-dashboard
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+    grafana_dashboard: "1"      # the Grafana sidecar loads any ConfigMap with this label
+data:
+  {{ include "app.fullname" . }}.json: |-
+    {{- .Values.grafanaDashboard.json | nindent 4 }}
+{{- end }}

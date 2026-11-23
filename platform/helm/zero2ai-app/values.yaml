@@ -1,0 +1,202 @@
+# values.yaml: the DEFAULT settings for zero2ai-app.
+#
+# Every chapter overrides only what it needs, in its own file, e.g.
+#   chapter-10-kubernetes/cloud/phase2/values.yaml   (Phase 2: dev-style)
+#   chapter-10-kubernetes/cloud/phase3/values.yaml   (Phase 3: production)
+# Helm merges: this file  <  chapter values file  <  --set on the command line.
+
+# ---------------------------------------------------------------------------
+# What to run
+# ---------------------------------------------------------------------------
+image:
+  repository: ""            # REQUIRED. e.g. 123456789012.dkr.ecr.us-east-1.amazonaws.com/zero2ai-dev/fraud-api
+  tag: ""                   # defaults to the chart's appVersion
+  pullPolicy: IfNotPresent
+
+command: []                 # override the image's CMD, e.g. ["python", "app_with_metrics.py"]
+args: []
+
+containerPort: 5000         # where the Flask app listens
+metricsPort: 0              # >0 = the app also serves Prometheus metrics here (Chapters 11, 15, 18)
+
+env: {}                     # plain settings:  KEY: "value"
+envFromSecrets: []          # names of Kubernetes Secrets whose keys become env vars
+
+# ---------------------------------------------------------------------------
+# Long-running web app (Deployment) ...
+# ---------------------------------------------------------------------------
+deployment:
+  enabled: true
+
+replicaCount: 2
+
+# Labels added to every pod (used by Chapter 14's blue/green switch).
+podLabels: {}
+podAnnotations: {}
+
+# Optional: run this command in a copy of the same image BEFORE the app
+# starts (Chapter 17 builds its search index this way).
+initCommand: []
+
+# Empty, writable folders inside the pod. /tmp is always added because the
+# root filesystem is read-only by default.
+scratchMounts: []           # e.g. ["/app/vector_db"]
+
+probes:
+  enabled: true
+  path: /health
+  startup:                  # gives slow starters (model training, downloads) time
+    enabled: true
+    periodSeconds: 5
+    failureThreshold: 36    # 36 x 5s = up to 3 minutes to start
+  readiness:
+    periodSeconds: 5
+    failureThreshold: 3
+  liveness:
+    periodSeconds: 20
+    failureThreshold: 3
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    memory: 512Mi
+
+# ---------------------------------------------------------------------------
+# ... or a scheduled task (CronJob) for Chapters 12 and 13.
+# ---------------------------------------------------------------------------
+cronJob:
+  enabled: false
+  schedule: "*/15 * * * *"
+  command: []
+  args: []
+  backoffLimit: 1
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+
+# ---------------------------------------------------------------------------
+# The front desk (Service)
+# ---------------------------------------------------------------------------
+service:
+  enabled: true
+  type: ClusterIP           # Phase 2: ClusterIP + port-forward, like your laptop
+  port: 80
+  annotations: {}
+  # Send traffic to pods with THESE labels instead of this release's own
+  # pods. Chapter 14's blue/green "router" uses it.
+  selectorOverride: {}
+
+# ---------------------------------------------------------------------------
+# Public entrance (Ingress -> AWS Application Load Balancer). Phase 3.
+# ---------------------------------------------------------------------------
+ingress:
+  enabled: false
+  className: alb
+  # ALB "group": Ingresses with the same group share ONE load balancer.
+  # Empty = one ALB per release (simple: every chapter's app sits at "/").
+  # With your own domain, give every chapter the same group + its own host to
+  # pay for a single ALB.
+  groupName: ""
+  scheme: internet-facing
+  host: ""                  # leave empty to use the ALB's own DNS name
+  path: /
+  pathType: Prefix
+  certificateArn: ""        # an ACM certificate ARN turns on HTTPS (and HTTP->HTTPS redirect)
+  healthcheckPath: ""       # defaults to probes.path
+  annotations: {}
+  # Canary (Chapter 14): split traffic by weight between two Services.
+  weighted:
+    enabled: false
+    stableService: ""
+    canaryService: ""
+    canaryWeight: 10        # percent sent to canary
+
+# ---------------------------------------------------------------------------
+# Production safety nets. Phase 3 turns these on.
+# ---------------------------------------------------------------------------
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 70
+
+pdb:
+  enabled: false
+  minAvailable: 1           # never let voluntary disruptions take ALL copies down
+
+topologySpread:
+  enabled: false            # spread copies across availability zones
+
+networkPolicy:
+  enabled: false
+  # Traffic from the AWS load balancer comes from IPs in the VPC, so list the
+  # VPC range here when the app is behind an Ingress.
+  allowCidrs: []
+
+serviceAccount:
+  create: true
+  name: ""                  # defaults to the release name
+  annotations: {}
+  # Don't hand the pod a Kubernetes API token unless it needs one. (AWS
+  # permissions via EKS Pod Identity don't need it.)
+  automount: false
+
+# Kubernetes API permissions for this app (Role + RoleBinding in its namespace).
+rbac:
+  create: false
+  rules: []
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000           # the "appuser" every course Dockerfile creates
+  runAsGroup: 1000
+  fsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: ["ALL"]
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# ---------------------------------------------------------------------------
+# Observability (needs kube-prometheus-stack from eks-addons)
+# ---------------------------------------------------------------------------
+serviceMonitor:
+  enabled: false
+  interval: 30s
+  path: /metrics
+
+prometheusRule:
+  enabled: false
+  rules: []                 # standard Prometheus alerting rules (see Chapter 11 values)
+
+grafanaDashboard:
+  enabled: false
+  json: ""                  # pass with: --set-file grafanaDashboard.json=dashboard.json
+
+# ---------------------------------------------------------------------------
+# Secrets from AWS Secrets Manager (needs external-secrets from eks-addons).
+# Phase 3 of Chapters 16-18.
+# ---------------------------------------------------------------------------
+externalSecret:
+  enabled: false
+  region: us-east-1
+  remoteKey: ""             # e.g. zero2ai/prod/llm-api-keys
+  targetSecretName: ""      # defaults to <release>-secrets
+  refreshInterval: 1h
+  keys: []                  # JSON keys to copy, e.g. ["ANTHROPIC_API_KEY"]
+
+# ---------------------------------------------------------------------------
+# `helm test`: the same /health check you ran with curl on your laptop.
+# ---------------------------------------------------------------------------
+tests:
+  enabled: true
+  path: ""                  # defaults to probes.path

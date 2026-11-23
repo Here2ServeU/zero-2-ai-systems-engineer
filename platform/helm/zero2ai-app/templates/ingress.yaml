@@ -1,0 +1,55 @@
+{{- if .Values.ingress.enabled }}
+{{- $fullname := include "app.fullname" . -}}
+{{- $hc := default .Values.probes.path .Values.ingress.healthcheckPath -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $fullname }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+  annotations:
+    alb.ingress.kubernetes.io/scheme: {{ .Values.ingress.scheme }}
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/group.name: {{ default $fullname .Values.ingress.groupName }}
+    alb.ingress.kubernetes.io/healthcheck-path: {{ $hc }}
+    alb.ingress.kubernetes.io/success-codes: "200"
+    {{- if .Values.ingress.certificateArn }}
+    alb.ingress.kubernetes.io/certificate-arn: {{ .Values.ingress.certificateArn }}
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS13-1-2-2021-06
+    {{- else }}
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+    {{- end }}
+    {{- if .Values.ingress.weighted.enabled }}
+    alb.ingress.kubernetes.io/actions.weighted-routing: >-
+      {{- $stable := required "ingress.weighted.stableService is required" .Values.ingress.weighted.stableService }}
+      {{- $canary := required "ingress.weighted.canaryService is required" .Values.ingress.weighted.canaryService }}
+      {{- $w := int .Values.ingress.weighted.canaryWeight }}
+      {"type":"forward","forwardConfig":{"targetGroups":[{"serviceName":"{{ $stable }}","servicePort":"{{ .Values.service.port }}","weight":{{ sub 100 $w }}},{"serviceName":"{{ $canary }}","servicePort":"{{ .Values.service.port }}","weight":{{ $w }}}]}}
+    {{- end }}
+    {{- with .Values.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  rules:
+    - http:
+        paths:
+          - path: {{ .Values.ingress.path }}
+            pathType: {{ .Values.ingress.pathType }}
+            backend:
+              service:
+                {{- if .Values.ingress.weighted.enabled }}
+                name: weighted-routing
+                port:
+                  name: use-annotation
+                {{- else }}
+                name: {{ $fullname }}
+                port:
+                  number: {{ .Values.service.port }}
+                {{- end }}
+      {{- if .Values.ingress.host }}
+      host: {{ .Values.ingress.host }}
+      {{- end }}
+{{- end }}

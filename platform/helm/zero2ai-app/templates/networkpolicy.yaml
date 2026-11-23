@@ -1,0 +1,36 @@
+{{- if and .Values.deployment.enabled .Values.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "app.fullname" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "app.selectorLabels" . | nindent 6 }}
+  policyTypes: [Ingress]
+  ingress:
+    # 1. Other pods in this namespace (e.g. helm test, the Chapter 14 router).
+    - from:
+        - podSelector: {}
+      ports:
+        - port: {{ .Values.containerPort }}
+    # 2. Prometheus, from the monitoring namespace, on the metrics port.
+    {{- if gt (int .Values.metricsPort) 0 }}
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - port: {{ .Values.metricsPort }}
+    {{- end }}
+    # 3. The AWS load balancer (its IPs are inside the VPC range).
+    {{- range .Values.networkPolicy.allowCidrs }}
+    - from:
+        - ipBlock:
+            cidr: {{ . }}
+      ports:
+        - port: {{ $.Values.containerPort }}
+    {{- end }}
+{{- end }}

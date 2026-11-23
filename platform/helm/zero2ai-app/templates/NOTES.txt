@@ -1,0 +1,25 @@
+{{ include "app.fullname" . }} is installed in namespace "{{ .Release.Namespace }}".
+
+{{- if .Values.deployment.enabled }}
+
+1. Watch the copies start:
+     kubectl -n {{ .Release.Namespace }} get pods -l app.kubernetes.io/instance={{ .Release.Name }} -w
+
+2. Test it exactly like on your laptop:
+     kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "app.fullname" . }} 8080:{{ .Values.service.port }}
+     curl http://localhost:8080{{ .Values.probes.path }}
+
+3. Or let Helm test it for you:
+     helm test {{ .Release.Name }} -n {{ .Release.Namespace }}
+{{- end }}
+{{- if .Values.cronJob.enabled }}
+
+Scheduled task "{{ include "app.fullname" . }}" runs on: {{ .Values.cronJob.schedule }}
+Run it right now:
+  kubectl -n {{ .Release.Namespace }} create job --from=cronjob/{{ include "app.fullname" . }} {{ include "app.fullname" . }}-now
+{{- end }}
+{{- if .Values.ingress.enabled }}
+
+Public address (takes 2-3 minutes the first time):
+  kubectl -n {{ .Release.Namespace }} get ingress {{ include "app.fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
+{{- end }}

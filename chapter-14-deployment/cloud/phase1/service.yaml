@@ -1,0 +1,19 @@
+# Phase 1: the light switch. The Service sends everyone to the copies whose
+# labels match its selector. Change "color: blue" to "color: green" and ALL
+# traffic moves at once; change it back to roll back. switch.sh does that.
+apiVersion: v1
+kind: Service
+metadata:
+  name: fraud-live-p1
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: external
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+spec:
+  type: LoadBalancer
+  selector:
+    app: fraud-bg
+    color: blue
+  ports:
+  - port: 80
+    targetPort: 5000

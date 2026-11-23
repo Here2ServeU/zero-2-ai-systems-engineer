@@ -294,6 +294,14 @@ That's a program reacting to its own trouble, hands-free.
 - The reaction (alert, scale up, open a ticket) can be **automatic** — no human pressing
   buttons.
 
+## ☁️ Cloud track (EKS + Terraform + Helm)
+
+This chapter also runs on a real cloud cluster, in three phases (plain YAML → Helm chart →
+production settings): the guard reads **real** CPU/memory from Prometheus on EKS and, in Phase 3, scales the app itself with tightly limited permissions (RBAC).
+
+Guide: **[cloud/README.md](cloud/README.md)** · Build the shared platform once first:
+[platform/README.md](../platform/README.md). 💳 Costs money while it runs — destroy it when done.
+
 ## Where to next
 
 [Chapter 13 — Notice when the world changes (Drift & retraining)](../chapter-13-retraining).

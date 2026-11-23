@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: prod-llm-p1
+spec:
+  selector: {app: prod-llm-p1}
+  ports:
+  - {name: http, port: 80, targetPort: 5000}
+  - {name: metrics, port: 8000, targetPort: 8000}

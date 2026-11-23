@@ -1,0 +1,43 @@
+# Phase 3: production settings, layered ON TOP of phase2/values.yaml:
+#   helm upgrade fraud-api ... -f phase2/values.yaml -f phase3/values.yaml
+# Same release, new revision: `helm rollback fraud-api` returns to Phase 2.
+
+# A real web server instead of Flask's development server:
+# 2 worker processes x 4 threads each per copy.
+command: ["gunicorn", "--workers", "2", "--threads", "4", "--bind", "0.0.0.0:5000",
+          "--access-logfile", "-", "--graceful-timeout", "20", "api:app"]
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 384Mi
+  limits:
+    memory: 768Mi
+
+# Add copies when average CPU passes 70%, remove them when it calms down.
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 70
+
+# During node upgrades / scale-downs, always keep at least one copy serving.
+pdb:
+  enabled: true
+  minAvailable: 1
+
+# Spread copies across availability zones and nodes.
+topologySpread:
+  enabled: true
+
+# Only the load balancer (VPC range, set by deploy.sh) and pods in this
+# namespace may talk to the app.
+networkPolicy:
+  enabled: true
+
+# Public HTTP entrance through an AWS Application Load Balancer.
+# Add an ACM certificate ARN to switch on HTTPS:
+#   --set ingress.certificateArn=arn:aws:acm:us-east-1:123456789012:certificate/...
+ingress:
+  enabled: true
+  healthcheckPath: /health

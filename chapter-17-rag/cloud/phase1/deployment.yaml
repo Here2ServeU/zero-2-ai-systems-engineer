@@ -1,0 +1,30 @@
+# Phase 1: the RAG API on EKS, same steps as your laptop in one container:
+# file the notes (index_corpus.py), then answer questions (rag_api.py).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rag-api-p1
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: rag-api-p1}
+  template:
+    metadata:
+      labels: {app: rag-api-p1}
+    spec:
+      containers:
+      - name: app
+        image: __IMAGE__
+        envFrom:
+        - secretRef:
+            name: llm-api-keys
+        ports:
+        - containerPort: 5000
+        resources:
+          requests: {cpu: 250m, memory: 1Gi}
+          limits: {memory: 2Gi}
+        readinessProbe:
+          httpGet: {path: /health, port: 5000}
+          initialDelaySeconds: 20
+          periodSeconds: 5
+          failureThreshold: 30
