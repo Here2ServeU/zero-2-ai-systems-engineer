@@ -203,9 +203,19 @@ http_post() {
   echo
 }
 
-# wait_for_ingress <ingress-name>: prints the public hostname once it answers.
+# ingress_port <ingress-name>: the ALB listener port the Helm chart asked for
+# (ingress.port, e.g. 8010). Read back from the Ingress so the test always uses
+# what is really deployed.
+ingress_port() {
+  kubectl -n "$NAMESPACE" get ingress "$1" \
+    -o jsonpath='{.metadata.annotations.alb\.ingress\.kubernetes\.io/listen-ports}' 2>/dev/null \
+    | grep -o '[0-9][0-9]*' | head -1
+}
+
+# wait_for_ingress <ingress-name> [path]: prints "host" or "host:port" once
+# the app answers through the ALB, ready to use as  http://$(wait_for_ingress x)
 wait_for_ingress() {
-  local name="$1" host="" path="${2:-/health}"
+  local name="$1" host="" path="${2:-/health}" port addr
   say "Waiting for the AWS load balancer for ingress/$name (first time: 2-4 minutes)"
   for _ in $(seq 1 60); do
     host=$(kubectl -n "$NAMESPACE" get ingress "$name" -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' 2>/dev/null || true)
@@ -213,11 +223,27 @@ wait_for_ingress() {
     sleep 5
   done
   [ -n "$host" ] || die "No load balancer address yet. Check: kubectl -n $NAMESPACE describe ingress $name"
-  for _ in $(seq 1 60); do
-    curl -fsS --max-time 5 "http://$host$path" >/dev/null 2>&1 && { echo "$host"; return 0; }
+  port=$(ingress_port "$name")
+  addr="$host"
+  if [ -n "$port" ] && [ "$port" != "80" ]; then addr="$host:$port"; fi
+  for _ in $(seq 1 72); do
+    curl -fsS --max-time 5 "http://$addr$path" >/dev/null 2>&1 && { echo "$addr"; return 0; }
     sleep 5
   done
-  die "Load balancer $host is not answering on $path yet. DNS can take a few more minutes; retry the test script."
+  die "Load balancer $addr is not answering on $path yet. DNS can take a few more minutes; retry the test script."
+}
+
+# platform_alb: DNS name of the shared platform ALB (built by eks-addons).
+platform_alb() {
+  kubectl -n kube-system get ingress zero2ai-platform \
+    -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' 2>/dev/null || true
+}
+
+# my_public_cidr: this computer's public IP as a /32 (asks AWS's checkip service).
+my_public_cidr() {
+  local ip
+  ip=$(curl -fsS --max-time 10 https://checkip.amazonaws.com 2>/dev/null | tr -d '[:space:]') || true
+  case "$ip" in *.*.*.*) echo "$ip/32" ;; *) echo "" ;; esac
 }
 
 # wait_for_lb_service <service-name>: same, for a Service of type LoadBalancer (Phase 1).

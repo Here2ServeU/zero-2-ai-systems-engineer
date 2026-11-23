@@ -22,6 +22,7 @@ networkPolicy:
 
 ingress:
   enabled: true
+  port: 8011                # http://<platform-alb>:8011 (shared ALB, see platform/README.md)
   healthcheckPath: /health
 
 # Alert rules Prometheus evaluates every 30 seconds. Firing alerts show up in

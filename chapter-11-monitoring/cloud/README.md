@@ -51,9 +51,11 @@ bash test.sh 2
 See it in Prometheus yourself:
 
 ```bash
+bash ../../platform/scripts/urls.sh     # Prometheus is on the platform ALB at :9090 (your IP only)
+# or, without the ALB:
 kubectl -n monitoring port-forward svc/kube-prometheus-stack-prometheus 9090:9090
-# http://localhost:9090 -> Status > Targets: look for serviceMonitor/zero2ai/metrics-api
-# Graph: rate(api_requests_total[1m])
+# http://<platform-alb>:9090 or http://localhost:9090 -> Status > Targets:
+#   look for serviceMonitor/zero2ai/metrics-api.  Graph: rate(api_requests_total[1m])
 ```
 
 ## Phase 3 — Production monitoring

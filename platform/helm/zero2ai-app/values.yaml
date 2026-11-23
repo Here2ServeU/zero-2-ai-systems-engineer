@@ -95,15 +95,19 @@ ingress:
   enabled: false
   className: alb
   # ALB "group": Ingresses with the same group share ONE load balancer.
-  # Empty = one ALB per release (simple: every chapter's app sits at "/").
-  # With your own domain, give every chapter the same group + its own host to
-  # pay for a single ALB.
-  groupName: ""
+  # "zero2ai" is the platform ALB that eks-addons builds (landing page on :80,
+  # Grafana on :3000). Each chapter's app gets its OWN listener port on it, so
+  #   http://<platform-alb>:8010/health   -> Chapter 10
+  #   http://<platform-alb>:8011/health   -> Chapter 11 ...
+  # Set groupName: "" to give this release a separate ALB of its own.
+  groupName: zero2ai
+  port: 80                  # listener port on the ALB; every chapter sets its own (80NN)
+  allowedCidrs: []          # who may connect, e.g. ["203.0.113.4/32"]; empty = anyone
   scheme: internet-facing
   host: ""                  # leave empty to use the ALB's own DNS name
   path: /
   pathType: Prefix
-  certificateArn: ""        # an ACM certificate ARN turns on HTTPS (and HTTP->HTTPS redirect)
+  certificateArn: ""        # with your own domain (set host): ACM cert ARN = HTTPS on 443 + HTTP->HTTPS redirect
   healthcheckPath: ""       # defaults to probes.path
   annotations: {}
   # Canary (Chapter 14): split traffic by weight between two Services.

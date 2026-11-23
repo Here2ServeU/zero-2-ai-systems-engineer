@@ -15,7 +15,8 @@
 > |---|---|---|
 > | EKS control plane | $0.10/hour (~$73/month) | One per environment |
 > | 2 × t3.medium nodes (dev, Spot) | ~$0.03/hour | prod uses 3 × t3.large On-Demand |
-> | Load balancer (Phase 1 NLB / Phase 3 ALB) | ~$0.025/hour each | Only while a chapter's app is exposed |
+> | Platform ALB (shared by Grafana + every Phase 3 app) | ~$0.025/hour | One per environment, while the platform exists |
+> | Phase 1 NLB | ~$0.025/hour | Only while a chapter's Phase 1 is running |
 > | NAT gateway (qa/prod only) | ~$0.045/hour | dev has none |
 >
 > A 3-hour dev session costs about **$0.50–$1**. A forgotten prod platform costs **$250+/month**.
@@ -31,6 +32,8 @@ build and run it:
   layout, state bucket, and `dev` / `qa` / `prod` files.
 - **EKS** (Elastic Kubernetes Service) is Kubernetes that AWS runs for you. Same `kubectl`
   commands as your laptop.
+- **An ALB** (Application Load Balancer) is the platform's **front door**: one public address
+  that reaches Grafana, Prometheus and every chapter's app, from your browser or with `curl`.
 - **Helm** is Kubernetes' **package manager**. A **chart** is a folder of YAML **templates** with
   blanks; a **values** file fills in the blanks. One command installs, upgrades, or rolls back
   an app.
@@ -41,7 +44,7 @@ Every chapter from 10 to 18 then teaches its topic in **three phases**:
 |---|---|---|
 | **1 — Lift and shift** | `kubectl apply` plain YAML, same as your laptop. Image comes from ECR. | port-forward + curl (like local), then the public load balancer |
 | **2 — Package with Helm** | `helm upgrade --install` the shared chart with the chapter's `phase2/values.yaml`. | port-forward + curl + `helm test` |
-| **3 — Production** | Same release, plus `phase3/values.yaml`: autoscaling, disruption budget, zone spreading, network policy, hardened security, ALB ingress, monitoring/alerts, managed secrets. | public ALB + `helm test` + checking each safety net |
+| **3 — Production** | Same release, plus `phase3/values.yaml`: autoscaling, disruption budget, zone spreading, network policy, hardened security, a port on the platform ALB, monitoring/alerts, managed secrets. | platform ALB + `helm test` + checking each safety net |
 
 ## What's where
 
@@ -55,11 +58,11 @@ chapter-08-cloud/terraform/
 │   └── pod-identity-role/  # NEW: AWS permissions for one pod, no access keys
 ├── ec2/                # Chapter 08's stack
 ├── eks/                # NEW stack: network + cluster + ECR + IAM   (environments/dev|qa|prod)
-└── eks-addons/         # NEW stack: Helm-installed cluster software (environments/dev|qa|prod)
+└── eks-addons/         # NEW stack: Helm-installed cluster software + the platform ALB (platform-alb.tf)
 
 platform/
 ├── helm/zero2ai-app/   # ONE chart every chapter installs with its own values
-└── scripts/            # platform-up / platform-down / check-tools / status / put-llm-secret / lib
+└── scripts/            # platform-up / platform-down / urls / check-tools / status / put-llm-secret / lib
 
 chapter-NN-*/cloud/
 ├── phase1/*.yaml       # plain Kubernetes YAML
@@ -106,12 +109,13 @@ It runs, in order:
    → VPC, EKS cluster, node group, ECR repositories, IAM roles, MLflow bucket, LLM secret envelope.
 3. `terraform apply` in `chapter-08-cloud/terraform/eks-addons`
    → Helm installs the AWS Load Balancer Controller, metrics-server, Cluster Autoscaler,
-   External Secrets, and Prometheus + Grafana.
-4. Points `kubectl` at the cluster.
+   External Secrets, and Prometheus + Grafana. Then it builds the **platform ALB** (see below).
+4. Points `kubectl` at the cluster and prints every URL (`urls.sh`).
 
 Terraform shows each plan and waits for you to type `yes` (set `AUTO_APPROVE=1` to skip that).
 
-**What you should see at the end:** `kubectl get nodes` lists 2 nodes `Ready`.
+**What you should see at the end:** `kubectl get nodes` lists 2 nodes `Ready`, then a list of
+addresses starting with `http://k8s-zero2ai-....us-east-1.elb.amazonaws.com`.
 
 Prefer doing it by hand? It's the Chapter 08 routine, twice:
 
@@ -140,6 +144,9 @@ cd ../eks-addons
 | 17 RAG | [cloud/](../chapter-17-rag/cloud/README.md) | rag-api | index built per pod by an init container, model baked into the image |
 | 18 Production LLM | [cloud/](../chapter-18-prodllm/cloud/README.md) | prod-llm | everything above: ALB, HPA, PDB, secrets, metrics, cost/error alerts |
 
+Each Phase 3 app gets its own port on the platform ALB (Step 4): Chapter **NN** answers at
+`http://<platform-alb>:80NN` (10 → `:8010`, 14 → `:8014`, 18 → `:8018`).
+
 Each chapter's routine is the same:
 
 ```bash
@@ -153,12 +160,52 @@ bash down.sh            # remove this chapter's app (keeps the cluster)
 
 Use another environment by prefixing `ENV=qa` or `ENV=prod`, e.g. `ENV=prod bash deploy.sh 3`.
 
-## Step 4 — Look around
+## Step 4 — Reach the cluster: the platform ALB
+
+The add-ons stack builds **one** internet-facing **Application Load Balancer** for the whole
+cluster ([`eks-addons/platform-alb.tf`](../chapter-08-cloud/terraform/eks-addons/platform-alb.tf)).
+Every service gets its own **port** on it, so you never need `port-forward` to look around:
+
+| Address | What's there | Who can open it |
+|---|---|---|
+| `http://<alb>/` | Landing page with a link to everything below | `alb_allowed_cidrs` (default: anyone) |
+| `http://<alb>:3000` | Grafana (user `admin`) | `alb_allowed_cidrs` |
+| `http://<alb>:9090` | Prometheus | **your IP only** (no login, so `platform-up.sh` locks it to you) |
+| `http://<alb>:9093` | Alertmanager | your IP only |
+| `http://<alb>:8010` … `:8018` | Chapter 10 … 18's app, once you run its `deploy.sh 3` | anyone (set `ingress.allowedCidrs` to limit) |
+
+**In the browser:** open the landing page and click.
+
+**From the command line:**
 
 ```bash
-bash platform/scripts/status.sh                    # nodes, releases, apps, load balancers
-kubectl -n monitoring port-forward svc/kube-prometheus-stack-grafana 3000:80
+bash platform/scripts/urls.sh                       # every address, plus ready-made curl commands
+ALB=$(terraform -chdir=chapter-08-cloud/terraform/eks-addons output -raw platform_alb_hostname)
+curl -i http://$ALB/                                # landing page (HTTP 200)
+curl -s http://$ALB:3000/api/health                 # Grafana
+curl -s http://$ALB:8010/health                     # Chapter 10, after its Phase 3
 terraform -chdir=chapter-08-cloud/terraform/eks-addons output -raw grafana_admin_password
+kubectl get nodes                                   # the cluster's own API (not through the ALB)
+bash platform/scripts/status.sh                     # nodes, releases, apps, load balancers
+```
+
+**How it works.** Every Ingress with the annotation `alb.ingress.kubernetes.io/group.name: zero2ai`
+is merged by the AWS Load Balancer Controller into the **same** ALB. The Helm chart does this by
+default (`ingress.groupName: zero2ai`), and each chapter's `phase3/values.yaml` picks its port with
+`ingress.port: 80NN`. One ALB instead of one per chapter: cheaper, and one address to remember.
+
+**Settings** (in `eks-addons/environments/<env>.tfvars`):
+
+- `alb_allowed_cidrs` — who may open the landing page and Grafana. In prod, use your office/VPN ranges.
+- `alb_admin_cidrs` — who may open Prometheus/Alertmanager. `platform-up.sh` sets it to your
+  current public IP; if your IP changes, rerun `platform-up.sh`. Empty = not exposed.
+- Want HTTPS? With your own domain and an ACM certificate, set `ingress.host` and
+  `ingress.certificateArn` in a chapter's values (host-based routing on 443).
+
+Port-forward still works exactly like on your laptop if you prefer it:
+
+```bash
+kubectl -n monitoring port-forward svc/kube-prometheus-stack-grafana 3000:80   # http://localhost:3000
 ```
 
 ## Step 5 — Destroy (every time you stop)
@@ -167,8 +214,8 @@ terraform -chdir=chapter-08-cloud/terraform/eks-addons output -raw grafana_admin
 bash platform/scripts/platform-down.sh dev
 ```
 
-It removes every app first (so AWS deletes the load balancers), then destroys the add-ons, then
-the cluster and network. The tiny state backend stays for next time.
+It removes every app first, then destroys the add-ons (which deletes the platform ALB; the script
+waits until AWS confirms it's gone), then the cluster and network. The tiny state backend stays for next time.
 
 ## If something breaks
 
@@ -179,6 +226,10 @@ the cluster and network. The tiny state backend stays for next time.
   hours). `deploy.sh build` logs in again; just rerun it.
 - **Pods `ImagePullBackOff` with `exec format error` in logs** → The image was built for ARM.
   Use `deploy.sh build`; it always builds `linux/amd64`.
+- **Browser says "can't reach" right after `platform-up.sh`** → A new ALB needs 1–3 minutes
+  before its DNS name works. Wait and reload; `nslookup <alb-hostname>` should return addresses.
+- **Prometheus on `:9090` times out but Grafana works** → Your public IP changed since
+  `platform-up.sh`. Rerun it (it updates `alb_admin_cidrs`), or use port-forward.
 - **Ingress has no address after 5 minutes** → `kubectl -n zero2ai describe ingress <name>` and
   `kubectl -n kube-system logs deploy/aws-load-balancer-controller`. Usually a missing subnet tag
   or IAM permission; both come from Terraform, so re-run `platform-up.sh`.

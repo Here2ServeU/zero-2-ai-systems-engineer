@@ -22,6 +22,7 @@ networkPolicy:
   enabled: true
 ingress:
   enabled: true
+  port: 8016                # http://<platform-alb>:8016 (shared ALB, see platform/README.md)
   healthcheckPath: /health
   # A public chat endpoint spends YOUR money on every question. In real life,
   # put authentication in front of it (Cognito / an API gateway) or keep it

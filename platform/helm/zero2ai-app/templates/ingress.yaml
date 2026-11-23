@@ -11,6 +11,9 @@ metadata:
     alb.ingress.kubernetes.io/scheme: {{ .Values.ingress.scheme }}
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/group.name: {{ default $fullname .Values.ingress.groupName }}
+    {{- with .Values.ingress.allowedCidrs }}
+    alb.ingress.kubernetes.io/inbound-cidrs: {{ join "," . | quote }}
+    {{- end }}
     alb.ingress.kubernetes.io/healthcheck-path: {{ $hc }}
     alb.ingress.kubernetes.io/success-codes: "200"
     {{- if .Values.ingress.certificateArn }}
@@ -19,7 +22,7 @@ metadata:
     alb.ingress.kubernetes.io/ssl-redirect: "443"
     alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS13-1-2-2021-06
     {{- else }}
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": {{ int .Values.ingress.port }}}]'
     {{- end }}
     {{- if .Values.ingress.weighted.enabled }}
     alb.ingress.kubernetes.io/actions.weighted-routing: >-

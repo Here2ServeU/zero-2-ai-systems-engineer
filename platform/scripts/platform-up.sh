@@ -2,8 +2,9 @@
 # platform-up.sh <env>: build the whole cloud platform for one environment.
 #   1. checks the Chapter 08 state backend exists
 #   2. terraform apply  chapter-08-cloud/terraform/eks         (network, cluster, ECR, IAM)
-#   3. terraform apply  chapter-08-cloud/terraform/eks-addons  (Helm: LB controller, monitoring, ...)
-#   4. points kubectl at the new cluster
+#   3. terraform apply  chapter-08-cloud/terraform/eks-addons  (Helm: LB controller, monitoring, ...
+#                                                               + the shared platform ALB)
+#   4. points kubectl at the new cluster and prints every URL (urls.sh)
 # Takes ~20 minutes the first time. Costs money while it exists.
 set -euo pipefail
 ENV="${1:-${ENV:-dev}}"; export ENV
@@ -20,6 +21,18 @@ if ! BUCKET=$(terraform -chdir="$BACKEND" output -raw state_bucket 2>/dev/null) 
 fi
 ok "State bucket: $BUCKET"
 
+# Prometheus/Alertmanager have no login, so the platform ALB only opens them
+# to YOUR public IP. Override with  export TF_VAR_alb_admin_cidrs='["x.x.x.x/32"]'
+if [ -z "${TF_VAR_alb_admin_cidrs:-}" ]; then
+  me=$(my_public_cidr)
+  if [ -n "$me" ]; then
+    export TF_VAR_alb_admin_cidrs="[\"$me\"]"
+    ok "Prometheus/Alertmanager on the ALB will be open to your IP only: $me"
+  else
+    warn "Couldn't find your public IP; Prometheus/Alertmanager stay private (use port-forward)."
+  fi
+fi
+
 for stack in eks eks-addons; do
   say "terraform apply: $stack ($ENV)"
   terraform -chdir="$TF_DIR/$stack" init -input=false -reconfigure \
@@ -33,5 +46,7 @@ use_cluster
 say "Cluster is up"
 kubectl get nodes -o wide
 echo
-ok "Platform ready. Next: pick a chapter's cloud/README.md (start with chapter-10-kubernetes/cloud)."
-echo "Grafana password: terraform -chdir=$TF_DIR/eks-addons output -raw grafana_admin_password"
+bash "$PLATFORM_DIR/scripts/urls.sh"
+echo
+ok "Platform ready. Open the landing page above in your browser (new ALBs need 1-3 minutes for DNS)."
+echo "Next: pick a chapter's cloud/README.md (start with chapter-10-kubernetes/cloud)."

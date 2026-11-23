@@ -58,4 +58,13 @@ c=$ROOT/chapter-18-prodllm/cloud
 render prod-llm -f $c/phase2/values.yaml
 render prod-llm -f $c/phase2/values.yaml -f $c/phase3/values.yaml "${NP[@]}"
 
+# Phase 3 apps must join the shared platform ALB on their own port.
+c=$ROOT/chapter-10-kubernetes/cloud
+out=$(helm template fraud-api "$CHART" "${IMG[@]}" -f "$c/phase2/values.yaml" -f "$c/phase3/values.yaml" -s templates/ingress.yaml)
+if echo "$out" | grep -q 'group.name: zero2ai' && echo "$out" | grep -q '"HTTP": 8010'; then
+  echo "✔ fraud-api joins ALB group zero2ai on :8010"
+else
+  echo "✘ fraud-api ingress is not on the shared ALB :8010"; fail=1
+fi
+
 [ $fail -eq 0 ] && echo "All chart renders are valid." || { echo "Some renders failed."; exit 1; }
