@@ -40,4 +40,5 @@ networkPolicy:
 #   --set ingress.certificateArn=arn:aws:acm:us-east-1:123456789012:certificate/...
 ingress:
   enabled: true
+  port: 8010                # http://<platform-alb>:8010 (shared ALB, see platform/README.md)
   healthcheckPath: /health

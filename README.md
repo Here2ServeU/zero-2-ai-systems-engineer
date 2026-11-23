@@ -73,7 +73,8 @@ From Chapter 10 on, every chapter also runs on a real **AWS EKS** cluster, built
 | **3 — Production** | Same chart, production values: load balancer, autoscaling, disruption budgets, network policy, alerts, managed secrets, dev/qa/prod. |
 
 Start at **[platform/README.md](platform/README.md)** (build the cluster once), then each
-chapter's `cloud/README.md`. 💳 It costs money while it runs; every chapter shows how to tear
+chapter's `cloud/README.md`. One shared **Application Load Balancer** is the front door: open its
+landing page in your browser (or `curl` it) to reach Grafana, Prometheus and every chapter's app. 💳 It costs money while it runs; every chapter shows how to tear
 it down.
 
 > **Capstone project.** A capstone that brings everything together is coming soon.

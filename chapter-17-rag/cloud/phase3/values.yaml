@@ -21,4 +21,5 @@ networkPolicy:
   enabled: true
 ingress:
   enabled: true
+  port: 8017                # http://<platform-alb>:8017 (shared ALB, see platform/README.md)
   healthcheckPath: /health

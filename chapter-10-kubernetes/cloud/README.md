@@ -124,7 +124,7 @@ Same release, one more values file on top:
 | `topologySpread` | Spread copies across zones and nodes | One data-center outage doesn't take the app down |
 | `networkPolicy` | Only the load balancer and this namespace may connect | Limits damage if something else is compromised |
 | `securityContext` (chart default) | Non-root, read-only disk, no Linux capabilities | Hardening; passes Pod Security "restricted" |
-| `ingress` | Public **ALB** with health checks; HTTPS when you add a certificate | One stable public address |
+| `ingress` | Joins the **platform ALB** on port 8010, with health checks; HTTPS when you add a certificate | One stable public address, no extra load balancer to pay for |
 | `--atomic` (in deploy.sh) | If the upgrade fails, Helm rolls back by itself | No half-broken releases |
 
 ```bash
@@ -133,7 +133,9 @@ bash test.sh 3
 ```
 
 **What you should see:** `helm test` passes, then `/health`, `/info`, `/predict` answer through
-`http://k8s-fraudapi-....elb.amazonaws.com`, then the HPA, PDB and NetworkPolicy are listed.
+the **shared platform ALB on port 8010**, `http://k8s-zero2ai-....elb.amazonaws.com:8010`, then the
+HPA, PDB and NetworkPolicy are listed. Open the same address in your browser
+(`.../health`), or run `bash ../../platform/scripts/urls.sh` to list every address.
 
 Watch autoscaling work (second terminal: `kubectl -n zero2ai get hpa fraud-api -w`):
 
