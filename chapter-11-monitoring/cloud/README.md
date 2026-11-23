@@ -2,7 +2,7 @@
 
 > On your laptop you visited `/metrics` yourself. In the cloud, **Prometheus** (already running
 > on the cluster from `eks-addons`) collects every copy's numbers, all the time.
-> Platform first: [platform/README.md](../../platform/README.md).
+> Platform first: [chapter-10-kubernetes/PLATFORM.md](../../chapter-10-kubernetes/PLATFORM.md).
 
 **Labels:** 💳 Needs an account that may cost money · 🌐 Needs the internet
 

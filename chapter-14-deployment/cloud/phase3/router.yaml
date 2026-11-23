@@ -4,7 +4,7 @@
 # Move it up step by step (bash canary.sh 25 / 50 / 100) or back to 0.
 ingress:
   enabled: true
-  port: 8014                # http://<platform-alb>:8014 (shared ALB, see platform/README.md)
+  port: 8014                # http://<platform-alb>:8014 (shared ALB, see chapter-10-kubernetes/PLATFORM.md)
   healthcheckPath: /health
   weighted:
     enabled: true

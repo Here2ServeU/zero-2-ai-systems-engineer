@@ -3,7 +3,7 @@
 > Everything from Chapters 10–17 at once: Helm, autoscaling, disruption budgets, zone
 > spreading, network policy, a public ALB, secrets from the vault, Prometheus metrics, and
 > **alerts on errors, latency, and spend**.
-> Platform first: [platform/README.md](../../platform/README.md).
+> Platform first: [chapter-10-kubernetes/PLATFORM.md](../../chapter-10-kubernetes/PLATFORM.md).
 
 **Labels:** 💳 Needs an account that may cost money · 🌐 Needs the internet
 

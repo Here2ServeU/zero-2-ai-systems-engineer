@@ -300,7 +300,7 @@ This chapter also runs on a real cloud cluster, in three phases (plain YAML → 
 production settings): blue/green with a Service selector and Helm, then a real canary split by the AWS load balancer and automatic rollback with `helm --atomic`.
 
 Guide: **[cloud/README.md](cloud/README.md)** · Build the shared platform once first:
-[platform/README.md](../platform/README.md). 💳 Costs money while it runs — destroy it when done.
+[chapter-10-kubernetes/PLATFORM.md](../chapter-10-kubernetes/PLATFORM.md). 💳 Costs money while it runs — destroy it when done.
 
 ## Where to next
 

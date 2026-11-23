@@ -12,14 +12,14 @@
 
 set -euo pipefail
 
-# These scripts live in chapter-10-kubernetes/scripts (the cloud track starts
-# in Chapter 10); the shared Helm chart and docs live in platform/.
+# Chapter 10 is self-contained: these scripts, the Terraform and the Helm
+# chart all live in chapter-10-kubernetes/. Chapters 11-18 reuse them.
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPTS_DIR/../.." && pwd)"
-PLATFORM_DIR="$REPO_ROOT/platform"
-CHART_DIR="$PLATFORM_DIR/helm/zero2ai-app"
+CHAPTER_DIR="$(cd "$SCRIPTS_DIR/.." && pwd)"
+REPO_ROOT="$(cd "$CHAPTER_DIR/.." && pwd)"
+CHART_DIR="$CHAPTER_DIR/helm/zero2ai-app"
 # shellcheck disable=SC2034  # used by the scripts that source this file
-TF_DIR="$REPO_ROOT/chapter-08-cloud/terraform"
+TF_DIR="$CHAPTER_DIR/terraform"
 
 ENV="${ENV:-dev}"
 AWS_REGION="${AWS_REGION:-us-east-1}"

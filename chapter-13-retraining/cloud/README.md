@@ -3,7 +3,7 @@
 > On your laptop, `retrain_pipeline.py` wrote its notebook to a local `mlruns` folder. On EKS,
 > retraining runs on a **schedule**, records every run in an **MLflow server**, and (Phase 3)
 > keeps model files in **S3**, with permissions given to the pod — no AWS keys anywhere.
-> Platform first: [platform/README.md](../../platform/README.md).
+> Platform first: [chapter-10-kubernetes/PLATFORM.md](../../chapter-10-kubernetes/PLATFORM.md).
 
 **Labels:** 💳 Needs an account that may cost money · 🌐 Needs the internet
 

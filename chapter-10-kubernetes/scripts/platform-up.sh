@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # platform-up.sh <env>: build the whole cloud platform for one environment.
-#   1. checks the Chapter 08 state backend exists
-#   2. terraform apply  chapter-08-cloud/terraform/eks         (network, cluster, ECR, IAM)
-#   3. terraform apply  chapter-08-cloud/terraform/eks-addons  (Helm: LB controller, monitoring, ...
+#   1. checks Chapter 10's state backend exists (terraform/backend; created if not)
+#   2. terraform apply  chapter-10-kubernetes/terraform/eks         (network, cluster, ECR, IAM)
+#   3. terraform apply  chapter-10-kubernetes/terraform/eks-addons  (Helm: LB controller, monitoring, ...
 #                                                               + the shared platform ALB)
 #   4. points kubectl at the new cluster and prints every URL (urls.sh)
 # Takes ~20 minutes the first time. Costs money while it exists.
@@ -12,7 +12,7 @@ source "$(dirname "$0")/lib.sh"
 require_tools aws terraform kubectl helm
 
 BACKEND="$TF_DIR/backend"
-say "Checking the Terraform state backend (Chapter 08)"
+say "Checking the Terraform state backend (chapter-10-kubernetes/terraform/backend)"
 if ! BUCKET=$(terraform -chdir="$BACKEND" output -raw state_bucket 2>/dev/null) || [ -z "$BUCKET" ]; then
   warn "No backend found. Creating it now (S3 bucket + DynamoDB lock table, pennies per month)."
   terraform -chdir="$BACKEND" init -input=false

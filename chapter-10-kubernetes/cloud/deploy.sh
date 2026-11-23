@@ -7,7 +7,7 @@
 # Choose the environment with ENV=dev|qa|prod (default dev).
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
-source "$HERE/../../chapter-10-kubernetes/scripts/lib.sh"
+source "$HERE/../scripts/lib.sh"
 
 APP=fraud-api            # ECR repository + Helm release name
 RELEASE=fraud-api

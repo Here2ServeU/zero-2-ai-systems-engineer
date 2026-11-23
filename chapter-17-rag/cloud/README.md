@@ -2,7 +2,7 @@
 
 > Chapter 17 ran as three scripts. For the cloud it becomes a small web API,
 > [`rag_api.py`](../rag_api.py): `POST /ask {"question": "..."}` → answer + the passages used.
-> Platform first: [platform/README.md](../../platform/README.md).
+> Platform first: [chapter-10-kubernetes/PLATFORM.md](../../chapter-10-kubernetes/PLATFORM.md).
 
 **Labels:** 💳 Needs an account that may cost money · 🌐 Needs the internet
 

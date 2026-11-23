@@ -1,8 +1,9 @@
 ###############################################################################
 # EKS stack (Chapter 10 onward): the cloud platform for chapters 10-18.
 #
-# Same layout as ../ec2 (Chapter 08): same S3 backend, same vpc module, same
-# dev / qa / prod environment files. It adds:
+# Everything Chapter 10 needs lives in chapter-10-kubernetes/terraform: its own
+# S3 backend (../backend), its own copy of the vpc module, and the same
+# dev / qa / prod environment files you know from Chapter 08. It adds:
 #   - modules/eks              the cluster + node group + core add-ons
 #   - modules/ecr              private image registries for every chapter's app
 #   - modules/pod-identity-role AWS permissions for specific pods, no keys
@@ -61,7 +62,7 @@ locals {
 }
 
 # ----------------------------------------------------------------------------
-# Network: the SAME vpc brick as Chapter 08, plus Kubernetes discovery tags.
+# Network: the same vpc brick as Chapter 08 (copied to ../modules/vpc), plus Kubernetes discovery tags.
 # dev: public subnets only (cheap). qa/prod: private subnets + NAT for nodes.
 # ----------------------------------------------------------------------------
 module "vpc" {

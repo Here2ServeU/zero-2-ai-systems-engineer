@@ -1,9 +1,9 @@
-# Backend settings for the dev EKS state file. Same bucket + lock table as
-# Chapter 08; only the key differs. The bucket name is added at init:
+# Backend settings for the dev EKS state file. Chapter 10's own bucket + lock
+# table (terraform/backend); only the key differs. The bucket name is added at init:
 #   terraform init -reconfigure \
 #     -backend-config=environments/dev.tfbackend \
 #     -backend-config="bucket=$(terraform -chdir=../backend output -raw state_bucket)"
 key            = "eks/dev/terraform.tfstate"
 region         = "us-east-1"
-dynamodb_table = "zero2ai-terraform-locks"
+dynamodb_table = "zero2ai-eks-terraform-locks"
 encrypt        = true

@@ -32,9 +32,10 @@ Professionals solve this with four habits, and you'll use all four in this chapt
 You'll also make the operating system image (the **AMI**) a setting. Terraform looks up the
 newest matching image every time, using a search pattern stored in `variables.tf`.
 
-> **Chapter 10 uses this same project layout.** It reuses the same backend (bucket and lock
-> table), the same `modules/` folder, and the same dev / qa / prod environments. It adds a new
-> stack next to `ec2/`. Learn the layout well here and Chapter 10 will feel familiar.
+> **Chapter 10 uses this same project layout.** It has its own copy in
+> `chapter-10-kubernetes/terraform`: a backend, a `modules/` folder (with this same `vpc`
+> brick), and the same dev / qa / prod environments. Learn the layout well here and Chapter 10
+> will feel familiar.
 
 Plan for about **60 minutes**.
 
@@ -113,7 +114,7 @@ The rules are the same as Chapter 07, plus a few new ones:
   Tier eligible. Running dev for an hour costs about one cent. Prod has two servers, so it costs
   a bit more, and your credits cover it.
 - **The S3 bucket and DynamoDB table cost almost nothing** (fractions of a cent per month at
-  this size). You can leave them in place until you finish Chapter 10.
+  this size). You can leave them in place until you finish this chapter.
 - **Always run `terraform destroy` for each environment you built.** Part 8 shows how.
 - **Never commit SSH private keys or state files to GitHub.** This repo's `.gitignore`
   already ignores `*.tfstate` and `.terraform/` (this chapter's `.gitignore` also ignores `*.pem`),
@@ -156,8 +157,8 @@ Open the `chapter-08-cloud/terraform` folder in your editor.
 
 ### 2a. `backend/main.tf`: the shared, locked notebook
 
-This stack creates two things. Every other stack in this chapter (and in Chapter 10) stores its
-state there.
+This stack creates two things. Every other stack in this chapter stores its state there.
+(Chapter 10 builds its own, separate backend the same way.)
 
 ```hcl
 data "aws_caller_identity" "current" {}
@@ -659,10 +660,9 @@ terraform destroy -var-file=environments/dev.tfvars
 
 If an environment was already destroyed, Terraform says `0 destroyed`. That's fine.
 
-**Keep the backend for Chapter 10.** The bucket and lock table cost almost nothing, and
-Chapter 10 stores its state in them.
+**Chapter 10 doesn't need this backend**: it creates its own (`zero2ai-eks-tfstate-<account>`).
 
-**When you're completely done with Chapters 08 and 10**, destroy the backend **last**. Destroy
+**When you're completely done with this chapter**, destroy the backend **last**. Destroy
 every environment first, because destroying the bucket deletes every state file in it:
 
 ```bash
@@ -674,32 +674,28 @@ terraform destroy
 
 ## How Chapter 10 reuses this
 
-Chapter 10 uses the same layout. It doesn't start from scratch:
+Chapter 10 is **self-contained**: you can start there without building anything here. It
+copies this chapter's layout into `chapter-10-kubernetes/terraform/`:
 
 ```text
-terraform/
-├── backend/          # same bucket + lock table (already created, don't recreate)
+chapter-10-kubernetes/terraform/
+├── backend/          # its OWN bucket + lock table (zero2ai-eks-tfstate-..., zero2ai-eks-terraform-locks)
 ├── modules/
-│   ├── vpc/          # same VPC brick (+ optional private subnets & NAT, off by default)
-│   ├── ec2/
-│   ├── eks/          # NEW: cluster, node group, core add-ons, admin access
-│   ├── ecr/          # NEW: image registries
-│   └── pod-identity-role/   # NEW: AWS permissions for one pod, no access keys
-├── ec2/              # this chapter's stack
-├── eks/              # Chapter 10's stack: environments/dev|qa|prod
-└── eks-addons/       # Chapter 10's Helm-installed add-ons: environments/dev|qa|prod
+│   ├── vpc/          # a copy of this chapter's VPC brick (+ optional private subnets & NAT)
+│   ├── eks/          # cluster, node group, core add-ons, admin access
+│   ├── ecr/          # image registries
+│   └── pod-identity-role/   # AWS permissions for one pod, no access keys
+├── eks/              # stack: environments/dev|qa|prod
+└── eks-addons/       # Helm-installed add-ons + the platform ALB: environments/dev|qa|prod
 ```
 
-- **Same backend:** the same S3 bucket and DynamoDB table, with state keys like
-  `eks/dev/terraform.tfstate` next to `ec2/dev/terraform.tfstate`.
-- **Same modules:** the `vpc` brick is reused. Its new private-subnet and NAT settings are off by
-  default, so this chapter's `ec2` stack plans exactly as before.
-- **Same environments:** `dev`, `qa`, and `prod` `.tfvars` and `.tfbackend` files, and the same
-  `init -reconfigure` → `plan` → `apply` → `destroy` routine.
-- **No name clashes:** names include the stack (`zero2ai-ec2-dev-...` vs `zero2ai-eks-dev-...`),
-  so both stacks can exist in one account.
+- **Same ideas:** a locked S3 backend, small reusable modules, and `dev`, `qa`, `prod`
+  `.tfvars` and `.tfbackend` files with the same `init -reconfigure` → `plan` → `apply` →
+  `destroy` routine.
+- **No clashes:** separate state bucket, and names include the stack (`zero2ai-ec2-dev-...` vs
+  `zero2ai-eks-dev-...`), so both chapters can exist in one account.
 
-The whole cloud track (Chapters 10–18) is explained in [platform/README.md](../platform/README.md).
+The whole cloud track (Chapters 10–18) is explained in [chapter-10-kubernetes/PLATFORM.md](../chapter-10-kubernetes/PLATFORM.md).
 
 ---
 

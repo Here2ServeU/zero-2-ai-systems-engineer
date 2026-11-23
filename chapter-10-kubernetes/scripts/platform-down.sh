@@ -6,8 +6,8 @@
 #       can't be deleted and Terraform gets stuck)
 #   2. terraform destroy eks-addons (removes the shared platform ALB too)
 #   3. terraform destroy eks
-# The Chapter 08 state backend is kept (it costs pennies). Remove it last with
-#   terraform -chdir=chapter-08-cloud/terraform/backend destroy
+# Chapter 10's state backend is kept (it costs pennies). Remove it last with
+#   terraform -chdir=chapter-10-kubernetes/terraform/backend destroy
 set -euo pipefail
 ENV="${1:-${ENV:-dev}}"; export ENV
 source "$(dirname "$0")/lib.sh"

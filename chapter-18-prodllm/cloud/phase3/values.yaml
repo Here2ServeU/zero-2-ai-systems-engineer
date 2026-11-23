@@ -28,7 +28,7 @@ networkPolicy:
   enabled: true
 ingress:
   enabled: true
-  port: 8018                # http://<platform-alb>:8018 (shared ALB, see platform/README.md)
+  port: 8018                # http://<platform-alb>:8018 (shared ALB, see chapter-10-kubernetes/PLATFORM.md)
   healthcheckPath: /health
   # Add --set ingress.certificateArn=<ACM ARN> for HTTPS. Put auth in front
   # of a public LLM endpoint before sharing the address with anyone.

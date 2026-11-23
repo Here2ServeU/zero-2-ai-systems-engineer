@@ -334,7 +334,7 @@ managed Kubernetes), built with **Terraform** and packaged with **Helm**:
 > finish** (the scripts include a one-line teardown).
 
 Start here: **[chapter-10-kubernetes/cloud/README.md](cloud/README.md)**. It sends you to
-[`platform/`](../platform/README.md) once to build the cluster, then walks Phase 1 → 3.
+[`PLATFORM.md`](PLATFORM.md) once to build the cluster, then walks Phase 1 → 3.
 
 ## Where to next
 

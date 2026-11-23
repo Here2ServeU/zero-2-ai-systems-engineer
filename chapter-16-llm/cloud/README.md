@@ -2,7 +2,7 @@
 
 > Same chat API, now on EKS. The real lesson is **where the API key lives**: your shell
 > (Phase 1–2), then **AWS Secrets Manager** with automatic syncing (Phase 3).
-> Platform first: [platform/README.md](../../platform/README.md).
+> Platform first: [chapter-10-kubernetes/PLATFORM.md](../../chapter-10-kubernetes/PLATFORM.md).
 
 **Labels:** 💳 Needs an account that may cost money · 🌐 Needs the internet
 

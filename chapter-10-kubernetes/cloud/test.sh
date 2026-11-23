@@ -2,7 +2,7 @@
 # Chapter 10 cloud track: test each phase the same way you tested on your laptop.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
-source "$HERE/../../chapter-10-kubernetes/scripts/lib.sh"
+source "$HERE/../scripts/lib.sh"
 
 RELEASE=fraud-api
 TXN='{"amount":950.0,"hour":3,"is_weekend":0,"amount_vs_avg":2.8,"is_large_txn":1,"is_late_night":1,"merch_txn_ct":4}'

@@ -310,7 +310,7 @@ This chapter also runs on a real cloud cluster, in three phases (plain YAML → 
 production settings): retraining runs as a weekly Kubernetes CronJob that logs to an MLflow server on EKS, with model files in S3 (Phase 3).
 
 Guide: **[cloud/README.md](cloud/README.md)** · Build the shared platform once first:
-[platform/README.md](../platform/README.md). 💳 Costs money while it runs — destroy it when done.
+[chapter-10-kubernetes/PLATFORM.md](../chapter-10-kubernetes/PLATFORM.md). 💳 Costs money while it runs — destroy it when done.
 
 ## Where to next
 

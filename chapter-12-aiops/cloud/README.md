@@ -2,7 +2,7 @@
 
 > On your laptop the guard looked at made-up numbers. On EKS it reads **real** CPU and memory
 > numbers from Prometheus and — in Phase 3 — **adds copies by itself**, within strict limits.
-> Platform first: [platform/README.md](../../platform/README.md).
+> Platform first: [chapter-10-kubernetes/PLATFORM.md](../../chapter-10-kubernetes/PLATFORM.md).
 
 **Labels:** 💳 Needs an account that may cost money · 🌐 Needs the internet
 
