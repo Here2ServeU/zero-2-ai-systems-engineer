@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # validate-chart.sh: render the shared chart with EVERY chapter's Phase 2 and
 # Phase 3 values, offline, and check the YAML. No cluster or AWS needed.
-#   bash platform/scripts/validate-chart.sh
+#   bash chapter-10-kubernetes/scripts/validate-chart.sh
 # Uses kubeconform for schema checks if it's installed (CI installs it).
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"

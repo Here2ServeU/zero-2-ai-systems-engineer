@@ -4,7 +4,7 @@
 #   (broken = Phase 3 demo: ship a bad green with --atomic and watch Helm undo it)
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
-source "$HERE/../../platform/scripts/lib.sh"
+source "$HERE/../../chapter-10-kubernetes/scripts/lib.sh"
 APP=fraud-api      # same image as Chapter 10
 
 case "${1:-}" in

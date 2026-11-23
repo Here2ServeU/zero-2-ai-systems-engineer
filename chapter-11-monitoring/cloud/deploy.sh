@@ -2,7 +2,7 @@
 # Chapter 11 cloud track: metrics app + Prometheus on EKS.  Usage: deploy.sh <build|1|2|3>
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
-source "$HERE/../../platform/scripts/lib.sh"
+source "$HERE/../../chapter-10-kubernetes/scripts/lib.sh"
 APP=metrics-api; RELEASE=metrics-api
 
 case "${1:-}" in

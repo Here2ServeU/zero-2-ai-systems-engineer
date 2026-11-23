@@ -3,7 +3,7 @@
 # cluster so the dashboard has something to draw. Default: 120 s, monitored-api.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
-source "$HERE/../../platform/scripts/lib.sh"
+source "$HERE/../../chapter-10-kubernetes/scripts/lib.sh"
 secs="${1:-120}"; svc="${2:-monitored-api}"
 use_cluster
 kubectl -n "$NAMESPACE" delete pod ch15-load --ignore-not-found >/dev/null

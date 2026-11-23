@@ -1,5 +1,5 @@
 
-# Cloud track: last pushed image per environment (platform/scripts/lib.sh)
+# Cloud track: last pushed image per environment (chapter-10-kubernetes/scripts/lib.sh)
 .zero2ai/
 # Terraform
 .terraform/

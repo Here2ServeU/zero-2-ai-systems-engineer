@@ -269,7 +269,7 @@ module "mlflow_role" {
 # ----------------------------------------------------------------------------
 # Chapters 16-18: one Secrets Manager secret that holds the LLM API keys.
 # Terraform creates the empty "envelope"; YOU put the value in with
-#   platform/scripts/put-llm-secret.sh
+#   chapter-10-kubernetes/scripts/put-llm-secret.sh
 # so the key never touches Terraform state or git.
 # ----------------------------------------------------------------------------
 resource "aws_secretsmanager_secret" "llm_api_keys" {

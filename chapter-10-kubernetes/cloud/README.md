@@ -135,7 +135,7 @@ bash test.sh 3
 **What you should see:** `helm test` passes, then `/health`, `/info`, `/predict` answer through
 the **shared platform ALB on port 8010**, `http://k8s-zero2ai-....elb.amazonaws.com:8010`, then the
 HPA, PDB and NetworkPolicy are listed. Open the same address in your browser
-(`.../health`), or run `bash ../../platform/scripts/urls.sh` to list every address.
+(`.../health`), or run `bash ../../chapter-10-kubernetes/scripts/urls.sh` to list every address.
 
 Watch autoscaling work (second terminal: `kubectl -n zero2ai get hpa fraud-api -w`):
 
@@ -158,7 +158,7 @@ helm rollback fraud-api <phase-2-revision> -n zero2ai
 ### The same thing in qa and prod
 
 ```bash
-bash ../../platform/scripts/platform-up.sh prod     # once (costs more: see platform README)
+bash ../../chapter-10-kubernetes/scripts/platform-up.sh prod     # once (costs more: see platform README)
 ENV=prod bash deploy.sh build
 ENV=prod bash deploy.sh 3
 ENV=prod bash test.sh 3
@@ -195,7 +195,7 @@ registry has **immutable** tags, so the image you tested is exactly the image th
 
 ```bash
 bash down.sh                                            # remove this chapter's app
-bash ../../platform/scripts/platform-down.sh dev        # when you're done for the day
+bash ../../chapter-10-kubernetes/scripts/platform-down.sh dev        # when you're done for the day
 ```
 
 ## Where to next

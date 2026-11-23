@@ -1,5 +1,5 @@
 # Phase 3: keys live in AWS Secrets Manager, not in anyone's shell.
-#   1. bash ../../platform/scripts/put-llm-secret.sh <env>    (once)
+#   1. bash ../../chapter-10-kubernetes/scripts/put-llm-secret.sh <env>    (once)
 #   2. External Secrets copies them into a Kubernetes Secret every hour,
 #      so rotating a key = updating it in Secrets Manager. No redeploy.
 envFromSecrets: []

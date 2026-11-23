@@ -46,7 +46,7 @@ use_cluster
 say "Cluster is up"
 kubectl get nodes -o wide
 echo
-bash "$PLATFORM_DIR/scripts/urls.sh"
+bash "$SCRIPTS_DIR/urls.sh"
 echo
 ok "Platform ready. Open the landing page above in your browser (new ALBs need 1-3 minutes for DNS)."
 echo "Next: pick a chapter's cloud/README.md (start with chapter-10-kubernetes/cloud)."

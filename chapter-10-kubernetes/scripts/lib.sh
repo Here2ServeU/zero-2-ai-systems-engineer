@@ -12,8 +12,11 @@
 
 set -euo pipefail
 
-PLATFORM_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-REPO_ROOT="$(cd "$PLATFORM_DIR/.." && pwd)"
+# These scripts live in chapter-10-kubernetes/scripts (the cloud track starts
+# in Chapter 10); the shared Helm chart and docs live in platform/.
+SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPTS_DIR/../.." && pwd)"
+PLATFORM_DIR="$REPO_ROOT/platform"
 CHART_DIR="$PLATFORM_DIR/helm/zero2ai-app"
 # shellcheck disable=SC2034  # used by the scripts that source this file
 TF_DIR="$REPO_ROOT/chapter-08-cloud/terraform"
@@ -42,7 +45,7 @@ trap 'kill $(jobs -p) 2>/dev/null || true' EXIT
 require_tools() {
   local missing=()
   for t in "$@"; do command -v "$t" >/dev/null 2>&1 || missing+=("$t"); done
-  [ ${#missing[@]} -eq 0 ] || die "Missing tools: ${missing[*]}. Run platform/scripts/check-tools.sh"
+  [ ${#missing[@]} -eq 0 ] || die "Missing tools: ${missing[*]}. Run chapter-10-kubernetes/scripts/check-tools.sh"
 }
 
 # AWS + cluster ---------------------------------------------------------------
@@ -63,7 +66,7 @@ use_cluster() {
   require_tools aws kubectl
   say "Connecting kubectl to $CLUSTER_NAME ($AWS_REGION)"
   aws eks describe-cluster --name "$CLUSTER_NAME" --region "$AWS_REGION" >/dev/null 2>&1 \
-    || die "Cluster $CLUSTER_NAME not found. Build it first: bash platform/scripts/platform-up.sh $ENV"
+    || die "Cluster $CLUSTER_NAME not found. Build it first: bash chapter-10-kubernetes/scripts/platform-up.sh $ENV"
   aws eks update-kubeconfig --region "$AWS_REGION" --name "$CLUSTER_NAME" --alias "$CLUSTER_NAME" >/dev/null
   kubectl config use-context "$CLUSTER_NAME" >/dev/null
   kubectl get namespace "$NAMESPACE" >/dev/null 2>&1 || kubectl create namespace "$NAMESPACE" >/dev/null

@@ -8,4 +8,4 @@ say "Helm releases";    helm list -A
 say "Apps ($NAMESPACE)"; kubectl -n "$NAMESPACE" get deploy,cronjob,svc,ingress,hpa,pdb 2>/dev/null
 say "Load balancers";   aws elbv2 describe-load-balancers --region "$AWS_REGION" \
                           --query 'LoadBalancers[].[LoadBalancerName,Type,DNSName]' --output table
-say "Platform ALB";     echo "http://$(platform_alb)   (all URLs: bash platform/scripts/urls.sh)"
+say "Platform ALB";     echo "http://$(platform_alb)   (all URLs: bash chapter-10-kubernetes/scripts/urls.sh)"

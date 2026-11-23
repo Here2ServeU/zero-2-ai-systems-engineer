@@ -61,8 +61,14 @@ chapter-08-cloud/terraform/
 └── eks-addons/         # NEW stack: Helm-installed cluster software + the platform ALB (platform-alb.tf)
 
 platform/
-├── helm/zero2ai-app/   # ONE chart every chapter installs with its own values
-└── scripts/            # platform-up / platform-down / urls / check-tools / status / put-llm-secret / lib
+└── helm/zero2ai-app/   # ONE chart every chapter installs with its own values
+
+chapter-10-kubernetes/scripts/   # the cloud track starts in Chapter 10, so its scripts live here
+├── platform-up.sh / platform-down.sh   # build / destroy the whole platform
+├── urls.sh / status.sh                 # every ALB address / what's running
+├── check-tools.sh / put-llm-secret.sh / validate-chart.sh
+├── lib.sh                              # shared helpers every chapter's cloud/*.sh sources
+└── local-up.sh / local-test.sh / local-down.sh   # Chapter 10 on your laptop (minikube/kind)
 
 chapter-NN-*/cloud/
 ├── phase1/*.yaml       # plain Kubernetes YAML
@@ -90,7 +96,7 @@ You need: **AWS CLI** (logged in, Chapter 07), **Terraform**, **kubectl**, **Hel
 **git**, **curl**. Check them all at once from the top of the repo:
 
 ```bash
-bash platform/scripts/check-tools.sh
+bash chapter-10-kubernetes/scripts/check-tools.sh
 ```
 
 > **Windows:** run every script in **Git Bash**. **Apple Silicon Mac:** nothing special — the
@@ -99,7 +105,7 @@ bash platform/scripts/check-tools.sh
 ## Step 2 — Build the platform (~20 minutes)
 
 ```bash
-bash platform/scripts/platform-up.sh dev
+bash chapter-10-kubernetes/scripts/platform-up.sh dev
 ```
 
 It runs, in order:
@@ -179,14 +185,14 @@ Every service gets its own **port** on it, so you never need `port-forward` to l
 **From the command line:**
 
 ```bash
-bash platform/scripts/urls.sh                       # every address, plus ready-made curl commands
+bash chapter-10-kubernetes/scripts/urls.sh                       # every address, plus ready-made curl commands
 ALB=$(terraform -chdir=chapter-08-cloud/terraform/eks-addons output -raw platform_alb_hostname)
 curl -i http://$ALB/                                # landing page (HTTP 200)
 curl -s http://$ALB:3000/api/health                 # Grafana
 curl -s http://$ALB:8010/health                     # Chapter 10, after its Phase 3
 terraform -chdir=chapter-08-cloud/terraform/eks-addons output -raw grafana_admin_password
 kubectl get nodes                                   # the cluster's own API (not through the ALB)
-bash platform/scripts/status.sh                     # nodes, releases, apps, load balancers
+bash chapter-10-kubernetes/scripts/status.sh                     # nodes, releases, apps, load balancers
 ```
 
 **How it works.** Every Ingress with the annotation `alb.ingress.kubernetes.io/group.name: zero2ai`
@@ -211,7 +217,7 @@ kubectl -n monitoring port-forward svc/kube-prometheus-stack-grafana 3000:80   #
 ## Step 5 — Destroy (every time you stop)
 
 ```bash
-bash platform/scripts/platform-down.sh dev
+bash chapter-10-kubernetes/scripts/platform-down.sh dev
 ```
 
 It removes every app first, then destroys the add-ons (which deletes the platform ALB; the script

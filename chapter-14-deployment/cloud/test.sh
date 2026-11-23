@@ -2,7 +2,7 @@
 # Chapter 14 cloud track tests: who answers, blue or green?  Usage: test.sh <1|2|3>
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
-source "$HERE/../../platform/scripts/lib.sh"
+source "$HERE/../../chapter-10-kubernetes/scripts/lib.sh"
 
 # Ask /info N times and count the colors, like get_usage_stats() in router.py.
 count_colors() {

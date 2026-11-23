@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
-source "$HERE/../../platform/scripts/lib.sh"
+source "$HERE/../../chapter-10-kubernetes/scripts/lib.sh"
 use_cluster
 for f in "$HERE"/phase1/*.yaml; do sed -e "s#__IMAGE__#x#;s#__SCRIPT__#x#" "$f" | kubectl delete -n "$NAMESPACE" --ignore-not-found -f -; done
 helm_uninstall llm-api

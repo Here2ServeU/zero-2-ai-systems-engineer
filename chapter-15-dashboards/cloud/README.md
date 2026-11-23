@@ -39,7 +39,7 @@ The chart turns it into a labelled ConfigMap; Grafana loads it within seconds.
 bash deploy.sh 2
 bash test.sh 2              # ... and checks Grafana has the "Zero2AI Fraud API" dashboard
 bash load.sh 300            # 5 minutes of traffic to watch
-bash ../../platform/scripts/urls.sh     # Grafana: http://<platform-alb>:3000 in your browser
+bash ../../chapter-10-kubernetes/scripts/urls.sh     # Grafana: http://<platform-alb>:3000 in your browser
 # (no ALB? kubectl -n monitoring port-forward svc/kube-prometheus-stack-grafana 3000:80 -> http://localhost:3000)
 # user: admin
 # password: terraform -chdir=../../chapter-08-cloud/terraform/eks-addons output -raw grafana_admin_password
