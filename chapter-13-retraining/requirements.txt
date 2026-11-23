@@ -2,4 +2,4 @@ scikit-learn
 pandas
 numpy
 scipy
-mlflow==2.22.0
+mlflow==3.17.2
