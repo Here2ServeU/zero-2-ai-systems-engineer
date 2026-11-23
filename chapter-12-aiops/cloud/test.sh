@@ -4,7 +4,7 @@
 #           rising CPU trend and says WARNING (Phase 3: and adds a copy).
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
-source "$HERE/../../platform/scripts/lib.sh"
+source "$HERE/../../chapter-10-kubernetes/scripts/lib.sh"
 RELEASE=aiops
 
 run_now() {

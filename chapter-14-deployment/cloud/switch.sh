@@ -3,7 +3,7 @@
 # Rolling back is just switching to blue again (or `helm rollback fraud-router`).
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
-source "$HERE/../../platform/scripts/lib.sh"
+source "$HERE/../../chapter-10-kubernetes/scripts/lib.sh"
 phase="${1:-}"; color="${2:-}"
 case "$color" in blue|green) ;; *) echo "Usage: $0 <1|2> <blue|green>"; exit 1 ;; esac
 use_cluster

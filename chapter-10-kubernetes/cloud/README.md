@@ -1,7 +1,7 @@
 # Chapter 10 — Cloud track: run many copies on AWS EKS
 
 > You ran the fraud API on your laptop's Kubernetes. Now run the **same app** on a real cloud
-> cluster, in three phases. Build the platform first: [platform/README.md](../../platform/README.md).
+> cluster, in three phases. Build the platform first: [chapter-10-kubernetes/PLATFORM.md](../PLATFORM.md).
 
 **Labels:** 💳 Needs an account that may cost money · 🌐 Needs the internet · 🧑‍🤝‍🧑 Easier with a helper the first time
 
@@ -71,7 +71,7 @@ kubectl -n zero2ai scale deployment zero2ai-fraud-api --replicas=4
 ## Phase 2 — Package it with Helm
 
 Copying YAML files around doesn't scale to 9 chapters × 3 environments. Helm fixes that:
-**one chart**, [`platform/helm/zero2ai-app`](../../platform/helm/zero2ai-app), used by every
+**one chart**, [`chapter-10-kubernetes/helm/zero2ai-app`](../helm/zero2ai-app), used by every
 chapter. Look inside:
 
 - `templates/deployment.yaml` — the Deployment you know, with blanks like
@@ -88,7 +88,7 @@ bash test.sh 2
 `deploy.sh 2` removes Phase 1 (and its load balancer), then runs:
 
 ```bash
-helm upgrade --install fraud-api platform/helm/zero2ai-app -n zero2ai \
+helm upgrade --install fraud-api chapter-10-kubernetes/helm/zero2ai-app -n zero2ai \
   -f phase2/values.yaml --set image.repository=... --set image.tag=... --wait
 ```
 
@@ -101,9 +101,9 @@ Helm superpowers to try:
 ```bash
 helm list -n zero2ai                                   # what's installed
 helm get values fraud-api -n zero2ai                   # the answers used
-helm template fraud-api ../../platform/helm/zero2ai-app -f phase2/values.yaml \
+helm template fraud-api ../helm/zero2ai-app -f phase2/values.yaml \
   --set image.repository=demo --set image.tag=v1      # see the YAML Helm generates, offline
-helm upgrade fraud-api ../../platform/helm/zero2ai-app -n zero2ai --reuse-values --set replicaCount=3
+helm upgrade fraud-api ../helm/zero2ai-app -n zero2ai --reuse-values --set replicaCount=3
 helm history fraud-api -n zero2ai                      # numbered revisions
 helm rollback fraud-api 1 -n zero2ai                   # back to revision 1
 ```
@@ -135,7 +135,7 @@ bash test.sh 3
 **What you should see:** `helm test` passes, then `/health`, `/info`, `/predict` answer through
 the **shared platform ALB on port 8010**, `http://k8s-zero2ai-....elb.amazonaws.com:8010`, then the
 HPA, PDB and NetworkPolicy are listed. Open the same address in your browser
-(`.../health`), or run `bash ../../platform/scripts/urls.sh` to list every address.
+(`.../health`), or run `bash ../scripts/urls.sh` to list every address.
 
 Watch autoscaling work (second terminal: `kubectl -n zero2ai get hpa fraud-api -w`):
 
@@ -158,7 +158,7 @@ helm rollback fraud-api <phase-2-revision> -n zero2ai
 ### The same thing in qa and prod
 
 ```bash
-bash ../../platform/scripts/platform-up.sh prod     # once (costs more: see platform README)
+bash ../scripts/platform-up.sh prod     # once (costs more: see platform README)
 ENV=prod bash deploy.sh build
 ENV=prod bash deploy.sh 3
 ENV=prod bash test.sh 3
@@ -195,7 +195,7 @@ registry has **immutable** tags, so the image you tested is exactly the image th
 
 ```bash
 bash down.sh                                            # remove this chapter's app
-bash ../../platform/scripts/platform-down.sh dev        # when you're done for the day
+bash ../scripts/platform-down.sh dev        # when you're done for the day
 ```
 
 ## Where to next

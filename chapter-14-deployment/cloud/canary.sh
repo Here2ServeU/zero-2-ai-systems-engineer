@@ -6,7 +6,7 @@
 #   bash canary.sh 0     # instant rollback to blue
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
-source "$HERE/../../platform/scripts/lib.sh"
+source "$HERE/../../chapter-10-kubernetes/scripts/lib.sh"
 w="${1:-}"
 case "$w" in ''|*[!0-9]*) echo "Usage: $0 <0-100>"; exit 1 ;; esac
 [ "$w" -le 100 ] || die "Percent must be 0-100"

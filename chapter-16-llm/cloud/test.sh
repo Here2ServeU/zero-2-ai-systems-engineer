@@ -2,7 +2,7 @@
 # Chapter 16 cloud track tests (each question costs a fraction of a cent).  Usage: test.sh <1|2|3>
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
-source "$HERE/../../platform/scripts/lib.sh"
+source "$HERE/../../chapter-10-kubernetes/scripts/lib.sh"
 Q='{"question":"In one sentence: what is a chargeback?"}'
 ask() { http_get "$1/health"; http_post "$1/chat" "$Q"; }
 

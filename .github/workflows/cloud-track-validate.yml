@@ -6,9 +6,9 @@ name: Cloud track checks
 on:
   push:
     branches: [main]
-    paths: ['chapter-08-cloud/terraform/**', 'platform/**', 'chapter-1*/**', 'chapter-06-docker/**', '.github/workflows/cloud-track-validate.yml']
+    paths: ['chapter-08-cloud/terraform/**', 'chapter-1*/**', 'chapter-06-docker/**', '.github/workflows/cloud-track-validate.yml']
   pull_request:
-    paths: ['chapter-08-cloud/terraform/**', 'platform/**', 'chapter-1*/**', 'chapter-06-docker/**', '.github/workflows/cloud-track-validate.yml']
+    paths: ['chapter-08-cloud/terraform/**', 'chapter-1*/**', 'chapter-06-docker/**', '.github/workflows/cloud-track-validate.yml']
 
 jobs:
   terraform:
@@ -17,13 +17,17 @@ jobs:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
       - name: terraform fmt
-        run: terraform fmt -check -recursive -diff chapter-08-cloud/terraform
+        run: |
+          terraform fmt -check -recursive -diff chapter-08-cloud/terraform
+          terraform fmt -check -recursive -diff chapter-10-kubernetes/terraform
       - name: terraform validate (every stack)
         run: |
-          for stack in ec2 eks eks-addons backend; do
+          for stack in chapter-08-cloud/terraform/ec2 chapter-08-cloud/terraform/backend \
+                       chapter-10-kubernetes/terraform/eks chapter-10-kubernetes/terraform/eks-addons \
+                       chapter-10-kubernetes/terraform/backend; do
             echo "::group::$stack"
-            terraform -chdir=chapter-08-cloud/terraform/$stack init -backend=false -input=false
-            terraform -chdir=chapter-08-cloud/terraform/$stack validate
+            terraform -chdir=$stack init -backend=false -input=false
+            terraform -chdir=$stack validate
             echo "::endgroup::"
           done
 
@@ -37,7 +41,7 @@ jobs:
           curl -sSL https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz | tar xz
           sudo mv kubeconform /usr/local/bin/
       - name: Render the chart for every chapter and phase
-        run: bash platform/scripts/validate-chart.sh
+        run: bash chapter-10-kubernetes/scripts/validate-chart.sh
 
   scripts:
     runs-on: ubuntu-latest

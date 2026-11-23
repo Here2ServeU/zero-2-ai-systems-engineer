@@ -3,7 +3,7 @@
 > Everything from Chapters 10–17 at once: Helm, autoscaling, disruption budgets, zone
 > spreading, network policy, a public ALB, secrets from the vault, Prometheus metrics, and
 > **alerts on errors, latency, and spend**.
-> Platform first: [platform/README.md](../../platform/README.md).
+> Platform first: [chapter-10-kubernetes/PLATFORM.md](../../chapter-10-kubernetes/PLATFORM.md).
 
 **Labels:** 💳 Needs an account that may cost money · 🌐 Needs the internet
 
@@ -36,7 +36,7 @@ bash test.sh 2
 ## Phase 3 — Production
 
 ```bash
-bash ../../platform/scripts/put-llm-secret.sh dev
+bash ../../chapter-10-kubernetes/scripts/put-llm-secret.sh dev
 bash deploy.sh 3
 bash test.sh 3
 ```
@@ -70,7 +70,7 @@ Alerts ([`phase3/values.yaml`](phase3/values.yaml)):
 
 ```bash
 bash down.sh
-bash ../../platform/scripts/platform-down.sh dev     # stop paying
+bash ../../chapter-10-kubernetes/scripts/platform-down.sh dev     # stop paying
 ```
 
 Repeat any chapter in `qa` or `prod` with `ENV=prod`; the code doesn't change, only the values.

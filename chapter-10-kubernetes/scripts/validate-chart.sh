@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # validate-chart.sh: render the shared chart with EVERY chapter's Phase 2 and
 # Phase 3 values, offline, and check the YAML. No cluster or AWS needed.
-#   bash platform/scripts/validate-chart.sh
+#   bash chapter-10-kubernetes/scripts/validate-chart.sh
 # Uses kubeconform for schema checks if it's installed (CI installs it).
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-CHART="$ROOT/platform/helm/zero2ai-app"
+CHART="$ROOT/chapter-10-kubernetes/helm/zero2ai-app"
 IMG=(--set image.repository=123456789012.dkr.ecr.us-east-1.amazonaws.com/zero2ai-dev/demo --set image.tag=v1)
 NP=(--set "networkPolicy.allowCidrs[0]=10.40.0.0/16")
 fail=0

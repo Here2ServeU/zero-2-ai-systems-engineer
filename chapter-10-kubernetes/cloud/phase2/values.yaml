@@ -1,5 +1,5 @@
 # Phase 2: the fraud API as a Helm release.
-# Everything not listed here comes from platform/helm/zero2ai-app/values.yaml.
+# Everything not listed here comes from chapter-10-kubernetes/helm/zero2ai-app/values.yaml.
 # The image repository and tag are filled in by deploy.sh.
 
 replicaCount: 2

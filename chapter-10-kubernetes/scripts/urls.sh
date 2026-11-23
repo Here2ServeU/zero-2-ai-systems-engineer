@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # urls.sh: every address on the platform's shared ALB, for your browser and
 # for curl. Run it any time after platform-up.sh:
-#   bash platform/scripts/urls.sh          (ENV=qa / ENV=prod for the others)
+#   bash chapter-10-kubernetes/scripts/urls.sh          (ENV=qa / ENV=prod for the others)
 set -euo pipefail
 source "$(dirname "$0")/lib.sh"
 use_cluster
 
 alb=$(platform_alb)
-[ -n "$alb" ] || die "No platform ALB yet. Run: bash platform/scripts/platform-up.sh $ENV  (or wait 2-3 minutes)"
+[ -n "$alb" ] || die "No platform ALB yet. Run: bash chapter-10-kubernetes/scripts/platform-up.sh $ENV  (or wait 2-3 minutes)"
 
 say "Platform ALB ($ENV): http://$alb"
 printf '  %-28s %s\n' "Landing page (browser)" "http://$alb/"
@@ -19,7 +19,7 @@ for i in grafana prometheus alertmanager; do
       -o jsonpath='{.metadata.annotations.alb\.ingress\.kubernetes\.io/listen-ports}' | grep -o '[0-9][0-9]*' | head -1)
     printf '  %-28s %s\n' "$i" "http://$alb:$port/"
   else
-    printf '  %-28s %s\n' "$i" "not on the ALB (port-forward; see platform/README.md)"
+    printf '  %-28s %s\n' "$i" "not on the ALB (port-forward; see chapter-10-kubernetes/PLATFORM.md)"
   fi
 done
 echo "  Grafana login: admin / \$(terraform -chdir=$TF_DIR/eks-addons output -raw grafana_admin_password)"

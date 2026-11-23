@@ -2,7 +2,7 @@
 
 > Chapter 17 ran as three scripts. For the cloud it becomes a small web API,
 > [`rag_api.py`](../rag_api.py): `POST /ask {"question": "..."}` → answer + the passages used.
-> Platform first: [platform/README.md](../../platform/README.md).
+> Platform first: [chapter-10-kubernetes/PLATFORM.md](../../chapter-10-kubernetes/PLATFORM.md).
 
 **Labels:** 💳 Needs an account that may cost money · 🌐 Needs the internet
 
@@ -53,7 +53,7 @@ Each copy builds its own small index at start-up, so copies are **identical and 
 the HPA can add copies without any shared disk. Keys come from Secrets Manager (see Chapter 16).
 
 ```bash
-bash ../../platform/scripts/put-llm-secret.sh dev
+bash ../../chapter-10-kubernetes/scripts/put-llm-secret.sh dev
 bash deploy.sh 3
 bash test.sh 3
 ```

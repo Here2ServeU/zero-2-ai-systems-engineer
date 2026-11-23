@@ -5,7 +5,7 @@
 #
 #   export ANTHROPIC_API_KEY=sk-ant-...      # any of the three
 #   export GEMINI_API_KEY=...
-#   bash platform/scripts/put-llm-secret.sh dev
+#   bash chapter-10-kubernetes/scripts/put-llm-secret.sh dev
 set -euo pipefail
 ENV="${1:-${ENV:-dev}}"; export ENV
 source "$(dirname "$0")/lib.sh"

@@ -14,7 +14,7 @@ networkPolicy:
   enabled: true
 ingress:
   enabled: true
-  port: 8015                # http://<platform-alb>:8015 (shared ALB, see platform/README.md)
+  port: 8015                # http://<platform-alb>:8015 (shared ALB, see chapter-10-kubernetes/PLATFORM.md)
   healthcheckPath: /health
 
 prometheusRule:

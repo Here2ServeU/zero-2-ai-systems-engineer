@@ -270,7 +270,7 @@ This chapter also runs on a real cloud cluster, in three phases (plain YAML → 
 production settings): the fully fledged version: autoscaling, disruption budgets, network policy, public load balancer, vault secrets, and alerts on errors, latency and spend.
 
 Guide: **[cloud/README.md](cloud/README.md)** · Build the shared platform once first:
-[platform/README.md](../platform/README.md). 💳 Costs money while it runs — destroy it when done.
+[chapter-10-kubernetes/PLATFORM.md](../chapter-10-kubernetes/PLATFORM.md). 💳 Costs money while it runs — destroy it when done.
 
 ## Where to next
 

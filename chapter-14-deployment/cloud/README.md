@@ -3,7 +3,7 @@
 > On your laptop, `switch.py` flipped a variable and `router.py` sent 20% of calls to the new
 > model. On EKS the same ideas move **real traffic**: a Service selector for blue/green, a Helm
 > release you can roll back, and an AWS load balancer that splits traffic by weight.
-> Platform first: [platform/README.md](../../platform/README.md).
+> Platform first: [chapter-10-kubernetes/PLATFORM.md](../../chapter-10-kubernetes/PLATFORM.md).
 
 **Labels:** 💳 Needs an account that may cost money · 🌐 Needs the internet
 

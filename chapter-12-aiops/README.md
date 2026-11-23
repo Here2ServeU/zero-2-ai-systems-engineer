@@ -300,7 +300,7 @@ This chapter also runs on a real cloud cluster, in three phases (plain YAML → 
 production settings): the guard reads **real** CPU/memory from Prometheus on EKS and, in Phase 3, scales the app itself with tightly limited permissions (RBAC).
 
 Guide: **[cloud/README.md](cloud/README.md)** · Build the shared platform once first:
-[platform/README.md](../platform/README.md). 💳 Costs money while it runs — destroy it when done.
+[chapter-10-kubernetes/PLATFORM.md](../chapter-10-kubernetes/PLATFORM.md). 💳 Costs money while it runs — destroy it when done.
 
 ## Where to next
 

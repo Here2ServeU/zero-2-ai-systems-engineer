@@ -2,7 +2,7 @@
 
 > Same chat API, now on EKS. The real lesson is **where the API key lives**: your shell
 > (Phase 1–2), then **AWS Secrets Manager** with automatic syncing (Phase 3).
-> Platform first: [platform/README.md](../../platform/README.md).
+> Platform first: [chapter-10-kubernetes/PLATFORM.md](../../chapter-10-kubernetes/PLATFORM.md).
 
 **Labels:** 💳 Needs an account that may cost money · 🌐 Needs the internet
 
@@ -51,7 +51,7 @@ bash test.sh 2
 ## Phase 3 — Keys from AWS Secrets Manager
 
 ```bash
-bash ../../platform/scripts/put-llm-secret.sh dev   # copies your exported key(s) into the vault
+bash ../../chapter-10-kubernetes/scripts/put-llm-secret.sh dev   # copies your exported key(s) into the vault
 bash deploy.sh 3
 bash test.sh 3         # shows ExternalSecret Ready=True, then asks through the public ALB
 ```

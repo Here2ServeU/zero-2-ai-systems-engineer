@@ -21,5 +21,5 @@ networkPolicy:
   enabled: true
 ingress:
   enabled: true
-  port: 8017                # http://<platform-alb>:8017 (shared ALB, see platform/README.md)
+  port: 8017                # http://<platform-alb>:8017 (shared ALB, see chapter-10-kubernetes/PLATFORM.md)
   healthcheckPath: /health

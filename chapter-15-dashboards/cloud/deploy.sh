@@ -2,7 +2,7 @@
 # Chapter 15 cloud track: dashboards on EKS.  Usage: deploy.sh <build|1|2|3>
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
-source "$HERE/../../platform/scripts/lib.sh"
+source "$HERE/../../chapter-10-kubernetes/scripts/lib.sh"
 APP=monitored-api; RELEASE=monitored-api
 
 case "${1:-}" in

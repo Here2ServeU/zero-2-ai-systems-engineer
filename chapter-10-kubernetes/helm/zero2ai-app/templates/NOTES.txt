@@ -23,6 +23,6 @@ Run it right now:
 Public address (takes 2-3 minutes the first time):
   echo "http://$(kubectl -n {{ .Release.Namespace }} get ingress {{ include "app.fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'){{ if and (not .Values.ingress.certificateArn) (ne (int .Values.ingress.port) 80) }}:{{ .Values.ingress.port }}{{ end }}{{ .Values.probes.path }}"
 {{- if .Values.ingress.groupName }}
-  (shared ALB group "{{ .Values.ingress.groupName }}": every service is listed at  bash platform/scripts/urls.sh)
+  (shared ALB group "{{ .Values.ingress.groupName }}": every service is listed at  bash chapter-10-kubernetes/scripts/urls.sh)
 {{- end }}
 {{- end }}

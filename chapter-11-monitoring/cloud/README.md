@@ -2,7 +2,7 @@
 
 > On your laptop you visited `/metrics` yourself. In the cloud, **Prometheus** (already running
 > on the cluster from `eks-addons`) collects every copy's numbers, all the time.
-> Platform first: [platform/README.md](../../platform/README.md).
+> Platform first: [chapter-10-kubernetes/PLATFORM.md](../../chapter-10-kubernetes/PLATFORM.md).
 
 **Labels:** 💳 Needs an account that may cost money · 🌐 Needs the internet
 
@@ -51,7 +51,7 @@ bash test.sh 2
 See it in Prometheus yourself:
 
 ```bash
-bash ../../platform/scripts/urls.sh     # Prometheus is on the platform ALB at :9090 (your IP only)
+bash ../../chapter-10-kubernetes/scripts/urls.sh     # Prometheus is on the platform ALB at :9090 (your IP only)
 # or, without the ALB:
 kubectl -n monitoring port-forward svc/kube-prometheus-stack-prometheus 9090:9090
 # http://<platform-alb>:9090 or http://localhost:9090 -> Status > Targets:

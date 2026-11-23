@@ -28,8 +28,8 @@ On your laptop, Kubernetes was a toy kitchen. In the cloud it's a real restauran
 build and run it:
 
 - **Terraform** builds the building: the network, the Kubernetes cluster (**EKS**), the image
-  shelves (**ECR**), and the permissions. You learned it in Chapters 07–08; this reuses the same
-  layout, state bucket, and `dev` / `qa` / `prod` files.
+  shelves (**ECR**), and the permissions. You learned it in Chapters 07–08. Chapter 10 uses the same
+  layout and `dev` / `qa` / `prod` files, with its **own** state bucket, so it needs nothing from Chapter 08.
 - **EKS** (Elastic Kubernetes Service) is Kubernetes that AWS runs for you. Same `kubectl`
   commands as your laptop.
 - **An ALB** (Application Load Balancer) is the platform's **front door**: one public address
@@ -48,21 +48,29 @@ Every chapter from 10 to 18 then teaches its topic in **three phases**:
 
 ## What's where
 
-```text
-chapter-08-cloud/terraform/
-├── backend/            # S3 state bucket + DynamoDB lock (from Chapter 08, reused)
-├── modules/
-│   ├── vpc/            # same brick as Chapter 08 (+ optional private subnets & NAT)
-│   ├── eks/            # NEW: cluster, node group, core add-ons, admin access
-│   ├── ecr/            # NEW: one image registry per chapter app
-│   └── pod-identity-role/  # NEW: AWS permissions for one pod, no access keys
-├── ec2/                # Chapter 08's stack
-├── eks/                # NEW stack: network + cluster + ECR + IAM   (environments/dev|qa|prod)
-└── eks-addons/         # NEW stack: Helm-installed cluster software + the platform ALB (platform-alb.tf)
+Chapter 10 is **self-contained**: everything the platform needs is in this folder. Chapters
+11–18 only add their own `cloud/` files and reuse what's here.
 
-platform/
-├── helm/zero2ai-app/   # ONE chart every chapter installs with its own values
-└── scripts/            # platform-up / platform-down / urls / check-tools / status / put-llm-secret / lib
+```text
+chapter-10-kubernetes/
+├── PLATFORM.md          # this guide
+├── terraform/
+│   ├── backend/         # Chapter 10's OWN S3 state bucket + DynamoDB lock (no Chapter 08 needed)
+│   ├── modules/
+│   │   ├── vpc/         # the same network brick as Chapter 08 (+ optional private subnets & NAT)
+│   │   ├── eks/         # cluster, node group, core add-ons, admin access
+│   │   ├── ecr/         # one image registry per chapter app
+│   │   └── pod-identity-role/  # AWS permissions for one pod, no access keys
+│   ├── eks/             # stack: network + cluster + ECR + IAM   (environments/dev|qa|prod)
+│   └── eks-addons/      # stack: Helm-installed cluster software + the platform ALB (platform-alb.tf)
+├── helm/zero2ai-app/    # ONE chart every chapter installs with its own values
+├── scripts/
+│   ├── platform-up.sh / platform-down.sh   # build / destroy the whole platform
+│   ├── urls.sh / status.sh                 # every ALB address / what's running
+│   ├── check-tools.sh / put-llm-secret.sh / validate-chart.sh
+│   ├── lib.sh                              # shared helpers every chapter's cloud/*.sh sources
+│   └── local-up.sh / local-test.sh / local-down.sh   # Chapter 10 on your laptop (minikube/kind)
+└── cloud/               # Chapter 10's own phases (below)
 
 chapter-NN-*/cloud/
 ├── phase1/*.yaml       # plain Kubernetes YAML
@@ -90,7 +98,7 @@ You need: **AWS CLI** (logged in, Chapter 07), **Terraform**, **kubectl**, **Hel
 **git**, **curl**. Check them all at once from the top of the repo:
 
 ```bash
-bash platform/scripts/check-tools.sh
+bash chapter-10-kubernetes/scripts/check-tools.sh
 ```
 
 > **Windows:** run every script in **Git Bash**. **Apple Silicon Mac:** nothing special — the
@@ -99,15 +107,16 @@ bash platform/scripts/check-tools.sh
 ## Step 2 — Build the platform (~20 minutes)
 
 ```bash
-bash platform/scripts/platform-up.sh dev
+bash chapter-10-kubernetes/scripts/platform-up.sh dev
 ```
 
 It runs, in order:
 
-1. Checks the Chapter 08 **state backend** exists (creates it if not).
-2. `terraform apply` in `chapter-08-cloud/terraform/eks` with `environments/dev.tfvars`
+1. Checks Chapter 10's **state backend** (`terraform/backend`) exists, and creates it the first time
+   (bucket `zero2ai-eks-tfstate-<account>`, lock table `zero2ai-eks-terraform-locks`).
+2. `terraform apply` in `chapter-10-kubernetes/terraform/eks` with `environments/dev.tfvars`
    → VPC, EKS cluster, node group, ECR repositories, IAM roles, MLflow bucket, LLM secret envelope.
-3. `terraform apply` in `chapter-08-cloud/terraform/eks-addons`
+3. `terraform apply` in `chapter-10-kubernetes/terraform/eks-addons`
    → Helm installs the AWS Load Balancer Controller, metrics-server, Cluster Autoscaler,
    External Secrets, and Prometheus + Grafana. Then it builds the **platform ALB** (see below).
 4. Points `kubectl` at the cluster and prints every URL (`urls.sh`).
@@ -117,10 +126,10 @@ Terraform shows each plan and waits for you to type `yes` (set `AUTO_APPROVE=1` 
 **What you should see at the end:** `kubectl get nodes` lists 2 nodes `Ready`, then a list of
 addresses starting with `http://k8s-zero2ai-....us-east-1.elb.amazonaws.com`.
 
-Prefer doing it by hand? It's the Chapter 08 routine, twice:
+Prefer doing it by hand? It's the Chapter 08 routine (backend once, then each stack):
 
 ```bash
-cd chapter-08-cloud/terraform/eks
+cd chapter-10-kubernetes/terraform/eks
 terraform init -reconfigure -backend-config=environments/dev.tfbackend \
   -backend-config="bucket=$(terraform -chdir=../backend output -raw state_bucket)"
 terraform plan  -var-file=environments/dev.tfvars
@@ -134,7 +143,7 @@ cd ../eks-addons
 
 | Chapter | Cloud track | Image | What Phase 3 adds |
 |---|---|---|---|
-| 10 Kubernetes | [cloud/](../chapter-10-kubernetes/cloud/README.md) | fraud-api | gunicorn, HPA, PDB, zone spread, NetworkPolicy, ALB |
+| 10 Kubernetes | [cloud/](cloud/README.md) | fraud-api | gunicorn, HPA, PDB, zone spread, NetworkPolicy, ALB |
 | 11 Monitoring | [cloud/](../chapter-11-monitoring/cloud/README.md) | metrics-api | ServiceMonitor + alert rules in Prometheus |
 | 12 AIOps | [cloud/](../chapter-12-aiops/cloud/README.md) | aiops | watcher reads real Prometheus metrics and scales the app (RBAC-limited) |
 | 13 Retraining | [cloud/](../chapter-13-retraining/cloud/README.md) | retrain, mlflow | MLflow server on EKS, artifacts in S3 via Pod Identity, weekly CronJob |
@@ -163,7 +172,7 @@ Use another environment by prefixing `ENV=qa` or `ENV=prod`, e.g. `ENV=prod bash
 ## Step 4 — Reach the cluster: the platform ALB
 
 The add-ons stack builds **one** internet-facing **Application Load Balancer** for the whole
-cluster ([`eks-addons/platform-alb.tf`](../chapter-08-cloud/terraform/eks-addons/platform-alb.tf)).
+cluster ([`eks-addons/platform-alb.tf`](terraform/eks-addons/platform-alb.tf)).
 Every service gets its own **port** on it, so you never need `port-forward` to look around:
 
 | Address | What's there | Who can open it |
@@ -179,14 +188,14 @@ Every service gets its own **port** on it, so you never need `port-forward` to l
 **From the command line:**
 
 ```bash
-bash platform/scripts/urls.sh                       # every address, plus ready-made curl commands
-ALB=$(terraform -chdir=chapter-08-cloud/terraform/eks-addons output -raw platform_alb_hostname)
+bash chapter-10-kubernetes/scripts/urls.sh                       # every address, plus ready-made curl commands
+ALB=$(terraform -chdir=chapter-10-kubernetes/terraform/eks-addons output -raw platform_alb_hostname)
 curl -i http://$ALB/                                # landing page (HTTP 200)
 curl -s http://$ALB:3000/api/health                 # Grafana
 curl -s http://$ALB:8010/health                     # Chapter 10, after its Phase 3
-terraform -chdir=chapter-08-cloud/terraform/eks-addons output -raw grafana_admin_password
+terraform -chdir=chapter-10-kubernetes/terraform/eks-addons output -raw grafana_admin_password
 kubectl get nodes                                   # the cluster's own API (not through the ALB)
-bash platform/scripts/status.sh                     # nodes, releases, apps, load balancers
+bash chapter-10-kubernetes/scripts/status.sh                     # nodes, releases, apps, load balancers
 ```
 
 **How it works.** Every Ingress with the annotation `alb.ingress.kubernetes.io/group.name: zero2ai`
@@ -211,7 +220,7 @@ kubectl -n monitoring port-forward svc/kube-prometheus-stack-grafana 3000:80   #
 ## Step 5 — Destroy (every time you stop)
 
 ```bash
-bash platform/scripts/platform-down.sh dev
+bash chapter-10-kubernetes/scripts/platform-down.sh dev
 ```
 
 It removes every app first, then destroys the add-ons (which deletes the platform ALB; the script
@@ -240,4 +249,4 @@ waits until AWS confirms it's gone), then the cluster and network. The tiny stat
 
 ## Where to next
 
-Start with [Chapter 10's cloud track](../chapter-10-kubernetes/cloud/README.md).
+Start with [Chapter 10's cloud track](cloud/README.md).

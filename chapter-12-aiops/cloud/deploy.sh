@@ -2,7 +2,7 @@
 # Chapter 12 cloud track: the AIOps guard on EKS.  Usage: deploy.sh <build|1|2|3>
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
-source "$HERE/../../platform/scripts/lib.sh"
+source "$HERE/../../chapter-10-kubernetes/scripts/lib.sh"
 APP=aiops; RELEASE=aiops
 CH11="$REPO_ROOT/chapter-11-monitoring/cloud"
 

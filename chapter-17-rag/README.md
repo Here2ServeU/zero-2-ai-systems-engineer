@@ -286,7 +286,7 @@ This chapter also runs on a real cloud cluster, in three phases (plain YAML → 
 production settings): RAG becomes a web API (`rag_api.py`); an init container builds the index in every copy so it scales out freely.
 
 Guide: **[cloud/README.md](cloud/README.md)** · Build the shared platform once first:
-[platform/README.md](../platform/README.md). 💳 Costs money while it runs — destroy it when done.
+[chapter-10-kubernetes/PLATFORM.md](../chapter-10-kubernetes/PLATFORM.md). 💳 Costs money while it runs — destroy it when done.
 
 ## Where to next
 

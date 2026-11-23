@@ -2,7 +2,7 @@
 # Chapter 13 cloud track tests.  Usage: test.sh <1|2|3>
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
-source "$HERE/../../platform/scripts/lib.sh"
+source "$HERE/../../chapter-10-kubernetes/scripts/lib.sh"
 RELEASE=retrain
 
 run_now() {
