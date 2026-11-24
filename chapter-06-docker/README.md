@@ -2,7 +2,7 @@
 
 > Matches **Chapter 06** in the book. The runnable scripts for this chapter are in this folder.
 
-**Labels:** 💻 Runs free on your laptop · 🧑‍🤝‍🧑 Easier with a helper the first time
+**Labels:** Runs free on your laptop · Easier with a helper the first time
 
 ---
 
@@ -53,7 +53,7 @@ Before anything else, you need Docker itself.
 
    **What you should see:** something like `Docker version 24.0.6`.
 
-> 🧑‍🤝‍🧑 This install is the trickiest part of the whole book — it touches deep computer
+> This install is the trickiest part of the whole book — it touches deep computer
 > settings and sometimes asks for a restart. If a more experienced person is around, this is a
 > great moment to have them sit with you. Once Docker is installed, the rest is easy.
 

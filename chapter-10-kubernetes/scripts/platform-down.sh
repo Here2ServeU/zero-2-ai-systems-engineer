@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # platform-down.sh <env>: delete EVERYTHING the cloud track created for one
 # environment, in the safe order:
-#   1. every Helm release and Phase 1 app in the app namespace
+#   1. every Helm release and Phase 2A app in the app namespace
 #      (this deletes the AWS load balancers they created; otherwise the VPC
 #       can't be deleted and Terraform gets stuck)
 #   2. terraform destroy eks-addons (removes the shared platform ALB too)

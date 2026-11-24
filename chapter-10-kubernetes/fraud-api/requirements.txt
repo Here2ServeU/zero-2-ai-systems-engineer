@@ -1,0 +1,7 @@
+# Pinned versions: the exact set this chapter was tested with, so a new
+# release of any library can't break your build.
+flask==3.1.3
+scikit-learn==1.9.1
+pandas==3.1.1
+numpy==2.4.6
+gunicorn==27.0.1

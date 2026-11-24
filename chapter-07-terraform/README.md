@@ -2,7 +2,7 @@
 
 > Matches **Chapter 07** in the book. The runnable file for this chapter, `main.tf`, is in this folder.
 
-**Labels:** 💳 Needs an account that may cost money · 🌐 Needs the internet · 🧑‍🤝‍🧑 Easier with a helper the first time
+**Labels:** Needs an account that may cost money · Needs the internet · Easier with a helper the first time
 
 ---
 
@@ -61,12 +61,12 @@ Plan for about **60–90 minutes**. You can stop after any part and come back la
 
 ---
 
-## ⚠️ Money and safety: read this before you start
+## Money and safety: read this before you start
 
 AWS is a real paid service. If you follow this guide exactly, it should cost **$0**. Here's
 why, and how to keep it that way:
 
-- 💳 **AWS asks for a credit or debit card** when you sign up. You may see a small temporary charge
+- **AWS asks for a credit or debit card** when you sign up. You may see a small temporary charge
   (about $1) that is returned. It is only a check that the card works.
 - **You must be 18 or older to own an AWS account.** If you are younger, a parent or guardian
   must create the account and enter the card details. They should sit with you for
@@ -153,7 +153,7 @@ could run up a large bill. MFA means a password alone is not enough to sign in.
 **What you should see:** your device listed under Multi-factor authentication. From now on,
 signing in as root asks for your password **and** a code from your phone.
 
-> ⚠️ Don't delete the authenticator app or the account entry in it. You need it to sign in.
+> Don't delete the authenticator app or the account entry in it. You need it to sign in.
 
 ---
 

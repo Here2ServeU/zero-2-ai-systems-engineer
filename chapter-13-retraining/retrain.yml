@@ -19,7 +19,7 @@ jobs:
           python -m venv venv
           source venv/bin/activate
           pip install scikit-learn pandas
-          pip install numpy scipy mlflow
+          pip install numpy scipy mlflow==2.22.0   # MLflow 3 cannot save this model with the book code
       - name: Check for drift
         run: |
           source venv/bin/activate

@@ -3,7 +3,7 @@
 > Matches **Chapter 08** in the book. The Terraform project for this chapter is in the
 > [`terraform/`](terraform) folder.
 
-**Labels:** 💳 Needs an account that may cost money · 🌐 Needs the internet · 🧑‍🤝‍🧑 Easier with a helper the first time
+**Labels:** Needs an account that may cost money · Needs the internet · Easier with a helper the first time
 
 ---
 
@@ -106,7 +106,7 @@ the shared bucket:
 
 ---
 
-## ⚠️ Money and safety: read this before you start
+## Money and safety: read this before you start
 
 The rules are the same as Chapter 07, plus a few new ones:
 
@@ -466,7 +466,7 @@ allowed_all_traffic_cidrs = ["10.10.0.0/16"]
 Run `plan` and you'll see one extra `aws_vpc_security_group_ingress_rule.all_traffic` per range.
 To remove the rule, set the list back to `[]` and run `apply`.
 
-> ⚠️ Never put `"0.0.0.0/0"` here. That opens **every** port on your servers to the whole
+> Never put `"0.0.0.0/0"` here. That opens **every** port on your servers to the whole
 > internet. Use your VPC range or a single `/32` address.
 
 ### Rotating a key

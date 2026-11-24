@@ -1,8 +1,8 @@
 # values.yaml: the DEFAULT settings for zero2ai-app.
 #
 # Every chapter overrides only what it needs, in its own file, e.g.
-#   chapter-10-kubernetes/cloud/phase2/values.yaml   (Phase 2: dev-style)
-#   chapter-10-kubernetes/cloud/phase3/values.yaml   (Phase 3: production)
+#   chapter-10-kubernetes/cloud/phase2b-helm/values.yaml   (Phase 2B: dev-style)
+#   chapter-10-kubernetes/cloud/phase3-production/values.yaml   (Phase 3: production)
 # Helm merges: this file  <  chapter values file  <  --set on the command line.
 
 # ---------------------------------------------------------------------------
@@ -81,7 +81,7 @@ cronJob:
 # ---------------------------------------------------------------------------
 service:
   enabled: true
-  type: ClusterIP           # Phase 2: ClusterIP + port-forward, like your laptop
+  type: ClusterIP           # Phase 2B: ClusterIP + port-forward, like your laptop
   port: 80
   annotations: {}
   # Send traffic to pods with THESE labels instead of this release's own

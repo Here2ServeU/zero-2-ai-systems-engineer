@@ -15,7 +15,7 @@ checks() {
 }
 
 case "${1:-}" in
-  1)
+  2a)
     use_cluster
     say "Through the tunnel (exactly like your laptop)"
     with_port_forward zero2ai-fraud-svc 8080 80 checks http://localhost:8080
@@ -23,7 +23,7 @@ case "${1:-}" in
     say "Through the public Network Load Balancer: http://$host"
     checks "http://$host"
     ;;
-  2)
+  2b)
     use_cluster
     say "Through the tunnel"
     with_port_forward "$RELEASE" 8080 80 checks http://localhost:8080
@@ -40,6 +40,6 @@ case "${1:-}" in
     kubectl -n "$NAMESPACE" get hpa,pdb,networkpolicy -l app.kubernetes.io/instance="$RELEASE"
     kubectl -n "$NAMESPACE" get pods -l app.kubernetes.io/instance="$RELEASE" -o wide
     ;;
-  *) echo "Usage: $0 <1|2|3>"; exit 1 ;;
+  *) echo "Usage: $0 <2a|2b|3>"; exit 1 ;;
 esac
-ok "Phase ${1} checks passed"
+ok "Phase $(echo "$1" | tr a-z A-Z) checks passed"

@@ -2,7 +2,7 @@
 
 > Matches **Chapter 05** in the book. The runnable scripts for this chapter are in this folder.
 
-**Labels:** 💻 Runs free on your laptop · 🌐 Needs the internet
+**Labels:** Runs free on your laptop · Needs the internet
 
 ---
 

@@ -1,0 +1,14 @@
+# Phase 2A: tell the cluster's Prometheus (installed by eks-addons) to collect
+# this app's numbers every 15 seconds. On your laptop YOU visited /metrics;
+# here Prometheus does it for you, forever.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: metrics-api-p1
+spec:
+  selector:
+    matchLabels:
+      app: metrics-api-p1
+  endpoints:
+  - port: metrics
+    interval: 15s

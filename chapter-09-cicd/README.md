@@ -2,7 +2,7 @@
 
 > Matches **Chapter 09** in the book. The runnable scripts for this chapter are in this folder.
 
-**Labels:** 🌐 Needs the internet · 🧑‍🤝‍🧑 Easier with a helper the first time
+**Labels:** Needs the internet · Easier with a helper the first time
 
 ---
 
@@ -20,7 +20,7 @@ That pattern — *automatically re-checking your work every time you change it* 
 **CI/CD**. On GitHub, the robot helper is called **GitHub Actions**. You tell the robot what to
 do by writing its to-do list in a file called a **workflow**.
 
-> 🧑‍🤝‍🧑 **Easier with a helper the first time.** Connecting your project to GitHub and
+> **Easier with a helper the first time.** Connecting your project to GitHub and
 > reading the robot's report has a few fiddly first-time steps. A friend who's done it before
 > makes it smooth. Good news: a **free** GitHub account is all you need — **no credit card**.
 
@@ -157,7 +157,7 @@ and push your project up to it. (You installed **Git** back in Chapter 01.)
 2. Inside it, create a file named `ci.yml`.
 3. Paste in the workflow shown above and **save**.
 
-> ⚠️ YAML files care about spaces. Each indent is **two spaces**, never a tab. If lines don't
+> YAML files care about spaces. Each indent is **two spaces**, never a tab. If lines don't
 > line up, the robot can't read its list. This is the most common first-time snag.
 
 ### Step 3 — Push it up
@@ -179,7 +179,7 @@ git push
 1. Open your repository on GitHub in a web browser.
 2. Click the **Actions** tab at the top.
 3. You'll see your run, "Zero2AI Pipeline," start ticking through its steps.
-4. Wait for it to finish: a green check ✅ means everything passed; a red X ❌ means a step
+4. Wait for it to finish: a green check [OK] means everything passed; a red X [ERROR] means a step
    failed — click it to read which one and why.
 
 You just hired a tireless helper that re-checks your project every single time you save it.

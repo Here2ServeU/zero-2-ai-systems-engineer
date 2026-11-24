@@ -1,0 +1,22 @@
+# Phase 2A: the front desk. Same name and ports as your laptop's service.yaml,
+# so `kubectl port-forward service/zero2ai-fraud-svc 8080:80` works the same.
+#
+# NodePort -> LoadBalancer: in the cloud, nodes are private-ish servers, so
+# instead of a door number on a node we ask AWS for a real Network Load
+# Balancer with a public address. The annotations tell the AWS Load Balancer
+# Controller (installed by eks-addons) how to build it.
+apiVersion: v1
+kind: Service
+metadata:
+  name: zero2ai-fraud-svc
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: external
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+spec:
+  type: LoadBalancer
+  selector:
+    app: zero2ai-fraud-api
+  ports:
+  - port: 80
+    targetPort: 5000
