@@ -200,8 +200,11 @@ shelf and can't see images on your laptop until you hand them over).
 With your node showing `Ready`, run these one at a time from inside `chapter-10-kubernetes/`:
 
 ```bash
-# minikube only: hand your laptop's image to minikube
-minikube image load zero2ai-fraud-api:v1.0
+kubectl config current-context     # must be docker-desktop, minikube or kind-…, NOT an EKS arn
+
+# minikube / kind only: hand your laptop's image to the cluster
+minikube image load zero2ai-fraud-api:v1.0              # minikube
+kind load docker-image zero2ai-fraud-api:v1.0 --name kind   # kind (use your cluster's name)
 
 kubectl apply -f deployment.yaml   # ask for 2 copies
 kubectl apply -f service.yaml      # set up the front desk
@@ -287,7 +290,18 @@ all with a few short commands.
 - **`kubectl get nodes` shows nothing `Ready`** → The local cluster isn't up yet. Wait a minute,
   or restart it (`minikube start`, or toggle Docker Desktop's Kubernetes off and on).
 - **Pods stuck in `ErrImagePull` / `ImagePullBackOff`** → The cluster can't find the image
-  `zero2ai-fraud-api:v1.0`. Build it locally (Chapter 06) so the local cluster can see it.
+  `zero2ai-fraud-api:v1.0`. That image lives only in your laptop's Docker, so check three things:
+  1. `kubectl config current-context`: if it shows `arn:aws:eks:…`, you're talking to the
+     **cloud** cluster (running `platform-up.sh` switches you there), and it can't see your laptop.
+     Remove the local copy with `kubectl delete -f deployment.yaml -f service.yaml`, then either
+     switch back (`kubectl config use-context docker-desktop`, or `minikube` / `kind-<name>`)
+     or use the cloud track: `bash cloud/deploy.sh build` then `bash cloud/deploy.sh 1`.
+  2. `docker images zero2ai-fraud-api`: if `v1.0` isn't listed, build it (Chapter 06):
+     `docker build -t zero2ai-fraud-api:v1.0 ../chapter-06-docker`.
+  3. On minikube or kind, load it in (`minikube image load …` / `kind load docker-image …`).
+
+  Then run `kubectl rollout restart deployment zero2ai-fraud-api`. `bash scripts/local-up.sh`
+  does all of this for you and stops with a clear message if you're pointed at the cloud.
 - **`curl: (7) Failed to connect to localhost port 30080`** → You're on minikube or kind, where
   the NodePort isn't on your laptop. Use the tunnel instead:
   `kubectl port-forward service/zero2ai-fraud-svc 8080:80`, then `curl http://localhost:8080/health`
