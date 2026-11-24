@@ -14,6 +14,17 @@ kubectl get nodes
 CTX="$(kubectl config current-context)"
 echo "==> Current cluster: $CTX"
 
+# This script is for a LOCAL cluster. If kubectl points at EKS (platform-up.sh
+# switches it there), the cluster can't see an image that only exists on your
+# laptop, and the pods end up in ImagePullBackOff. Use the cloud track instead.
+case "$CTX" in
+  arn:aws:eks:*|*eks*)
+    echo "✘ kubectl is pointed at a cloud cluster ($CTX), not your laptop." >&2
+    echo "  Cloud:  bash chapter-10-kubernetes/cloud/deploy.sh build && bash chapter-10-kubernetes/cloud/deploy.sh 1" >&2
+    echo "  Local:  kubectl config get-contexts   then   kubectl config use-context docker-desktop   (or minikube / kind-<name>)" >&2
+    exit 1 ;;
+esac
+
 echo "==> Building $IMAGE from chapter-06-docker"
 docker build -t "$IMAGE" "$REPO_ROOT/chapter-06-docker"
 
@@ -23,7 +34,9 @@ docker build -t "$IMAGE" "$REPO_ROOT/chapter-06-docker"
 case "$CTX" in
   minikube*) echo "==> Loading image into minikube"; minikube image load "$IMAGE" ;;
   kind-*)    echo "==> Loading image into kind";     kind load docker-image "$IMAGE" --name "${CTX#kind-}" ;;
-  *)         echo "==> Docker Desktop (or similar): image is already visible" ;;
+  docker-desktop|rancher-desktop|orbstack)
+             echo "==> $CTX shares your laptop's images: nothing to load" ;;
+  *)         echo "==> Unknown cluster '$CTX': assuming it can see your laptop's images" ;;
 esac
 
 echo "==> Applying the wish-files"
@@ -31,7 +44,19 @@ kubectl apply -f "$HERE/deployment.yaml"
 kubectl apply -f "$HERE/service.yaml"
 
 echo "==> Waiting for both copies to be Ready (up to 2 minutes)"
-kubectl rollout status deployment/zero2ai-fraud-api --timeout=120s
+if ! kubectl rollout status deployment/zero2ai-fraud-api --timeout=120s; then
+  kubectl get pods -l app=zero2ai-fraud-api
+  if kubectl get pods -l app=zero2ai-fraud-api \
+       -o jsonpath='{.items[*].status.containerStatuses[*].state.waiting.reason}' \
+     | grep -qE 'ErrImagePull|ImagePullBackOff|ErrImageNeverPull'; then
+    echo "✘ The cluster '$CTX' can't see the image $IMAGE." >&2
+    echo "  It exists only in your laptop's Docker. Load it into the cluster, then restart:" >&2
+    echo "    minikube:  minikube image load $IMAGE" >&2
+    echo "    kind:      kind load docker-image $IMAGE --name <cluster>" >&2
+    echo "    then:      kubectl rollout restart deployment zero2ai-fraud-api" >&2
+  fi
+  exit 1
+fi
 kubectl get pods -l app=zero2ai-fraud-api
 
 echo
