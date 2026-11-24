@@ -2,7 +2,7 @@
 
 > Matches **Chapter 10** in the book. The runnable scripts for this chapter are in this folder.
 
-**Labels:** 🧑‍🤝‍🧑 Easier with a helper the first time
+**Labels:** Easier with a helper the first time
 
 ---
 
@@ -22,7 +22,7 @@ You tell Kubernetes what you want with two small files:
 - **`deployment.yaml`** — *how many copies* to run, and how to check each one is still alive.
 - **`service.yaml`** — *how visitors reach* a healthy copy (the front desk).
 
-> 🧑‍🤝‍🧑 **Easier with a helper the first time.** Getting Kubernetes running on your own
+> **Easier with a helper the first time.** Getting Kubernetes running on your own
 > laptop is the fiddly part. Once it's set up, the commands are short and friendly. A helper
 > nearby for the setup step saves a lot of frustration.
 
@@ -74,7 +74,7 @@ kubectl get nodes
 **What you should see:** at least one line with status `Ready`. `kubectl` (say "cube control")
 is how you talk to Kubernetes.
 
-> ⚠️ This setup step is the fiddly one. If `kubectl get nodes` doesn't show `Ready`, that's
+> This setup step is the fiddly one. If `kubectl get nodes` doesn't show `Ready`, that's
 > normal first-time friction — this is the moment a helper helps most. Don't push past it; get
 > the node `Ready` before going on.
 
