@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Chapter 14 cloud track tests: who answers, blue or green?  Usage: test.sh <1|2|3>
+# Chapter 14 cloud track tests: who answers, blue or green?  Usage: test.sh <2a|2b|3>
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 source "$HERE/../../chapter-10-kubernetes/scripts/lib.sh"
@@ -15,18 +15,18 @@ count_colors() {
 }
 
 case "${1:-}" in
-  1)
+  2a)
     use_cluster
     with_port_forward fraud-live-p1 8080 80 count_colors http://localhost:8080 10
     host=$(wait_for_lb_service fraud-live-p1 /health)
     say "Public NLB: http://$host"
     count_colors "http://$host" 10
-    echo "Now flip it: bash switch.sh 1 green   then run this test again." ;;
-  2)
+    echo "Now flip it: bash switch.sh 2a green   then run this test again." ;;
+  2b)
     use_cluster
     for r in fraud-blue fraud-green fraud-router; do helm test "$r" -n "$NAMESPACE" --logs >/dev/null && ok "helm test $r"; done
     with_port_forward fraud-router 8080 80 count_colors http://localhost:8080 10
-    echo "Now flip it: bash switch.sh 2 green   (undo: helm rollback fraud-router -n $NAMESPACE)" ;;
+    echo "Now flip it: bash switch.sh 2b green   (undo: helm rollback fraud-router -n $NAMESPACE)" ;;
   3)
     use_cluster
     host=$(wait_for_ingress fraud-router /health)
@@ -36,6 +36,6 @@ case "${1:-}" in
     kubectl -n "$NAMESPACE" get ingress fraud-router \
       -o jsonpath='{.metadata.annotations.alb\.ingress\.kubernetes\.io/actions\.weighted-routing}'; echo
     echo "Shift traffic: bash canary.sh 50   |   Demo auto-rollback: bash deploy.sh broken" ;;
-  *) echo "Usage: $0 <1|2|3>"; exit 1 ;;
+  *) echo "Usage: $0 <2a|2b|3>"; exit 1 ;;
 esac
-ok "Phase ${1} checks passed"
+ok "Phase $(echo "$1" | tr a-z A-Z) checks passed"

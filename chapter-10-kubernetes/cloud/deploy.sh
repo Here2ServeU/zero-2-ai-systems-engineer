@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Chapter 10 cloud track: deploy the fraud API to EKS.
-#   bash deploy.sh build   # build chapter-06-docker and push to ECR
-#   bash deploy.sh 1       # Phase 1: same YAML as your laptop
-#   bash deploy.sh 2       # Phase 2: Helm chart
+#   bash deploy.sh build   # build ../fraud-api and push to ECR
+#   bash deploy.sh 2a       # Phase 2A: same YAML as your laptop
+#   bash deploy.sh 2b       # Phase 2B: Helm chart
 #   bash deploy.sh 3       # Phase 3: production values
 # Choose the environment with ENV=dev|qa|prod (default dev).
 set -euo pipefail
@@ -15,27 +15,27 @@ RELEASE=fraud-api
 case "${1:-}" in
   build)
     use_cluster
-    build_push "$APP" "$REPO_ROOT/chapter-06-docker"
+    build_push "$APP" "$HERE/../fraud-api"
     ;;
-  1)
+  2a)
     use_cluster
-    helm_uninstall "$RELEASE"                       # in case Phase 2/3 was running
-    apply_manifests "$HERE/phase1" "$(last_image "$APP")"
+    helm_uninstall "$RELEASE"                       # in case Phase 2B/3 was running
+    apply_manifests "$HERE/phase2a-yaml" "$(last_image "$APP")"
     kubectl -n "$NAMESPACE" rollout status deployment/zero2ai-fraud-api --timeout=5m
     kubectl -n "$NAMESPACE" get pods,svc -l app=zero2ai-fraud-api
-    ok "Phase 1 deployed. Test it: bash test.sh 1"
+    ok "Phase 2A deployed. Test it: bash test.sh 2a"
     ;;
-  2)
+  2b)
     use_cluster
-    delete_manifests "$HERE/phase1"                 # removes Phase 1's load balancer too
-    values_args "$HERE/phase2"
+    delete_manifests "$HERE/phase2a-yaml"                 # removes Phase 2A's load balancer too
+    values_args "$HERE/phase2b-helm"
     helm_deploy "$RELEASE" "$(last_image "$APP")" "${VALUES_ARGS[@]}"
-    ok "Phase 2 deployed. Test it: bash test.sh 2"
+    ok "Phase 2B deployed. Test it: bash test.sh 2b"
     ;;
   3)
     use_cluster
-    delete_manifests "$HERE/phase1"
-    values_args "$HERE/phase2" "$HERE/phase3"
+    delete_manifests "$HERE/phase2a-yaml"
+    values_args "$HERE/phase2b-helm" "$HERE/phase3-production"
     helm_deploy "$RELEASE" "$(last_image "$APP")" "${VALUES_ARGS[@]}" \
       --set "networkPolicy.allowCidrs[0]=$(vpc_cidr)" \
       --atomic                                       # failed upgrade = automatic rollback

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Chapter 11 cloud track tests.  Usage: test.sh <1|2|3>
+# Chapter 11 cloud track tests.  Usage: test.sh <2a|2b|3>
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 source "$HERE/../../chapter-10-kubernetes/scripts/lib.sh"
@@ -29,12 +29,12 @@ prometheus_sees() {
 prom() { NAMESPACE=monitoring with_port_forward kube-prometheus-stack-prometheus 9090 9090 "$@"; }
 
 case "${1:-}" in
-  1)
+  2a)
     use_cluster
     with_port_forward metrics-api-p1 8080 80 \
       with_port_forward metrics-api-p1 8000 8000 poke_and_read http://localhost:8080 http://localhost:8000
     prom prometheus_sees metrics-api-p1 ;;
-  2)
+  2b)
     use_cluster
     with_port_forward "$RELEASE" 8080 80 \
       with_port_forward "$RELEASE" 8000 8000 poke_and_read http://localhost:8080 http://localhost:8000
@@ -50,6 +50,6 @@ case "${1:-}" in
     say "Alert rules loaded into Prometheus"
     kubectl -n "$NAMESPACE" get prometheusrule "$RELEASE" -o jsonpath='{range .spec.groups[*].rules[*]}{.alert}{"\n"}{end}'
     kubectl -n "$NAMESPACE" get hpa,pdb -l app.kubernetes.io/instance="$RELEASE" ;;
-  *) echo "Usage: $0 <1|2|3>"; exit 1 ;;
+  *) echo "Usage: $0 <2a|2b|3>"; exit 1 ;;
 esac
-ok "Phase ${1} checks passed"
+ok "Phase $(echo "$1" | tr a-z A-Z) checks passed"

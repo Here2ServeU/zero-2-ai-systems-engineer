@@ -84,7 +84,7 @@ variable "alb_admin_cidrs" {
 }
 
 # Listener port each chapter's Phase 3 app gets on the shared ALB. Must match
-# ingress.port in that chapter's cloud/phase3 values. Only used to draw the
+# ingress.port in that chapter's cloud/phase3-production values. Only used to draw the
 # landing page; the apps open their own ports when they are deployed.
 variable "app_ports" {
   type = map(number)

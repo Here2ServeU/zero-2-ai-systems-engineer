@@ -9,6 +9,8 @@ def chunk_text(text, size=500, overlap=100):
     while start < len(text):
         end = min(start + size, len(text))
         chunks.append(text[start:end])
+        if end == len(text):
+            break
         start = end - overlap
         if start <= 0:
             break

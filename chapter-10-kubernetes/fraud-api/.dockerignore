@@ -1,0 +1,10 @@
+# .dockerignore
+venv/
+__pycache__/
+*.pyc
+.git/
+*.md
+mlruns/
+data/
+.env
+*.log

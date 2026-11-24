@@ -32,9 +32,9 @@ STATE_DIR="$REPO_ROOT/.zero2ai/$ENV"   # remembers the last image you pushed (gi
 # Messages go to stderr, so functions that "return" a value with echo (like
 # wait_for_ingress) can still print progress.
 say()  { printf '\n\033[1;36m==> %s\033[0m\n' "$*" >&2; }
-ok()   { printf '\033[1;32m✔ %s\033[0m\n' "$*" >&2; }
+ok()   { printf '\033[1;32m[OK] %s\033[0m\n' "$*" >&2; }
 warn() { printf '\033[1;33m! %s\033[0m\n' "$*" >&2; }
-die()  { printf '\033[1;31m✘ %s\033[0m\n' "$*" >&2; exit 1; }
+die()  { printf '\033[1;31m[ERROR] %s\033[0m\n' "$*" >&2; exit 1; }
 
 case "$ENV" in dev|qa|prod) ;; *) die "ENV must be dev, qa or prod (got '$ENV')";; esac
 
@@ -128,11 +128,11 @@ last_image() {
   cat "$f"
 }
 
-# Phase 1: plain YAML ---------------------------------------------------------
+# Phase 2A: plain YAML ---------------------------------------------------------
 # apply_manifests <dir> <image>: replaces __IMAGE__ in every *.yaml and applies.
 apply_manifests() {
   local dir="$1" image="$2" f
-  say "Phase 1: kubectl apply -f $dir (image $image)"
+  say "Phase 2A: kubectl apply -f $dir (image $image)"
   for f in "$dir"/*.yaml; do
     sed -e "s#__IMAGE__#${image}#g" "$f" | kubectl apply -n "$NAMESPACE" -f -
   done
@@ -145,7 +145,7 @@ delete_manifests() {
   done
 }
 
-# Phase 2 / 3: Helm -----------------------------------------------------------
+# Phase 2B / 3: Helm -----------------------------------------------------------
 # helm_deploy <release> <image> [extra helm args...]
 helm_deploy() {
   local release="$1" image="$2"; shift 2
@@ -249,7 +249,7 @@ my_public_cidr() {
   case "$ip" in *.*.*.*) echo "$ip/32" ;; *) echo "" ;; esac
 }
 
-# wait_for_lb_service <service-name>: same, for a Service of type LoadBalancer (Phase 1).
+# wait_for_lb_service <service-name>: same, for a Service of type LoadBalancer (Phase 2A).
 wait_for_lb_service() {
   local name="$1" host="" path="${2:-/health}"
   say "Waiting for the AWS load balancer for service/$name (first time: 2-4 minutes)"
@@ -280,10 +280,10 @@ create_llm_secret_from_env() {
 }
 
 usage_phase() {
-  echo "Usage: $0 <build|1|2|3>   (ENV=${ENV}, region ${AWS_REGION})"
+  echo "Usage: $0 <build|2a|2b|3>   (ENV=${ENV}, region ${AWS_REGION})"
   echo "  build  build the image and push it to ECR"
-  echo "  1      Phase 1: plain Kubernetes YAML, same as your laptop"
-  echo "  2      Phase 2: Helm chart + values, tested with port-forward and helm test"
-  echo "  3      Phase 3: production values (load balancer, autoscaling, hardening)"
+  echo "  2a     Phase 2A: plain Kubernetes YAML, same as your laptop"
+  echo "  2b     Phase 2B: Helm chart + values, tested with port-forward and helm test"
+  echo "  3      Phase 3:  production settings (load balancer, autoscaling, alerts, hardening)"
   exit 1
 }

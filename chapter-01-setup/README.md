@@ -3,7 +3,7 @@
 > Matches **Chapter 01** in the book. This is the very first step of the whole journey.
 > The runnable scripts for this chapter are in this folder.
 
-**Labels:** 💻 Runs free on your laptop
+**Labels:** Runs free on your laptop
 
 ---
 

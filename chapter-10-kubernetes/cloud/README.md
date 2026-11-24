@@ -1,204 +1,175 @@
-# Chapter 10 — Cloud track: run many copies on AWS EKS
+# Chapter 10 — Phase 2: Promote it to the cloud (AWS EKS)
 
-> You ran the fraud API on your laptop's Kubernetes. Now run the **same app** on a real cloud
-> cluster, in three phases. Build the platform first: [chapter-10-kubernetes/PLATFORM.md](../PLATFORM.md).
+> In Phase 1 you ran 2 self-healing copies of the fraud API on your laptop. Now you move the
+> **same app** to a real cloud cluster, in two small steps: **2A** with the same plain YAML,
+> then **2B** packaged with Helm. Phase 3 ([PRODUCTION.md](PRODUCTION.md)) hardens it for
+> production.
 
-**Labels:** 💳 Needs an account that may cost money · 🌐 Needs the internet · 🧑‍🤝‍🧑 Easier with a helper the first time
+**Labels:** Needs an account that may cost money · Needs the internet · Easier with a helper the first time
 
 ---
+
+## Before you start
+
+1. **Finish Phase 1** ([../README.md](../README.md)). Everything here builds on it.
+2. **Build the shared cloud platform once:** [../PLATFORM.md](../PLATFORM.md). It creates the EKS
+   cluster, your private image shelf (ECR) and the add-ons, and takes about 20 minutes.
+3. **Costs money.** An EKS cluster costs roughly **$0.10/hour** plus servers and load
+   balancers. Get permission if the AWS account isn't yours, and **tear everything down when
+   you finish** (see "Clean up" at the bottom).
+
+**Run every command on this page from this folder:**
+
+```bash
+cd chapter-10-kubernetes/cloud
+```
+
+## What changes from your laptop to the cloud
+
+| On your laptop (Phase 1) | In the cloud (Phase 2) | Why |
+|---|---|---|
+| Image built on your laptop | Image pushed to **ECR**, your private image shelf in AWS | Cloud servers can't see your laptop |
+| `NodePort` front desk on door 30080 | `LoadBalancer` front desk: AWS gives you a public address | Cloud servers are not your laptop |
+| No size limits | Each copy says how much CPU and memory it needs (**resources**) | So the cloud can pick a server with room |
+| Plain YAML files (2A) | A **Helm chart** with values (2B) | One command installs, upgrades and rolls back |
 
 ## New words
 
 - **EKS** — Kubernetes that AWS runs for you. `kubectl` works exactly the same.
-- **ECR** — Your private image shelf in AWS. The cluster pulls your lunchbox recipe from here.
+- **ECR** — Your private image shelf in AWS. The cluster pulls your app's image from here.
 - **LoadBalancer Service** — Asks AWS for a real load balancer with a public address.
 - **Helm chart** — A folder of YAML **templates** with blanks.
 - **Values file** — The answers that fill in the blanks. Same chart + different values = a
   different app or environment.
 - **Release** — One installed copy of a chart (here: `fraud-api`). Each upgrade is a numbered
   **revision** you can roll back to.
-- **Ingress** — The public entrance; on EKS it becomes an **Application Load Balancer (ALB)**.
-- **HPA (HorizontalPodAutoscaler)** — Adds copies when they're busy, removes them when quiet.
-- **PDB (PodDisruptionBudget)** — "Never take down more than this many copies at once."
 
-## Step 0 — Point at the cluster and push your image
-
-From this folder (`chapter-10-kubernetes/cloud`):
+## Step 0 — Build the image and push it to ECR
 
 ```bash
 bash deploy.sh build
 ```
 
-This logs in to ECR, builds `chapter-06-docker` for `linux/amd64`, tags it with your git commit
-(e.g. `3f9c2ab`), and pushes it. **What you should see:** `✔ Pushed ...zero2ai-dev/fraud-api:3f9c2ab`.
+This logs in to ECR, builds this chapter's app ([`../fraud-api`](../fraud-api)) for
+`linux/amd64` (the kind of computer EKS uses, even if your laptop is a newer Mac), tags it with
+your git commit (for example `3f9c2ab`), and pushes it.
+
+**What you should see:** `[OK] Pushed ...zero2ai-dev/fraud-api:3f9c2ab`.
 
 ---
 
-## Phase 1 — Lift and shift (same YAML as your laptop)
+## Phase 2A — Same YAML as your laptop
 
-Open [`phase1/deployment.yaml`](phase1/deployment.yaml) next to your laptop's
-[`../deployment.yaml`](../deployment.yaml). Only two things changed: the **image** now comes from
-ECR, and each copy declares how much CPU/memory it needs (**resources**) so the cloud scheduler
-can place it.
+Open [`phase2a-yaml/deployment.yaml`](phase2a-yaml/deployment.yaml) next to your laptop's
+[`../deployment.yaml`](../deployment.yaml). Only two things changed: the **image** now comes
+from ECR, and each copy declares its **resources**.
 
-[`phase1/service.yaml`](phase1/service.yaml) keeps the same name and ports, but `NodePort`
-becomes `LoadBalancer`: in the cloud you don't knock on a node's door, you get a real AWS
-**Network Load Balancer** with a public address.
+[`phase2a-yaml/service.yaml`](phase2a-yaml/service.yaml) keeps the same name and ports, but
+`NodePort` becomes `LoadBalancer`: you get a real AWS **Network Load Balancer** with a public
+address.
 
 ```bash
-bash deploy.sh 1
-bash test.sh 1
+bash deploy.sh 2a
+bash test.sh 2a
 ```
 
-`test.sh 1` does exactly what you did locally, **then** goes through the public load balancer:
+**What you should see:** `deploy.sh 2a` ends with two pods `Running` and
+`[OK] Phase 2A deployed`. `test.sh 2a` calls `/health`, `/info` and `/predict` through a tunnel
+(exactly like your laptop), then through the public load balancer, and ends with
+`[OK] Phase 2A checks passed`. A brand-new load balancer can take 2 to 4 minutes to answer;
+the script waits for it.
+
+What `test.sh 2a` does, by hand:
 
 ```bash
 kubectl -n zero2ai port-forward service/zero2ai-fraud-svc 8080:80   # same tunnel as your laptop
-curl http://localhost:8080/health
-curl http://<the-nlb-address>/health                                # the public way
+curl http://localhost:8080/health                                   # in a second terminal
+kubectl -n zero2ai get service zero2ai-fraud-svc                    # EXTERNAL-IP = the public address
+curl http://<that-address>/health
 ```
 
-Try the laptop tricks — they work the same in the cloud:
+`-n zero2ai` means "in the `zero2ai` namespace", the folder on the cluster where every chapter's
+app lives.
+
+Try the laptop tricks. They work the same in the cloud:
 
 ```bash
-kubectl -n zero2ai get pods -o wide                     # see which node and zone each copy is on
+kubectl -n zero2ai get pods -o wide                     # see which server and zone each copy is on
 kubectl -n zero2ai delete pod <pod-name>                # self-healing, in the cloud
 kubectl -n zero2ai scale deployment zero2ai-fraud-api --replicas=4
 ```
 
 ---
 
-## Phase 2 — Package it with Helm
+## Phase 2B — Package it with Helm
 
-Copying YAML files around doesn't scale to 9 chapters × 3 environments. Helm fixes that:
-**one chart**, [`chapter-10-kubernetes/helm/zero2ai-app`](../helm/zero2ai-app), used by every
-chapter. Look inside:
+Copying YAML files around doesn't scale to 9 chapters and 3 environments. Helm fixes that:
+**one chart**, [`../helm/zero2ai-app`](../helm/zero2ai-app), used by every chapter. Look inside:
 
 - `templates/deployment.yaml` — the Deployment you know, with blanks like
-  `replicas: {{ .Values.replicaCount }}` and `image: {{ include "app.image" . }}`.
+  `replicas: {{ .Values.replicaCount }}`.
 - `values.yaml` — the default answers.
-- [`phase2/values.yaml`](phase2/values.yaml) — **this chapter's** answers (2 copies, port 5000,
-  health path `/health`, inside-only `ClusterIP` service).
+- [`phase2b-helm/values.yaml`](phase2b-helm/values.yaml) — **this chapter's** answers (2 copies,
+  port 5000, health path `/health`, an inside-only `ClusterIP` front desk).
 
 ```bash
-bash deploy.sh 2
-bash test.sh 2
+bash deploy.sh 2b
+bash test.sh 2b
 ```
 
-`deploy.sh 2` removes Phase 1 (and its load balancer), then runs:
+`deploy.sh 2b` removes Phase 2A (and its load balancer, so you stop paying for it), then runs:
 
 ```bash
-helm upgrade --install fraud-api chapter-10-kubernetes/helm/zero2ai-app -n zero2ai \
-  -f phase2/values.yaml --set image.repository=... --set image.tag=... --wait
+helm upgrade --install fraud-api ../helm/zero2ai-app -n zero2ai \
+  -f phase2b-helm/values.yaml --set image.repository=... --set image.tag=... --wait
 ```
 
-`test.sh 2` tests it **like on your laptop** — port-forward + curl — and then runs
-`helm test fraud-api`, which starts a tiny pod *inside* the cluster that calls `/health` through
-the Service.
+**What you should see:** `[OK] Phase 2B deployed`, then `test.sh 2b` tests it **like on your
+laptop** (port-forward + curl) and runs `helm test fraud-api`, which starts a tiny pod *inside*
+the cluster that calls `/health`. It ends with `[OK] Phase 2B checks passed`.
 
 Helm superpowers to try:
 
 ```bash
 helm list -n zero2ai                                   # what's installed
 helm get values fraud-api -n zero2ai                   # the answers used
-helm template fraud-api ../helm/zero2ai-app -f phase2/values.yaml \
-  --set image.repository=demo --set image.tag=v1      # see the YAML Helm generates, offline
+helm template fraud-api ../helm/zero2ai-app -f phase2b-helm/values.yaml \
+  --set image.repository=demo --set image.tag=v1      # see the YAML Helm makes, offline
 helm upgrade fraud-api ../helm/zero2ai-app -n zero2ai --reuse-values --set replicaCount=3
 helm history fraud-api -n zero2ai                      # numbered revisions
 helm rollback fraud-api 1 -n zero2ai                   # back to revision 1
 ```
 
----
-
-## Phase 3 — Production platform
-
-Same release, one more values file on top:
-[`phase3/values.yaml`](phase3/values.yaml) (+ [`values-prod.yaml`](phase3/values-prod.yaml) when
-`ENV=prod`).
-
-| Setting | What it does | Why production needs it |
-|---|---|---|
-| `command: gunicorn ...` | A real web server: 2 processes × 4 threads per copy | Flask's built-in server is for development only |
-| `autoscaling` | HPA: 2–6 copies, target 70% CPU | Handles busy hours without paying for idle copies |
-| `pdb.minAvailable: 1` | PodDisruptionBudget | Node upgrades never take every copy down |
-| `topologySpread` | Spread copies across zones and nodes | One data-center outage doesn't take the app down |
-| `networkPolicy` | Only the load balancer and this namespace may connect | Limits damage if something else is compromised |
-| `securityContext` (chart default) | Non-root, read-only disk, no Linux capabilities | Hardening; passes Pod Security "restricted" |
-| `ingress` | Joins the **platform ALB** on port 8010, with health checks; HTTPS when you add a certificate | One stable public address, no extra load balancer to pay for |
-| `--atomic` (in deploy.sh) | If the upgrade fails, Helm rolls back by itself | No half-broken releases |
-
-```bash
-bash deploy.sh 3
-bash test.sh 3
-```
-
-**What you should see:** `helm test` passes, then `/health`, `/info`, `/predict` answer through
-the **shared platform ALB on port 8010**, `http://k8s-zero2ai-....elb.amazonaws.com:8010`, then the
-HPA, PDB and NetworkPolicy are listed. Open the same address in your browser
-(`.../health`), or run `bash ../scripts/urls.sh` to list every address.
-
-Watch autoscaling work (second terminal: `kubectl -n zero2ai get hpa fraud-api -w`):
-
-```bash
-kubectl -n zero2ai run load --rm -it --image=curlimages/curl --restart=Never -- \
-  sh -c 'while true; do curl -s -o /dev/null -X POST http://fraud-api/predict \
-  -H "Content-Type: application/json" \
-  -d "{\"amount\":950,\"hour\":3,\"is_weekend\":0,\"amount_vs_avg\":2.8,\"is_large_txn\":1,\"is_late_night\":1,\"merch_txn_ct\":4}"; done'
-```
-
-Press Ctrl+C to stop; about 5 minutes later the extra copies are removed.
-
-Roll back to Phase 2 with one command — that's the point of Helm:
-
-```bash
-helm history fraud-api -n zero2ai
-helm rollback fraud-api <phase-2-revision> -n zero2ai
-```
-
-### The same thing in qa and prod
-
-```bash
-bash ../scripts/platform-up.sh prod     # once (costs more: see platform README)
-ENV=prod bash deploy.sh build
-ENV=prod bash deploy.sh 3
-ENV=prod bash test.sh 3
-```
-
-Same chart, same values, plus `values-prod.yaml` (3–10 copies, `minAvailable: 2`). The prod
-registry has **immutable** tags, so the image you tested is exactly the image that runs.
-
----
-
 ## Try it yourself
 
-- In `phase2/values.yaml` change `replicaCount` to `3`, run `bash deploy.sh 2`, then
+- In `phase2b-helm/values.yaml` change `replicaCount` to `3`, run `bash deploy.sh 2b`, then
   `helm history fraud-api -n zero2ai`. Roll back to the previous revision.
-- Run `helm template` (above) for Phase 2 and Phase 3 and compare the output. Which Kubernetes
-  objects only exist in Phase 3?
-- Delete a node's worth of pods: `kubectl -n zero2ai delete pod -l app.kubernetes.io/instance=fraud-api`.
-  How long until `/health` answers again through the ALB? (With the PDB and 2+ copies, a node
-  *drain* would never take them all at once.)
+- Run the `helm template` command above and find the `replicas:` line in its output.
 
 ## If something breaks
 
-- **`test.sh 1` port-forward works but the NLB never answers** → New load balancers take 2–4
-  minutes plus DNS time. Rerun `bash test.sh 1`.
+- **`Cluster zero2ai-eks-dev not found`** → Build the platform first: [../PLATFORM.md](../PLATFORM.md).
+- **`No image recorded for 'fraud-api'`** → Run Step 0 first: `bash deploy.sh build`.
+- **`Cannot connect to the Docker daemon`** during `build` → Open Docker Desktop and wait for
+  *Engine running*.
+- **`test.sh 2a`: the tunnel works but the load balancer never answers** → New load balancers take
+  2 to 4 minutes plus DNS time. Run `bash test.sh 2a` again.
 - **`Error: UPGRADE FAILED: ... has no deployed releases`** → A failed first install. Run
-  `helm uninstall fraud-api -n zero2ai`, then `bash deploy.sh 2` again.
-- **Phase 3 pods `CreateContainerConfigError: container has runAsNonRoot and image has
-  non-numeric user`** → The chart sets `runAsUser: 1000` to avoid this; make sure you're using
-  this repo's chart, not an older copy.
-- **HPA shows `<unknown>/70%`** → metrics-server needs ~1 minute after pods start.
-  `kubectl top pods -n zero2ai` should show numbers first.
+  `helm uninstall fraud-api -n zero2ai`, then `bash deploy.sh 2b` again.
+- **Pods `ImagePullBackOff` in the cloud** → The cluster can't find the image in ECR. Run
+  `bash deploy.sh build` again, then the deploy step.
 
 ## Clean up
 
 ```bash
-bash down.sh                                            # remove this chapter's app
-bash ../scripts/platform-down.sh dev        # when you're done for the day
+bash down.sh                                          # remove this chapter's app (the cluster stays)
+bash ../scripts/platform-down.sh dev                  # delete the whole platform when you're done for the day
 ```
 
-## Where to next
+**What you should see:** `[OK] Chapter 10 app removed`, and later the platform destroy finishing
+with no errors. After `platform-down.sh`, nothing from this course is costing you money.
 
-[Chapter 11's cloud track](../../chapter-11-monitoring/cloud/README.md): your app's metrics,
-collected by Prometheus on the cluster.
+## Next: Phase 3
+
+Your app runs in the cloud. Now make it production-grade, the way large companies run it:
+**[PRODUCTION.md](PRODUCTION.md)**.

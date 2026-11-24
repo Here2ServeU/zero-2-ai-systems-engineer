@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Chapter 12 cloud track tests.  Usage: test.sh <1|2|3> [--load]
+# Chapter 12 cloud track tests.  Usage: test.sh <2a|2b|3> [--load]
 #   --load  first make metrics-api busy for ~4 minutes, so the guard sees a
 #           rising CPU trend and says WARNING (Phase 3: and adds a copy).
 set -euo pipefail
@@ -28,12 +28,12 @@ make_load() {
 }
 
 case "${1:-}" in
-  1)
+  2a)
     use_cluster
     kubectl -n "$NAMESPACE" wait --for=condition=complete job/aiops-demo --timeout=3m
     say "The guard's report (same as your laptop)"
     kubectl -n "$NAMESPACE" logs job/aiops-demo ;;
-  2|3)
+  2b|3)
     use_cluster
     [ "${2:-}" = "--load" ] && make_load
     kubectl -n "$NAMESPACE" get deploy metrics-api
@@ -42,6 +42,6 @@ case "${1:-}" in
     kubectl -n "$NAMESPACE" get deploy metrics-api
     kubectl -n "$NAMESPACE" get hpa metrics-api 2>/dev/null || true
     [ "$1" = "3" ] && { say "What the guard may do (RBAC)"; kubectl -n "$NAMESPACE" describe role "$RELEASE" | sed -n '/PolicyRule/,$p'; } ;;
-  *) echo "Usage: $0 <1|2|3> [--load]"; exit 1 ;;
+  *) echo "Usage: $0 <2a|2b|3> [--load]"; exit 1 ;;
 esac
-ok "Phase ${1} checks passed"
+ok "Phase $(echo "$1" | tr a-z A-Z) checks passed"

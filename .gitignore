@@ -5,3 +5,7 @@
 .terraform/
 *.tfstate
 *.tfstate.*
+
+# Python caches
+__pycache__/
+*.pyc

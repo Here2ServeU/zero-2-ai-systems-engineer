@@ -5,9 +5,9 @@ fail=0
 check() {
   local name="$1" cmd="$2" hint="$3"
   if command -v "$name" >/dev/null 2>&1; then
-    printf '  \033[32m✔\033[0m %-10s %s\n' "$name" "$($cmd 2>&1 | head -1)"
+    printf '  \033[32m[OK]\033[0m %-10s %s\n' "$name" "$($cmd 2>&1 | head -1)"
   else
-    printf '  \033[31m✘\033[0m %-10s missing: %s\n' "$name" "$hint"; fail=1
+    printf '  \033[31m[ERROR]\033[0m %-10s missing: %s\n' "$name" "$hint"; fail=1
   fi
 }
 echo "Tools for the EKS cloud track:"

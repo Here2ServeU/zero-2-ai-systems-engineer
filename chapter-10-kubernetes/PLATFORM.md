@@ -3,11 +3,11 @@
 > Shared by every chapter from Chapter 10 on. Build it **once** per environment, run any
 > chapter's cloud track on it, then **destroy it** when you stop for the day.
 
-**Labels:** 💳 Needs an account that may cost money · 🌐 Needs the internet · 🧑‍🤝‍🧑 Easier with a helper the first time
+**Labels:** Needs an account that may cost money · Needs the internet · Easier with a helper the first time
 
 ---
 
-> ### ⚠️ Money first
+> ### Money first
 >
 > While the platform exists you pay for it, even when nothing is happening:
 >
@@ -16,7 +16,7 @@
 > | EKS control plane | $0.10/hour (~$73/month) | One per environment |
 > | 2 × t3.medium nodes (dev, Spot) | ~$0.03/hour | prod uses 3 × t3.large On-Demand |
 > | Platform ALB (shared by Grafana + every Phase 3 app) | ~$0.025/hour | One per environment, while the platform exists |
-> | Phase 1 NLB | ~$0.025/hour | Only while a chapter's Phase 1 is running |
+> | Phase 2A NLB | ~$0.025/hour | Only while a chapter's Phase 2A is running |
 > | NAT gateway (qa/prod only) | ~$0.045/hour | dev has none |
 >
 > A 3-hour dev session costs about **$0.50–$1**. A forgotten prod platform costs **$250+/month**.
@@ -38,13 +38,15 @@ build and run it:
   blanks; a **values** file fills in the blanks. One command installs, upgrades, or rolls back
   an app.
 
-Every chapter from 10 to 18 then teaches its topic in **three phases**:
+Every chapter from 10 to 18 then teaches its topic in **three phases**. Phase 1 is on your
+laptop (free); this platform is for Phases 2 and 3:
 
 | Phase | What you do | Tested how |
 |---|---|---|
-| **1 — Lift and shift** | `kubectl apply` plain YAML, same as your laptop. Image comes from ECR. | port-forward + curl (like local), then the public load balancer |
-| **2 — Package with Helm** | `helm upgrade --install` the shared chart with the chapter's `phase2/values.yaml`. | port-forward + curl + `helm test` |
-| **3 — Production** | Same release, plus `phase3/values.yaml`: autoscaling, disruption budget, zone spreading, network policy, hardened security, a port on the platform ALB, monitoring/alerts, managed secrets. | platform ALB + `helm test` + checking each safety net |
+| **1 — Build it on your laptop** | Learn the idea, then pack it into a container. No AWS. | curl on your laptop |
+| **2A — Promote it: plain YAML** | `kubectl apply` plain YAML, same as your laptop. Image comes from ECR. | port-forward + curl (like local), then a public load balancer |
+| **2B — Promote it: Helm** | `helm upgrade --install` the shared chart with the chapter's `cloud/phase2b-helm/values.yaml`. | port-forward + curl + `helm test` |
+| **3 — Run it like a Fortune 500 company** | Same release, plus `cloud/phase3-production/values.yaml`: autoscaling, disruption budget, zone spreading, network policy, hardened security, a port on the platform ALB, monitoring/alerts, managed secrets. | platform ALB + `helm test` + checking each safety net |
 
 ## What's where
 
@@ -73,11 +75,13 @@ chapter-10-kubernetes/
 └── cloud/               # Chapter 10's own phases (below)
 
 chapter-NN-*/cloud/
-├── phase1/*.yaml       # plain Kubernetes YAML
-├── phase2/values.yaml  # Helm values
-├── phase3/values.yaml  # production values (+ values-prod.yaml for ENV=prod)
-├── deploy.sh           # build | 1 | 2 | 3
-├── test.sh             # 1 | 2 | 3
+├── README.md                      # Phase 2 guide
+├── PRODUCTION.md                  # Phase 3 guide
+├── phase2a-yaml/*.yaml            # Phase 2A: plain Kubernetes YAML
+├── phase2b-helm/values.yaml       # Phase 2B: Helm values
+├── phase3-production/values.yaml  # Phase 3: production values (+ values-prod.yaml for ENV=prod)
+├── deploy.sh                      # build | 2a | 2b | 3
+├── test.sh                        # 2a | 2b | 3
 └── down.sh
 ```
 
@@ -141,17 +145,17 @@ cd ../eks-addons
 
 ## Step 3 — Do the chapters
 
-| Chapter | Cloud track | Image | What Phase 3 adds |
+| Chapter | Phase 2 / Phase 3 guides | Image | What Phase 3 adds |
 |---|---|---|---|
-| 10 Kubernetes | [cloud/](cloud/README.md) | fraud-api | gunicorn, HPA, PDB, zone spread, NetworkPolicy, ALB |
-| 11 Monitoring | [cloud/](../chapter-11-monitoring/cloud/README.md) | metrics-api | ServiceMonitor + alert rules in Prometheus |
-| 12 AIOps | [cloud/](../chapter-12-aiops/cloud/README.md) | aiops | watcher reads real Prometheus metrics and scales the app (RBAC-limited) |
-| 13 Retraining | [cloud/](../chapter-13-retraining/cloud/README.md) | retrain, mlflow | MLflow server on EKS, artifacts in S3 via Pod Identity, weekly CronJob |
-| 14 Safe releases | [cloud/](../chapter-14-deployment/cloud/README.md) | fraud-api | blue/green with Helm, ALB weighted canary, `--atomic` auto-rollback |
-| 15 Dashboards | [cloud/](../chapter-15-dashboards/cloud/README.md) | monitored-api | Grafana dashboard as code + alerts |
-| 16 LLM | [cloud/](../chapter-16-llm/cloud/README.md) | llm-api | keys from AWS Secrets Manager (External Secrets) |
-| 17 RAG | [cloud/](../chapter-17-rag/cloud/README.md) | rag-api | index built per pod by an init container, model baked into the image |
-| 18 Production LLM | [cloud/](../chapter-18-prodllm/cloud/README.md) | prod-llm | everything above: ALB, HPA, PDB, secrets, metrics, cost/error alerts |
+| 10 Kubernetes | [Phase 2](cloud/README.md) · [Phase 3](cloud/PRODUCTION.md) | fraud-api | gunicorn, HPA, PDB, zone spread, NetworkPolicy, ALB |
+| 11 Monitoring | [Phase 2](../chapter-11-monitoring/cloud/README.md) · [Phase 3](../chapter-11-monitoring/cloud/PRODUCTION.md) | metrics-api | ServiceMonitor + alert rules in Prometheus |
+| 12 AIOps | [Phase 2](../chapter-12-aiops/cloud/README.md) · [Phase 3](../chapter-12-aiops/cloud/PRODUCTION.md) | aiops | watcher reads real Prometheus metrics and scales the app (RBAC-limited) |
+| 13 Retraining | [Phase 2](../chapter-13-retraining/cloud/README.md) · [Phase 3](../chapter-13-retraining/cloud/PRODUCTION.md) | retrain, mlflow | MLflow server on EKS, artifacts in S3 via Pod Identity, weekly CronJob |
+| 14 Safe releases | [Phase 2](../chapter-14-deployment/cloud/README.md) · [Phase 3](../chapter-14-deployment/cloud/PRODUCTION.md) | fraud-api | blue/green with Helm, ALB weighted canary, `--atomic` auto-rollback |
+| 15 Dashboards | [Phase 2](../chapter-15-dashboards/cloud/README.md) · [Phase 3](../chapter-15-dashboards/cloud/PRODUCTION.md) | monitored-api | Grafana dashboard as code + alerts |
+| 16 LLM | [Phase 2](../chapter-16-llm/cloud/README.md) · [Phase 3](../chapter-16-llm/cloud/PRODUCTION.md) | llm-api | keys from AWS Secrets Manager (External Secrets) |
+| 17 RAG | [Phase 2](../chapter-17-rag/cloud/README.md) · [Phase 3](../chapter-17-rag/cloud/PRODUCTION.md) | rag-api | index built per pod by an init container, model baked into the image |
+| 18 Production LLM | [Phase 2](../chapter-18-prodllm/cloud/README.md) · [Phase 3](../chapter-18-prodllm/cloud/PRODUCTION.md) | prod-llm | everything above: ALB, HPA, PDB, secrets, metrics, cost/error alerts |
 
 Each Phase 3 app gets its own port on the platform ALB (Step 4): Chapter **NN** answers at
 `http://<platform-alb>:80NN` (10 → `:8010`, 14 → `:8014`, 18 → `:8018`).
@@ -161,9 +165,9 @@ Each chapter's routine is the same:
 ```bash
 cd chapter-10-kubernetes/cloud
 bash deploy.sh build    # build the image, push to ECR
-bash deploy.sh 1 && bash test.sh 1
-bash deploy.sh 2 && bash test.sh 2
-bash deploy.sh 3 && bash test.sh 3
+bash deploy.sh 2a && bash test.sh 2a    # Phase 2A: plain YAML
+bash deploy.sh 2b && bash test.sh 2b    # Phase 2B: Helm
+bash deploy.sh 3  && bash test.sh 3     # Phase 3: production
 bash down.sh            # remove this chapter's app (keeps the cluster)
 ```
 
@@ -200,7 +204,7 @@ bash chapter-10-kubernetes/scripts/status.sh                     # nodes, releas
 
 **How it works.** Every Ingress with the annotation `alb.ingress.kubernetes.io/group.name: zero2ai`
 is merged by the AWS Load Balancer Controller into the **same** ALB. The Helm chart does this by
-default (`ingress.groupName: zero2ai`), and each chapter's `phase3/values.yaml` picks its port with
+default (`ingress.groupName: zero2ai`), and each chapter's `cloud/phase3-production/values.yaml` picks its port with
 `ingress.port: 80NN`. One ALB instead of one per chapter: cheaper, and one address to remember.
 
 **Settings** (in `eks-addons/environments/<env>.tfvars`):

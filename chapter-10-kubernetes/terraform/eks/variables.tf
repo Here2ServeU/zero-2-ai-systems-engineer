@@ -111,7 +111,7 @@ variable "node_max_size" {
 variable "ecr_repositories" {
   type = list(string)
   default = [
-    "fraud-api",     # Chapter 10 and 14 (built from chapter-06-docker)
+    "fraud-api",     # Chapter 10 and 14 (built from chapter-10-kubernetes/fraud-api)
     "metrics-api",   # Chapter 11
     "aiops",         # Chapter 12
     "retrain",       # Chapter 13 (drift check + retraining job)

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Chapter 15 cloud track tests.  Usage: test.sh <1|2|3>
+# Chapter 15 cloud track tests.  Usage: test.sh <2a|2b|3>
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 source "$HERE/../../chapter-10-kubernetes/scripts/lib.sh"
@@ -18,13 +18,13 @@ grafana_has_dashboard() {
   ok "Grafana loaded the dashboard"
 }
 
-svc=monitored-api; [ "${1:-}" = "1" ] && svc=monitored-api-p1
+svc=monitored-api; [ "${1:-}" = "2a" ] && svc=monitored-api-p1
 case "${1:-}" in
-  1|2|3)
+  2a|2b|3)
     use_cluster
     bash "$HERE/load.sh" 45 "$svc"
     NAMESPACE=monitoring with_port_forward kube-prometheus-stack-prometheus 9090 9090 prom_has
-    if [ "$1" != "1" ]; then
+    if [ "$1" != "2a" ]; then
       helm test monitored-api -n "$NAMESPACE" --logs >/dev/null && ok "helm test monitored-api"
       NAMESPACE=monitoring with_port_forward kube-prometheus-stack-grafana 3000 80 grafana_has_dashboard
     fi
@@ -37,6 +37,6 @@ case "${1:-}" in
     echo "Open Grafana yourself:"
     echo "  kubectl -n monitoring port-forward svc/kube-prometheus-stack-grafana 3000:80"
     echo "  http://localhost:3000   user: admin   password: terraform -chdir=$TF_DIR/eks-addons output -raw grafana_admin_password" ;;
-  *) echo "Usage: $0 <1|2|3>"; exit 1 ;;
+  *) echo "Usage: $0 <2a|2b|3>"; exit 1 ;;
 esac
-ok "Phase ${1} checks passed"
+ok "Phase $(echo "$1" | tr a-z A-Z) checks passed"

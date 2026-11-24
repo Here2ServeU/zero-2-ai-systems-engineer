@@ -3,7 +3,7 @@
 > Matches **Chapter 03** in the book. Two real detectors, two different ways of learning.
 > The runnable scripts for this chapter are in this folder.
 
-**Labels:** 💻 Runs free on your laptop
+**Labels:** Runs free on your laptop
 
 ---
 

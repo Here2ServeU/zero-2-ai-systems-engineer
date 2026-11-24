@@ -3,7 +3,7 @@
 > Matches **Chapter 02** in the book. This is your first taste of machine learning.
 > The runnable scripts for this chapter are in this folder.
 
-**Labels:** 💻 Runs free on your laptop
+**Labels:** Runs free on your laptop
 
 ---
 

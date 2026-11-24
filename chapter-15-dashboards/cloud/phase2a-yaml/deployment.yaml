@@ -1,0 +1,27 @@
+# Phase 2A: Chapter 15's monitored API on EKS. On your laptop, docker-compose
+# started the app + Prometheus + Grafana. Here Prometheus and Grafana are
+# already running for the whole cluster (eks-addons); we only add the app.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: monitored-api-p1
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app: monitored-api-p1}
+  template:
+    metadata:
+      labels: {app: monitored-api-p1}
+    spec:
+      containers:
+      - name: app
+        image: __IMAGE__
+        ports:
+        - {name: http, containerPort: 5000}
+        - {name: metrics, containerPort: 8000}
+        resources:
+          requests: {cpu: 50m, memory: 128Mi}
+          limits: {memory: 256Mi}
+        readinessProbe:
+          httpGet: {path: /health, port: 5000}
+          periodSeconds: 5

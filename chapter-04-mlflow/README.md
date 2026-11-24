@@ -3,7 +3,7 @@
 > Matches **Chapter 04** in the book. Same training as before, but now the notebook writes itself.
 > The scripts for this chapter are in this folder.
 
-**Labels:** 💻 Runs free on your laptop
+**Labels:** Runs free on your laptop
 
 ---
 

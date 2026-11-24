@@ -1,0 +1,53 @@
+# Phase 3: production monitoring = metrics + ALERTS + safety nets.
+#
+# Why still one process per copy? prometheus_client's start_http_server(8000)
+# runs inside the app. Several gunicorn workers would each try to open port
+# 8000. (Multi-process metrics need PROMETHEUS_MULTIPROC_DIR; out of scope.)
+
+resources:
+  requests: {cpu: 100m, memory: 128Mi}
+  limits: {memory: 256Mi}
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+pdb:
+  enabled: true
+topologySpread:
+  enabled: true
+networkPolicy:
+  enabled: true            # Prometheus (monitoring namespace) may still reach :8000
+
+ingress:
+  enabled: true
+  port: 8011                # http://<platform-alb>:8011 (shared ALB, see chapter-10-kubernetes/PLATFORM.md)
+  healthcheckPath: /health
+
+# Alert rules Prometheus evaluates every 30 seconds. Firing alerts show up in
+# Prometheus (Alerts tab) and Alertmanager.
+prometheusRule:
+  enabled: true
+  rules:
+    - alert: MetricsApiDown
+      # absent(...) also fires when there are NO copies at all (e.g. scaled to 0),
+      # where sum(up) would return nothing and stay silent.
+      expr: absent(up{service="metrics-api"} == 1)
+      for: 2m
+      labels: {severity: critical}
+      annotations:
+        summary: "Every copy of metrics-api is down"
+        description: "Prometheus has not reached any healthy metrics-api copy for 2 minutes."
+    - alert: MetricsApiCopyMissing
+      expr: count(up{service="metrics-api"} == 1) < 2
+      for: 5m
+      labels: {severity: warning}
+      annotations:
+        summary: "Fewer than 2 healthy copies of metrics-api"
+    - alert: MetricsApiSlowPredictions
+      expr: histogram_quantile(0.95, sum(rate(api_request_duration_seconds_bucket{service="metrics-api"}[5m])) by (le)) > 0.5
+      for: 5m
+      labels: {severity: warning}
+      annotations:
+        summary: "95% of predictions take longer than 0.5 s"
